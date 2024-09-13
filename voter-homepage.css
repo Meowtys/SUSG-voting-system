@@ -1,0 +1,211 @@
+/* Reset some default styles */
+body, h1, h2, p, button {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Navigation Bar */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #da2a2a;
+    color: white;
+    padding: 15px 5%;
+    height: 70px; /* Thicker navbar */
+}
+
+.nav-left h1 {
+    font-size: 1.5em;
+}
+
+.nav-right {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-right button {
+    background-color: white;
+    color: #da2a2a;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.nav-right button:hover {
+    background-color: #e0e0e0;
+}
+
+/* User Account Profile */
+.profile {
+    background-color: #ffffff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-info {
+    text-align: center; /* Align text to the left */
+}
+
+.profile-info h2 {
+    margin-bottom: 10px;
+    color: #da2a2a;
+    font-size: 1.5em;
+}
+
+.profile-id, .profile-college, .profile-status {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.profile-status {
+    color: #da2a2a;
+}
+
+/* Main Content */
+main {
+    display: flex;
+    flex-wrap: wrap; /* Allows panels to wrap on smaller screens */
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.panel {
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background color */
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    width: 300px; /* Set a fixed width for the panels */
+    height: 200px; /* Adjust height for consistent design */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-size: cover; /* Ensure the background image covers the panel */
+    background-position: center; /* Center the background image */
+    background-repeat: no-repeat; /* Prevent background image from repeating */
+}
+
+.panel1 {
+    background-image: url('img/vote-now.png'); /* Replace with the path to your image */
+}
+
+.panel2 {
+    background-image: url('img/tally.png'); /* Replace with the path to your image */
+}
+
+.panel h2 {
+    margin-bottom: 10px;
+    color: white;
+    font-size: 1.2em;
+}
+
+.panel p {
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.panel-button {
+    background-color: white;
+    color: #da2a2a;
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    width: 100%;
+}
+
+.panel-button:hover {
+    background-color: #811818;
+}
+
+/* Footer */
+footer {
+    background-color: #da2a2a;
+    color: white;
+    text-align: center;
+    padding: 10px 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-left h1 {
+        font-size: 1.2em;
+    }
+
+    .nav-right button {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    .profile-info h2 {
+        font-size: 1.3em;
+    }
+
+    .profile-id, .profile-college, .profile-status {
+        font-size: 0.8em;
+    }
+
+    .panel {
+        max-width: 90%; /* Adjust width for smaller screens */
+    }
+
+    .panel h2 {
+        font-size: 1.1em;
+    }
+
+    .panel-button {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-left h1 {
+        font-size: 1em;
+    }
+
+    .nav-right button {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    .profile-info h2 {
+        font-size: 1.2em;
+    }
+
+    .profile-id, .profile-college, .profile-status {
+        font-size: 0.7em;
+    }
+
+    .panel {
+        width: 100%; /* Panels take full width on very small screens */
+        max-width: none;
+        height: 150px; /* Adjust height for smaller screens */
+    }
+
+    .panel-button {
+        font-size: 0.8em;
+    }
+}
