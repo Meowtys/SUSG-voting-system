@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Header</title>
+
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background-color: #c41f1f; 
+            padding: 10px 20px;
+            padding-left: 250px; 
+
+        }
+
+        body.overlay-active {
+            overflow: hidden;
+        }
+
+        body.overlay-active::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .icons {
+            margin-right: 55px;
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .icons img {
+            width: 24px;
+            height: 24px;
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        .menu-icon {
+            display: block;
+        }
+
+        .menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: #811111;
+            width: 250px;
+            height: 100%;
+            z-index: 1001;
+            padding-top: 60px;
+            transition: transform 0.3s ease;
+            transform: translateX(100%);
+        }
+
+        .menu.active {
+            transform: translateX(0);
+        }
+
+        .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .menu ul li {
+            padding: 15px;
+            color: white;
+            font-size: 18px;
+            text-align: left;
+        }
+
+        .menu ul li a {
+            text-decoration: none;
+            color: white;
+            display: block;
+            padding: 10px 0;
+        }
+
+        .menu ul li:hover {
+            background-color: #c41f1f;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 18px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            
+        }
+
+        .title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding-left: 20px; 
+                justify-content: flex-start; 
+            }
+
+            .logo {
+                width: 80px;
+                height: auto;
+            }
+
+            .title {
+                font-size: 18px;
+            }
+        }
+
+        main {
+            padding-top: 150px;
+            height: auto;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header id="header">
+        <header class="header">
+            <img src="asset/susg.png" alt="Logo" class="logo">
+            <span class="title">SUSG Election System</span>
+            <div class="icons">
+                <img src="asset/notification.png" alt="Notifications" id="notification-bell">
+                <img src="asset/menu.png" alt="Menu" class="menu-icon" id="menu-toggle">
+            </div>
+        </header>
+    </header>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Dropdown Menu -->
+    <nav class="menu" id="side-menu">
+        <ul>
+            <li>STUDENT D. NAME</li>
+            <li>21-0-00000</li>
+            <li>College of Computer Studies</li>
+            <li><button class="voting-status">Voting Status</button></li>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Vote</a></li>
+            <li><a href="#">Live Tally</a></li>
+            <li><a href="#">Vote Casting</a></li>
+            <li><a href="#">Countdown</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Leave a Feedback</a></li>
+        </ul>
+    </nav>
+
+</body>
+
+</html>
