@@ -217,7 +217,21 @@
 
     <footer id="footer">
     </footer>
-    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Redirect when "Vote Now" button is clicked
+            const voteNowButton = document.querySelector('.vote-btn');
+            voteNowButton.addEventListener('click', function () {
+                window.location.href = 'votecasting.html'; // Redirect to votecasting.html
+            });
+
+            // Redirect when "Live Tally" button is clicked
+            const liveTallyButton = document.querySelector('.tally-btn');
+            liveTallyButton.addEventListener('click', function () {
+                window.location.href = 'liveresults.html'; // Redirect to liveresults.html
+            });
+        });
+    </script>
 </body>
 
 </html>

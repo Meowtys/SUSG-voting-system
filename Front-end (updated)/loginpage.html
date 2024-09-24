@@ -136,7 +136,20 @@
 
     <footer id="footer">
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get the login button element
+            const loginButton = document.querySelector('.login-btn');
 
+            // Add event listener to the login button
+            loginButton.addEventListener('click', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                // Redirect to the homepage.html
+                window.location.href = 'homepage.html';
+            });
+        });
+    </script>
 </body>
 
 </html>
