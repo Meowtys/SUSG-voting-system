@@ -121,6 +121,7 @@
             <div class="login-box">
                 <img src="asset/surem.png" alt="University Logo" class="logo">
                 <h2>Login</h2>
+                <form action ="" method = "POST">
                     <div class="input-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" required>
@@ -130,26 +131,34 @@
                         <input type="password" id="password" name="password" required>
                     </div>
                     <button type="submit" class="login-btn">Login</button>
+                </form>
+
+    </script>
+            <?php
+            if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+                $username = $_POST['username'];
+                $password = $_POST['password'];
+
+                echo "<script>console.log('Username: " . $username . "');</script>";
+                echo "<script>console.log('Password: " . $password . "');</script>";
+
+                $correctUsername = "RamAmper";
+                $correctPassword = "123";
+
+
+                if ($username === $correctUsername && $password === $correctPassword){
+                    echo "<script>window.location.href = 'homepage.html';</script>";
+                } else {
+                    echo "<p style ='color: red;'> Invalid username and/or password!</p>";
+                }
+            }
+            ?>
             </div>
         </div>
     </main>
 
     <footer id="footer">
     </footer>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Get the login button element
-            const loginButton = document.querySelector('.login-btn');
-
-            // Add event listener to the login button
-            loginButton.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent the default form submission
-
-                // Redirect to the homepage.html
-                window.location.href = 'homepage.html';
-            });
-        });
-    </script>
 </body>
 
 </html>

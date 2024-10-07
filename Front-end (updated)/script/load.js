@@ -31,24 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the form from submitting
-        
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim();
-        
-        // Sample validation: Checking if the username and password match predefined values
-        if (username === 'admin' && password === 'password123') {
-            alert('Login successful!');
-            // Proceed with the login logic, such as redirecting to another page
-        } else {
-            alert('Invalid username or password');
-            // Add a red border to the input fields to indicate an error
-            usernameInput.style.border = '2px solid red';
-            passwordInput.style.border = '2px solid red';
-        }
-    });
-
     // Remove the red border when the user starts typing again
     usernameInput.addEventListener('input', function() {
         usernameInput.style.border = '';
