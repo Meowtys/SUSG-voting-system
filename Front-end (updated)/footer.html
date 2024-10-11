@@ -4,147 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Footer</title>
-
-    <style>
-
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        footer {
-            padding: 40px 0;
-            position: relative; 
-        }
-
-        .footer-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            padding: 0 50px;
-        }
-
-        .footer-section {
-            flex: 1;
-            margin: 10px;
-            text-align: left;
-        }
-
-        .footer-section h3 {
-            color: black;
-            font-size: 18px;
-            margin-bottom: 20px;
-            display: inline-block;
-            padding-bottom: 5px;
-            position: relative;
-        }
-
-        .footer-section h3::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -5px;
-            background-color: #c41f1f;
-            height: 2px;
-            box-sizing: border-box;
-            width: 50px;
-            transition: width 0.3s ease;
-        }
-
-        .footer-section h3:hover::before {
-            width: 100%;
-        }
-
-        .footer-section ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 10px;
-        }
-
-        .footer-section ul li a {
-            color: black;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .footer-section ul li a:hover {
-            color: #c41f1f;
-        }
-
-
-        .footer-section .logo {
-            margin-left: 100px;
-            width: 140px;
-            height: 140px;
-            margin-top: 25px;
-        }
-
-        .footer-section p {
-            font-size: 14px;
-            color: black;
-        }
-
-        .social-icons a img {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
-        }
-
-        .social-icons a img:hover {
-            filter: brightness(0.8);
-        }
-
-        .copyright {
-            text-align: center;
-            width: 100%;
-            padding-top: 20px;
-            font-size: 16px;
-            color: black;
-        }
-
-        @media (max-width: 768px) {
-            .footer-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .footer-section {
-                width: 100%;
-                margin-bottom: 20px;
-                text-align: center;
-            }
-
-            .footer-section .logo {
-                margin: 0 auto;
-                width: 100px;
-                height: auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .footer-section h3 {
-                font-size: 16px;
-            }
-
-            .footer-section ul li a {
-                font-size: 12px;
-            }
-
-            .social-icons a img {
-                width: 25px;
-                height: 25px;
-            }
-        }
-
-    </style>
-
+    
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="cssscript/footerstyle.css">
 </head>
 
 <body>
@@ -160,7 +22,6 @@
                 <ul>
                     <li><a href="#">Election Guidelines</a></li>
                     <li><a href="#">Voter Registration</a></li>
-                    <li><a href="#">Election Security</a></li>
                     <li><a href="#">Data Privacy Policy</a></li>
                 </ul>
             </div>
@@ -169,8 +30,6 @@
                 <ul>
                     <li><a href="#">FAQs</a></li>
                     <li><a href="#">How to Vote</a></li>
-                    <li><a href="#">Technical Support</a></li>
-                    <li><a href="#">Election Contact Center</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -178,7 +37,6 @@
                 <ul>
                     <li><a href="#">Election Monitoring</a></li>
                     <li><a href="#">Real-Time Results</a></li>
-                    <li><a href="#">Poll Worker Portal</a></li>
                     <li><a href="#">Election Analytics</a></li>
                 </ul>
             </div>
