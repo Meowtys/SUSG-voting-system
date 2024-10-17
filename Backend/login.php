@@ -4,8 +4,8 @@
 		$username = $_POST['username'];
 		$password = $_POST['password'];
         session_start();
-        $conn = mysqli_connect('localhost', 'root', '', 'voting_system') or die('Unable to connect');
-		$query = $conn->query("SELECT * FROM `user` WHERE `username` = '$username' && `password` = '$password'") or die(mysqli_error());
+        $conn = mysqli_connect('localhost', 'root', '', 'susg_voting') or die('Unable to connect');
+		$query = $conn->query("SELECT * FROM `student` WHERE `username` = '$username' && `password` = '$password'") or die(mysqli_error());
 		$fetch = $query->fetch_array();
 		$row = $query->num_rows;
 		

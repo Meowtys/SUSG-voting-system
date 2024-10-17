@@ -1,3 +1,3 @@
 <?php 
-$conn = mysqli_connect('localhost','root','','voting_system'); 
+$conn = mysqli_connect('localhost','root','','susg_voting'); 
 ?>
