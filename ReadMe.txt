@@ -3,3 +3,4 @@ election management software tailored for Silliman University Student Government
 elections. This system aims to provide a streamlined, transparent, and secure voting process by
 leveraging advanced technology to meet the unique needs of student government elections.
 
+.
