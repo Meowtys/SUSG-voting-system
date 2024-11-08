@@ -75,6 +75,28 @@ echo "Enter candidate ID for Representative: ";
 $representativeId = trim(fgets(STDIN));
 $votes['Representative'] = $representativeId;
 
+// Print vote summary
+echo "\n--- VOTE SUMMARY ---\n";
+echo "Student ID: $studentId\n";
+foreach ($votes as $position => $candidateId) {
+    // Look up the candidate names based on their ID for each position
+    switch ($position) {
+        case 'President':
+            $candidateName = $presidentCandidates[$candidateId] ?? 'Unknown';
+            break;
+        case 'Vice President':
+            $candidateName = $vicePresidentCandidates[$candidateId] ?? 'Unknown';
+            break;
+        case 'Representative':
+            $candidateName = $representativeCandidates[$candidateId] ?? 'Unknown';
+            break;
+        default:
+            $candidateName = 'Unknown';
+            break;
+    }
+    echo "$position: $candidateName (ID: $candidateId)\n";
+}
+
 // Cast the vote
 castVote($studentId, $votes);
 ?>
