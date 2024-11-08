@@ -1,0 +1,75 @@
+<?php
+	session_start();
+
+    if(!isset($_SESSION['username'])){
+        header('location:loginpage.php');
+        
+    }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Dashboard</title>
+
+    <link rel="icon" href="asset/susg.png" type="image/png">
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="cssscript/homepagestyle.css">
+    <script src="script/load.js" type="module" defer></script>
+</head>
+
+<body>
+
+    <header id="header">
+    </header>
+
+    <main class="main">
+        <div class="student-info">
+            <span class="voting-status">Voting Status</span>
+            <h1 class="student-name">STUDENT D. NAME</h1>
+            <p class="student-id">21-0-00000</p>
+            <p class="student-course">College of Computer Studies</p>
+        </div>
+
+        <div class="action-cards">
+            <div class="card">
+                <div class="card-content">
+                    <h3>Current Results</h3>
+                    <p>10% Voted</p>
+                </div>
+                <button class="btn vote-btn">Vote Now</button>
+            </div>
+            <div class="card">
+                <div class="card-content">
+                    <h3>Live Tally</h3>
+                    <p>John Doe: 45%<br>Jane Doe: 55%</p>
+                </div>
+                <button class="btn tally-btn">Live Tally</button>
+            </div>
+        </div>
+        <a href='../Backend/logout.php'>Logout</a>
+    </main>
+
+    <footer id="footer">
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Redirect when "Vote Now" button is clicked
+            const voteNowButton = document.querySelector('.vote-btn');
+            voteNowButton.addEventListener('click', function () {
+                window.location.href = 'votecasting.html'; // Redirect to votecasting.html
+            });
+
+            // Redirect when "Live Tally" button is clicked
+            const liveTallyButton = document.querySelector('.tally-btn');
+            liveTallyButton.addEventListener('click', function () {
+                window.location.href = 'liveresults.html'; // Redirect to liveresults.html
+            });
+        });
+    </script>
+</body>
+
+</html>

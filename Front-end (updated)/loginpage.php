@@ -30,29 +30,11 @@
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
                     </div>
-                    <button type="submit" class="login-btn">Login</button>
+                    <button type="submit" class="login-btn" name="user_login">Login</button>
                 </form>
 
     </script>
-            <?php
-            if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-                $username = $_POST['username'];
-                $password = $_POST['password'];
-
-                echo "<script>console.log('Username: " . $username . "');</script>";
-                echo "<script>console.log('Password: " . $password . "');</script>";
-
-                $correctUsername = "RamAmper";
-                $correctPassword = "123";
-
-
-                if ($username === $correctUsername && $password === $correctPassword){
-                    echo "<script>window.location.href = 'homepage.html';</script>";
-                } else {
-                    echo "<p style ='color: red;'> Invalid username and/or password!</p>";
-                }
-            }
-            ?>
+            <?php require_once '../Backend/login.php'?>
             </div>
         </div>
     </main>
