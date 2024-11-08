@@ -6,7 +6,7 @@ function castVote($studentId, $votes) {
     // Simulate database transaction
     echo "Transaction started...\n";
 
-    // Loop through each position and candidate in the votes array
+    // Loop through each position and candidate ID in the votes array
     foreach ($votes as $position => $candidateId) {
         // Simulate inserting each vote into the Votes table
         echo "Recording vote for $position: Candidate ID $candidateId\n";
@@ -25,21 +25,55 @@ function castVote($studentId, $votes) {
 echo "Enter Student ID: ";
 $studentId = trim(fgets(STDIN));
 
+// List of candidates for each position
+$presidentCandidates = [
+    'A123' => 'John Doe',
+    'A124' => 'Jane Smith',
+    'A125' => 'Mary Johnson'
+];
+
+$vicePresidentCandidates = [
+    'B123' => 'Chris Lee',
+    'B124' => 'Patricia Brown',
+    'B125' => 'Michael Davis'
+];
+
+$representativeCandidates = [
+    'C123' => 'Laura White',
+    'C124' => 'David Clark',
+    'C125' => 'Sarah Miller'
+];
+
+// Display the candidates and their IDs
+echo "\n--- PRESIDENTIAL CANDIDATES ---\n";
+foreach ($presidentCandidates as $id => $name) {
+    echo "$id: $name\n";
+}
+
+echo "\n--- VICE PRESIDENTIAL CANDIDATES ---\n";
+foreach ($vicePresidentCandidates as $id => $name) {
+    echo "$id: $name\n";
+}
+
+echo "\n--- REPRESENTATIVE CANDIDATES ---\n";
+foreach ($representativeCandidates as $id => $name) {
+    echo "$id: $name\n";
+}
+
 $votes = [];
 
-// Prompt for each position vote
-while (true) {
-    echo "Enter position (or type 'done' to finish): ";
-    $position = trim(fgets(STDIN));
-    if (strtolower($position) == 'done') {
-        break;
-    }
+// Ask for the candidate ID for each position
+echo "\nEnter candidate ID for President: ";
+$presidentId = trim(fgets(STDIN));
+$votes['President'] = $presidentId;
 
-    echo "Enter candidate ID for $position: ";
-    $candidateId = trim(fgets(STDIN));
+echo "Enter candidate ID for Vice President: ";
+$vicePresidentId = trim(fgets(STDIN));
+$votes['Vice President'] = $vicePresidentId;
 
-    $votes[$position] = $candidateId;
-}
+echo "Enter candidate ID for Representative: ";
+$representativeId = trim(fgets(STDIN));
+$votes['Representative'] = $representativeId;
 
 // Cast the vote
 castVote($studentId, $votes);
