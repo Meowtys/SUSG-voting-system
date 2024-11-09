@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin View Comments - SUSG Election System</title>
+    <link rel="icon" href="../asset/susglogo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body, html {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            height: 100%;
+            width: 100%;
+        }
+    
+        body {
+            display: flex;
+            min-height: 100vh;
+        }
+    
+        .sidebar {
+            width: 250px;
+            background-color: #b82323;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+    
+        .sidebar h2 {
+            margin-bottom: 40px;
+            font-size: 20px;
+        }
+    
+        .sidebar a {
+            text-decoration: none;
+            color: white;
+            font-size: 16px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+    
+        .sidebar a:hover {
+            background-color: #d9534f;
+        }
+    
+        .sidebar .active {
+            background-color: white;
+            color: #b82323;
+        }
+    
+        .sidebar .section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar .sections .section:not(:first-child) {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+    
+        .sidebar .sections .section h3 {
+            margin-bottom: 15px;
+        }
+    
+        .icon {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+    
+        .sidebar a .fas {
+            width: 20px;
+        }
+    
+        .content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+    
+        h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: left;
+            color: #333;
+        }
+
+        /* Management CSS */
+        .mngment-box {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px 20px;
+            width: 95%;
+            max-width: 3000px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .mngment-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            border: 1px solid #e0e0e0;
+            width: 90%;
+            margin: 20px auto 30px auto;
+        }
+
+        .mngment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+            width: 90%;
+            font-size: 16px;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .comment {
+            font-size: 15px;
+            padding: 10px; 
+        }
+        .mngment-table tr {
+            border-bottom: 1px solid #cfcfcf;
+        }
+        .mngment-table th {
+            font-size: 18px;
+            padding: 15px 5px;
+        }
+        .mngment-table td {
+            padding: 10px; 
+            color:#4f4f4f;
+        }
+        
+
+        /* Buttons */
+        .remove-btn {
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            border-radius: 4px;
+            background-color: #f44336; 
+            color: white;
+        }
+
+        .remove-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        
+            document.querySelector('.sidebar').insertBefore(toggleButton, document.querySelector('.sidebar').firstChild);
+            toggleButton.addEventListener('click', function () {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Remove button functionality
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const row = this.parentNode.parentNode;
+                    row.parentNode.removeChild(row);
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const sidebarLinks = document.querySelectorAll('.sidebar a');
+
+        // Remove 'active' class from all links
+        sidebarLinks.forEach(link => link.classList.remove('active'));
+
+        // Set 'active' class based on current URL
+        sidebarLinks.forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    });
+    </script>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sections">
+            <div class="section">
+                <h2>SUSG COMELEC</h2>
+                <a href="admin-liveresults.html"><i class="fas fa-chart-bar icon"></i>Live Results</a>
+            </div>
+            <div class="section">
+                <h3>Management</h3>
+                <a href="admin-voters.html"><i class="fas fa-user-friends icon"></i>Voters</a>
+                <a href="admin-candidates.html"><i class="fas fa-user-tie icon"></i>Candidates</a>
+            </div>
+            <div class="section">
+                <h3>Feedback</h3>
+                <a href="admin-feedback.html"><i class="fas fa-comments icon"></i>View Feedback</a>  
+            </div>
+            <div class="section">
+                <a href="admin-analytics.html"><i class="fas fa-chart-pie icon"></i>Analytics</a>
+            </div>
+            <div class="section">
+                <a href="../start.html"><i class="fas fa-sign-out-alt icon"></i>Logout</a> <!-- Logout Section -->
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Feedback</h1>
+        <div class="mngment-box">
+            <table class="mngment-table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Comment</th>
+                        <th>Submitted on</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Larry King</td><td class="comment">I kept encountering errors while submitting my vote. Please fix this issue pretty please</td><td>11/1/2024 at 1:00pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Lorainne Magdana</td><td class="comment">had a hard time navigating through the website. took too long to figure out how to vote kek</td><td>11/1/2024 at 4:10pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>sgeo108@j</td><td class="comment">победи, выиграй, выиграй по-крупному, нажмите ссылку 1 миллион мгновенно bit.ly/3YTYkwF</td><td>11/3/2024 at 12:00am</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Marie Caster</td><td class="comment">Very smooth process! I had no issues. Kudos to the team!</td><td>11/3/2024 at 3:30pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Josephine Pata</td><td class="comment">Site looks amazing but some links are a bit slow.</td><td>11/3/2024 at 4:20pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Chew Win</td><td class="comment">Can we add an option to review our vote before final submission?</td><td>11/4/2024 at 9:00am</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Red Fox</td><td class="comment">Some options in the dropdown menu are glitching, please check.</td><td>11/4/2024 at 12:40pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Sarah Martin</td><td class="comment">Loved the interface, easy to understand and navigate!</td><td>11/4/2024 at 2:10pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Kenneth Dow</td><td class="comment">Everything worked perfectly, great work!</td><td>11/4/2024 at 5:30pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Elena Miles</td><td class="comment">Accidentally submitted my vote too early. Maybe add a confirmation?</td><td>11/5/2024 at 8:00am</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Nick Jonas</td><td class="comment">Fantastic job on the new voting system!</td><td>11/5/2024 at 10:15am</td><td><button class="remove-btn">Remove</button></td></tr>
+                    <tr><td>Miguel Rivera</td><td class="comment">Is it possible to add a dark mode for the site?</td><td>11/5/2024 at 1:45pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
