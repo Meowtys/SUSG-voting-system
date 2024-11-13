@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUSG Election System - Data Privacy Policy</title>
+    <title>SUSG Election System - Election Analytics</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
 
     <style>
+        /* Reset and body styles */
         body, html {
             margin: 0;
             padding: 0;
@@ -16,6 +17,7 @@
             background-color: #f5f5f5;
         }
 
+        /* Scoped header styles */
         .login-page-header {
             display: flex;
             align-items: center;
@@ -36,6 +38,7 @@
             margin-left: 15px;
         }
 
+        /* Responsive styles for the header */
         @media (max-width: 768px) {
             .login-page-header {
                 padding-left: 20px;
@@ -57,63 +60,73 @@
             height: auto;
         }
 
+        /* Election Analytics Section styles */
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
         }
 
-        .page-header {
+        .analytics-header {
             text-align: center;
             margin-bottom: 40px;
         }
 
-        .page-header h2 {
+        .analytics-header h2 {
             color: #c41f1f;
             font-size: 36px;
         }
 
-        .policy-section {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
-        .policy-section h3 {
+        .analytics-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .analytics-card h3 {
             color: #333;
             font-size: 24px;
             margin-bottom: 15px;
-            position: relative;
-            padding-bottom: 5px;
         }
 
-        .policy-section h3::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background-color: #c41f1f;
-        }
-
-        .policy-section p {
+        .analytics-card p {
             color: #555;
             font-size: 16px;
-            line-height: 1.8;
-            margin-bottom: 20px;
+            line-height: 1.6;
         }
 
-        .policy-section ul {
-            list-style-type: disc;
-            padding-left: 20px;
+        .analytics-card .analytics-number {
+            font-size: 36px;
+            color: #c41f1f;
+            font-weight: bold;
+            margin-top: 20px;
         }
 
-        .policy-section ul li {
-            margin-bottom: 10px;
+        .analytics-card a {
+            color: inherit;
+            text-decoration: none;
+            display: block;
+            height: 100%;
         }
 
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         .footer {
             padding: 40px 0;
             position: relative; 
@@ -250,37 +263,60 @@
         <span class="login-page-header-title">SUSG Election System</span>
     </div>
 
-    <!-- Main Content -->
+    <!-- Main Content: Election Analytics Section -->
     <div class="container">
-        <div class="page-header">
-            <h2>Data Privacy Policy</h2>
+        <div class="analytics-header">
+            <h2>Election Analytics</h2>
         </div>
 
-        <div class="policy-section">
-            <h3>1. Introduction</h3>
-            <p>We value your privacy and are committed to protecting your personal information. This policy outlines how we collect, use, and protect your data in connection with the SUSG Election System.</p>
+        <div class="analytics-grid">
+            <!-- Card 1: Voter Count -->
+            <div class="analytics-card">
+                <h3>Total Voter Count</h3>
+                <p>Check out the total number of voters who participated in this election.</p>
+                <div class="analytics-number">2,476</div>
+            </div>
 
-            <h3>2. Information We Collect</h3>
-            <p>We collect information that you provide directly, such as your name, student ID, and contact details, as well as data generated during the voting process.</p>
+            <!-- Card 2: Candidates Participating -->
+            <div class="analytics-card">
+                <h3>Number of Candidates</h3>
+                <p>Explore the total number of candidates running for different positions.</p>
+                <div class="analytics-number">24</div>
+            </div>
 
-            <h3>3. How We Use Your Information</h3>
-            <ul>
-                <li>To ensure the integrity and security of the election process.</li>
-                <li>To verify voter eligibility and prevent fraudulent activities.</li>
-                <li>To communicate important election updates and results.</li>
-            </ul>
+            <!-- Card 3: Votes Counted -->
+            <div class="analytics-card">
+                <h3>Votes Counted</h3>
+                <p>Total votes counted so far in real-time during the election.</p>
+                <div class="analytics-number">10,000</div>
+            </div>
 
-            <h3>4. Data Security</h3>
-            <p>We implement robust security measures to protect your data from unauthorized access, alteration, or disclosure. This includes encryption, access controls, and regular security audits.</p>
+            <!-- Card 4: Leading Candidates -->
+            <div class="analytics-card">
+                <a href="liveresult.html">
+                    <h3>Leading Candidates</h3>
+                    <p>The current candidates leading in the vote count.</p>
+                    <div class="analytics-number">John Doe</div>
+                </a>
+            </div>
 
-            <h3>5. Data Retention</h3>
-            <p>Your personal information will be retained only for as long as necessary to fulfill the purposes outlined in this policy. Once the election is concluded, data will be anonymized or securely deleted.</p>
+            <!-- Card 5: Vote -->
+            <div class="analytics-card">
+                <a href="votecasting.html">
+                    <h3>Voter's Page</h3>
+                    <p>Explore the voter's page showing the candidates for each position.</p>
+                    <div class="analytics-number">VOTE</div>
+                </a>
+            </div>
 
-            <h3>6. Your Rights</h3>
-            <p>You have the right to access, correct, or delete your personal information. If you have any concerns regarding your data, please <a href="contact.html" style="color: #c41f1f; text-decoration: underline;">contact us</a>.</p>
-
-            <h3>7. Changes to This Policy</h3>
-            <p>We may update this privacy policy from time to time. Any changes will be posted on this page with a revised effective date.</p>
+            <!-- Card 6: Countdown -->
+            <div class="analytics-card">
+                <a href="countdown.html">
+                    <h3>Vote Countdown</h3>
+                    <p>Check the remaining time to vote in real time.</p>
+                    <div class="analytics-number">COUNTDOWN</div>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -293,24 +329,24 @@
             <div class="footer-section">
                 <h3>About Election</h3>
                 <ul>
-                    <li><a href="guidelines.html">Election Guidelines</a></li>
+                    <li><a href="footer-guidelines.html">Election Guidelines</a></li>
                     <li><a href="#">Voter Registration</a></li>
-                    <li><a href="dataprivacypolicy.html">Data Privacy Policy</a></li>
+                    <li><a href="footer-dataprivacypolicy.html">Data Privacy Policy</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Help & Support</h3>
                 <ul>
-                    <li><a href="faq.html">FAQs</a></li>
-                    <li><a href="howtovote.html">How to Vote</a></li>
+                    <li><a href="footer-faq.html">FAQs</a></li>
+                    <li><a href="footer-howtovote.html">How to Vote</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Election Services</h3>
                 <ul>
-                    <li><a href="#">Election Monitoring</a></li>
-                    <li><a href="#">Real-Time Results</a></li>
-                    <li><a href="#">Election Analytics</a></li>
+                    <li><a href="footer-electionmonitoring.html">Election Monitoring</a></li>
+                    <li><a href="footer-realtimeresult.html">Real-Time Results</a></li>
+                    <li><a href="footer-electionanalytics.html">Election Analytics</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -326,7 +362,5 @@
     <div class="footer-copyright">
         © 2024 Election Commission, All Rights Reserved.
     </div>
-
 </body>
-
 </html>
