@@ -1,0 +1,35 @@
+-- Colleges
+INSERT INTO Colleges (college_name) VALUES
+('College of Engineering'),
+('College of Computer Studies'),
+('College of Arts and Sciences');
+
+-- Positions
+INSERT INTO Positions (position_name) VALUES
+('President'),
+('Vice President'),
+('Secretary');
+
+-- Students
+INSERT INTO Students (username, stud_name, college_id, is_admin, password, has_voted) VALUES
+('jdoe', 'John Doe', 1, TRUE, 'password123', FALSE),
+('jsmith', 'Jane Smith', 2, FALSE, 'securepass456', TRUE),
+('abrown', 'Alice Brown', 3, FALSE, 'mypassword789', FALSE);
+
+-- Candidates
+INSERT INTO Candidates (student_id, college_id, position_id, qualified, remarks) VALUES
+(1, 1, 1, TRUE, 'Top candidate'),
+(2, 2, 2, FALSE, 'Pending approval'),
+(3, 3, 3, TRUE, 'Qualified with honors');
+
+-- Votes
+INSERT INTO Votes (student_id, candidate_id, position_id, vote_timestamp) VALUES
+(1, 1, 1, '2024-11-16 10:00:00'),
+(2, 3, 3, '2024-11-16 11:30:00'),
+(3, 2, 2, '2024-11-16 12:45:00');
+
+INSERT INTO Feedback (student_id, comment, feedback_date) VALUES
+(1, 'I kept encountering errors while submitting my vote. Please fix this issue pretty please', '2024-11-01 13:00:00'),
+(2, 'Had a hard time navigating through the website. Took too long to figure out how to vote kek', '2024-11-01 16:10:00'),
+(3, 'Very smooth process! I had no issues. Kudos to the team!', '2024-11-03 15:30:00');
+
