@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Countdown</title>
+    <link rel="icon" href="asset/susglogo.png" type="image/png">
+
+    <style>
+    /* Global styling */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body, html {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Header and footer full-width styling */
+    #header, #footer {
+        width: 100%;
+    }
+
+    /* Make sure header and footer have a full-width background */
+    header, footer {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Countdown styling */
+    main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-top: 100px;
+        padding-bottom: 60px;
+        background-color: #ffffff;
+        width: 100%;
+    }
+
+    .countdown-container {
+        text-align: center;
+        color: #333;
+    }
+
+    .countdown-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-top: 0;
+    }
+
+    .countdown-message {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .timer {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .timer-box {
+        background-color: #dc3545;
+        padding: 20px;
+        border-radius: 8px;
+        color: white;
+        font-size: 36px;
+        font-weight: bold;
+        width: 80px;
+        text-align: center;
+    }
+
+    .timer-labels {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .vote-btn {
+        background-color: #dc3545;
+    }
+
+    .review-btn {
+        background-color: #333;
+    }
+
+    /* Button disabled state */
+    .btn.disabled {
+        background-color: gray;
+        cursor: not-allowed;
+    }
+
+    /* Responsive styling */
+    @media (max-width: 768px) {
+        .countdown-message {
+            font-size: 28px;
+        }
+
+        .countdown-title {
+            font-size: 20px;
+        }
+
+        .timer {
+            gap: 10px;
+        }
+
+        .timer-box {
+            width: 60px;
+            font-size: 28px;
+            padding: 15px;
+        }
+
+        .timer-labels {
+            font-size: 12px;
+            gap: 10px;
+        }
+
+        .actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .countdown-message {
+            font-size: 24px;
+        }
+
+        .countdown-title {
+            font-size: 18px;
+        }
+
+        .timer-box {
+            width: 50px;
+            font-size: 24px;
+            padding: 10px;
+        }
+
+        .timer-labels {
+            font-size: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 8px;
+            font-size: 12px;
+        }
+    }
+    </style>
+    <script src="script/load.js" type="module" defer></script>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <?php include 'header.php'; ?>
+
+    <!-- Main Section -->
+    <main class="countdown-container">
+        <h2 class="countdown-title">ELECTION COUNTDOWN</h2>
+        <div id="countdown-message" class="countdown-message">CAST YOUR VOTES NOW</div>
+
+        <div class="timer">
+            <div class="timer-box" id="days">00</div>
+            <div class="timer-box" id="hours">00</div>
+            <div class="timer-box" id="minutes">00</div>
+            <div class="timer-box" id="seconds">00</div>
+        </div>
+
+        <div class="timer-labels">
+            <span class="timer-label">DAYS</span>
+            <span class="timer-label">HOURS</span>
+            <span class="timer-label">MINUTES</span>
+            <span class="timer-label">SECONDS</span>
+        </div>
+
+        <div class="actions">
+            <button id="vote-btn" class="btn vote-btn">VOTE NOW</button>
+            <button id="review-btn" class="btn review-btn">YOUR VOTES</button>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <?php include 'footer.php'; ?>
+
+    <script>
+        // Countdown settings
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 5); // Set to 5 days from now
+
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const messageEl = document.getElementById('countdown-message');
+        const voteBtn = document.getElementById('vote-btn');
+        const reviewBtn = document.getElementById('review-btn');
+
+        // Redirect to votecasting.html on clicking the "Vote Now" button
+        voteBtn.addEventListener('click', () => {
+            window.location.href = 'votecasting.php';
+        });
+
+        // Redirect to votecastingconfirm.html on clicking the "Your Votes" button
+        reviewBtn.addEventListener('click', () => {
+            window.location.href = 'votecastingconfirm.php';
+        });
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance > 0) {
+                // Calculate remaining time
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % 1000) / 1000);
+
+                // Update HTML elements
+                daysEl.textContent = days < 10 ? `0${days}` : days;
+                hoursEl.textContent = hours < 10 ? `0${hours}` : hours;
+                minutesEl.textContent = minutes < 10 ? `0${minutes}` : minutes;
+                secondsEl.textContent = seconds < 10 ? `0${seconds}` : seconds;
+
+                // Enable voting buttons
+                voteBtn.classList.remove("disabled");
+                reviewBtn.classList.remove("disabled");
+                voteBtn.disabled = false;
+                reviewBtn.disabled = false;
+            } else {
+                // Time's up
+                clearInterval(countdownInterval);
+                messageEl.textContent = "VOTES ARE CLOSED";
+
+                // Set countdown to zero
+                daysEl.textContent = "00";
+                hoursEl.textContent = "00";
+                minutesEl.textContent = "00";
+                secondsEl.textContent = "00";
+
+                // Disable voting buttons
+                voteBtn.classList.add("disabled");
+                reviewBtn.classList.add("disabled");
+                voteBtn.disabled = true;
+                reviewBtn.disabled = true;
+            }
+        }
+
+        // Update every second
+        const countdownInterval = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
