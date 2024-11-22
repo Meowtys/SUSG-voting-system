@@ -89,5 +89,6 @@
 
     <!-- Footer Section -->
     <?php include 'footer.php'; ?>
+    
 </body>
 </html>

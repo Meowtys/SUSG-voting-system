@@ -1,6 +1,7 @@
 CREATE TABLE Colleges (
     college_id INT(4) AUTO_INCREMENT PRIMARY KEY,
     college_name VARCHAR(255) NOT NULL
+    max_representatives NOT NULL, DEFAULT 1
 );
 
 CREATE TABLE Positions (
