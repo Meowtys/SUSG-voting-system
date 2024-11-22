@@ -202,7 +202,7 @@
             <li><a href="countdown.php">Countdown</a></li>
             <li><a href="faq.php">FAQ</a></li>
             <li><a href="feedback.php">Leave a Feedback</a></li>
-            <li><a href="start.php">Logout</a></li> <!-- Call logout function here -->
+            <li><a href="logout.php">Logout</a></li>
         </ul>
     </nav>
 
