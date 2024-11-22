@@ -137,12 +137,12 @@
     <script src="script/mainload.js" type="module" defer></script>
 </head>
 <body>
-
+    
+    <!-- Header Section -->
+    <?php include 'header.php'; ?>
+  
     <!-- Page Content Container -->
     <div class="page-container">
-        
-        <!-- Header Section -->
-        <?php include 'header.php'; ?>
 
         <!-- Main Content Section -->
         <main class="main">
