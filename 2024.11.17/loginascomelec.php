@@ -139,11 +139,11 @@
 </head>
 <body>
 
+    <!-- Header Section -->
+    <?php include 'header.php'; ?>
+
     <!-- Page Content Container -->
-    <div class="page-container">
-        
-        <!-- Header Section -->
-        <?php include 'header.php'; ?>
+    <div class="page-container"> 
 
         <!-- Main Content Section -->
         <main class="main">
