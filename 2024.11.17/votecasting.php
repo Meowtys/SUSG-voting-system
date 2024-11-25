@@ -335,7 +335,11 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         function fetchCandidates(position_id) {
             return fetch(`fetch_candidates.php?position_id=${position_id}`)
-                .then(response => response.json());
+                .then(response => response.json())
+                .then(candidates => {
+                    console.log(candidates); // Log fetched candidates
+                    return candidates;
+                });
         }
 
         function displayPosition() {
@@ -360,6 +364,11 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
                     candidatesContainer.appendChild(candidateCard);
+
+                    // Highlight previously selected candidate
+                    if (selectedVotes[position.position_name] && selectedVotes[position.position_name].candidate_id === candidate.candidate_id) {
+                        candidateCard.classList.add("selected");
+                    }
                 });
 
                 // Update the selection state of the candidate cards
@@ -417,6 +426,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 currentPositionIndex++;
                 displayPosition();
             } else {
+                console.log("Reached the last position, showing summary"); // Debugging log
                 showSummary();
             }
         }
@@ -429,6 +439,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         function showSummary() {
+            console.log("Showing summary"); // Debugging log
             document.querySelector(".vote-casting-container").style.display = "none";
             const summaryContainer = document.getElementById("summaryContainer");
             summaryContainer.style.display = "flex";
@@ -447,6 +458,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 summaryList.appendChild(summaryItem);
             }
+
+            console.log("Summary displayed:", summaryList.innerHTML); // Debugging log
         }
 
         function submitVotes() {

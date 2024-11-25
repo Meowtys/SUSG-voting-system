@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['user'] = [
             'student_id' => $user['student_id'],
-            'studet_name' => $user['student_name'],
+            'student_name' => $user['student_name'],
             'college_name' => $user['college_name'],
             'has_voted' => $user['has_voted'],
         ];
