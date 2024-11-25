@@ -6,6 +6,8 @@ if (session_status() == PHP_SESSION_NONE) {
 // Check if the user is logged in
 if (isset($_SESSION['user'])) {
     $user = $_SESSION['user'];
+} else {
+    $user = null;
 }
 
 ?>
@@ -243,7 +245,7 @@ if (isset($_SESSION['user'])) {
     <!-- Dropdown Menu -->
     <nav class="header-menu" id="header-side-menu">
         <div class="header-student-info">
-            <?php if (isset($user)): ?>
+            <?php if ($user): ?>
                 <div class="header-name"><?php echo htmlspecialchars($user['student_name']); ?></div>
                 <div class="header-id"><?php echo htmlspecialchars($user['student_id']); ?></div>
                 <div class="header-department"><?php echo htmlspecialchars($user['college_name']); ?></div>
