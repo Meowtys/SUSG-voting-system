@@ -99,7 +99,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .candidates {
             display: flex;
-            justify-content: space-around;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 20px;
         }
 
@@ -109,8 +110,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             background-color: #f8d0d0;
             border-radius: 10px;
-            padding: 20px;
-            width: 30%;
+            padding: 15px;
+            width: 200px; /* Adjusted width for a more compact design */
             transition: transform 0.3s ease, background-color 0.3s ease;
             cursor: pointer;
         }
@@ -125,29 +126,29 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .candidate-photo {
             width: 100%;
-            height: 150px;
+            height: 150px; /* Adjusted height for a more compact design */
             background-color: #d3a5a5;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .candidate-name {
-            font-size: 18px;
+            font-size: 16px; /* Adjusted font size */
             font-weight: 500;
             color: #333;
             margin-bottom: 5px;
         }
 
         .candidate-party {
-            font-size: 14px;
+            font-size: 12px; /* Adjusted font size */
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .vote-btn {
             background-color: #333;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 16px; /* Adjusted padding */
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -279,11 +280,11 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             }
 
             .candidate-name {
-                font-size: 16px;
+                font-size: 14px;
             }
 
             .candidate-party {
-                font-size: 12px;
+                font-size: 10px;
             }
 
             .vote-btn {
@@ -303,8 +304,6 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="vote-casting-container">
         <h1 class="title" id="mainTitle">Vote Casting</h1>
         <div class="voting-box">
-            <h2 id="positionTitle" class="position-title">Position</h2>
-            <hr class="divider">
             <div class="candidates" id="candidatesContainer">
                 <!-- Candidates will be loaded here dynamically -->
             </div>
@@ -345,7 +344,6 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         function displayPosition() {
             const position = positions[currentPositionIndex];
             document.getElementById("mainTitle").textContent = position.position_name;
-            document.getElementById("positionTitle").textContent = position.position_name;
 
             fetchCandidates(position.position_id).then(candidates => {
                 const candidatesContainer = document.getElementById("candidatesContainer");
@@ -498,4 +496,4 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>    
 </body>
 
-</html>
+</html> 
