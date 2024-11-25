@@ -182,6 +182,34 @@ if (isset($_SESSION['user'])) {
             padding-top: 150px;
             height: auto;
         }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1002;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #c41f1f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -196,6 +224,12 @@ if (isset($_SESSION['user'])) {
 
     <!-- Overlay -->
     <div class="header-overlay" id="header-overlay"></div>
+
+    <!-- Popup Message -->
+    <div class="popup" id="vote-popup">
+        <p>You have already voted.</p>
+        <button onclick="closePopup()">Close</button>
+    </div>
 
     <!-- Dropdown Menu -->
     <nav class="header-menu" id="header-side-menu">
@@ -214,7 +248,7 @@ if (isset($_SESSION['user'])) {
         </div>
         <ul>
             <li><a href="homepage.php">Home</a></li>
-            <li><a href="votecasting.php">Vote</a></li>
+            <li><a href="votecasting.php" onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">Vote</a></li>
             <li><a href="liveresult.php">Live Tally</a></li>
             <li><a href="votecastingconfirm.php">Vote Casting</a></li>
             <li><a href="countdown.php">Countdown</a></li>
@@ -224,12 +258,13 @@ if (isset($_SESSION['user'])) {
         </ul>
     </nav>
 
-    <!-- JavaScript for toggling menu and logout function -->
+    <!-- JavaScript for toggling menu and popup message -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const menuToggle = document.getElementById('header-menu-toggle');
             const sideMenu = document.getElementById('header-side-menu');
             const overlay = document.getElementById('header-overlay');
+            const votePopup = document.getElementById('vote-popup');
 
             menuToggle.addEventListener('click', function () {
                 sideMenu.classList.toggle('active');
@@ -242,6 +277,19 @@ if (isset($_SESSION['user'])) {
                 overlay.classList.remove('active');
                 document.body.classList.remove('header-overlay-active');
             });
+
+            window.checkVotingStatus = function(event, hasVoted) {
+                if (hasVoted) {
+                    event.preventDefault();
+                    votePopup.classList.add('active');
+                    overlay.classList.add('active');
+                }
+            };
+
+            window.closePopup = function() {
+                votePopup.classList.remove('active');
+                overlay.classList.remove('active');
+            };
         });
     </script>
 </body>
