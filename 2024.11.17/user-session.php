@@ -6,8 +6,12 @@ session_start();
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
-    $student_id = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_NUMBER_INT);
+    $student_id = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
+
+    // Debugging: Log the received student_id and password
+    error_log("Received Student ID: $student_id");
+    error_log("Received Password: $password");
 
     if (empty($student_id)) {
         $errors['student_id'] = 'Student ID cannot be empty';
@@ -27,12 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     $stmt->execute(['student_id' => $student_id]);
     $user = $stmt->fetch();
 
+    // Debugging: Log the fetched user data
+    if ($user) {
+        error_log("User found: " . print_r($user, true));
+    } else {
+        error_log("User not found");
+    }
+
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user'] = [
-            'id' => $user['id'],
             'student_id' => $user['student_id'],
-            'name' => $user['name'],
-            'created_at' => $user['created_at']
         ];
 
         header('Location: homepage.php');

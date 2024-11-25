@@ -162,13 +162,27 @@ if (isset($_SESSION['errors'])) {
                     <div class="login-page-input-group">
                         <label for="student_id">Student ID</label>
                         <input type="text" id="student_id" name="student_id" required>
+                        <?php
+                        if (isset($errors['student_id'])) {
+                            echo '<div class="error"><p>' . $errors['student_id'] . '</p></div>';
+                        }
+                        ?>
                     </div>
                     <div class="login-page-input-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
+                        <?php
+                        if (isset($errors['password'])) {
+                            echo '<div class="error"><p>' . $errors['password'] . '</p></div>';
+                        }
+                        ?>
                     </div>
                     <button type="submit" name="signin" class="login-page-btn">Login</button>
-                    <p id="login-page-error-message" class="login-page-error-message"></p>
+                    <?php
+                    if (isset($errors['login'])) {
+                        echo '<p class="login-page-error-message">' . $errors['login'] . '</p>';
+                    }
+                    ?>
                 </form>
             </div>
         </main>
@@ -180,3 +194,8 @@ if (isset($_SESSION['errors'])) {
 
 </body>
 </html>
+<?php
+if (isset($_SESSION['errors'])) {
+  unset($_SESSION['errors']);
+}
+?>
