@@ -150,18 +150,17 @@
                 <img src="asset/sulogo.png" alt="University Logo" class="login-page-logo">
                 <h2 class="login-page-title">Login as Voter</h2>
                 
-                <form id="loginForm">
+                <form id="loginForm" method="POST" action="user-session.php">
                     <div class="login-page-input-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" required>
+                        <label for="student_id">Student ID</label>
+                        <input type="text" id="student_id" name="student_id" required>
                     </div>
                     <div class="login-page-input-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
                     </div>
-                    <button type="submit" class="login-page-btn">Login</button>
+                    <button type="submit" name="signin" class="login-page-btn">Login</button>
                     <p id="login-page-error-message" class="login-page-error-message"></p>
-                
                 </form>
             </div>
         </main>
