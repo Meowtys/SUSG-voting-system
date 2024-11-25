@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+// Retrieve user details from the session
+$user = $_SESSION['user'];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,14 +49,22 @@
 
         .voting-status {
             font-size: 14px;
-            color: #6c757d;
             text-transform: uppercase;
-            background-color: #e9ecef;
             padding: 5px 10px;
             border-radius: 5px;
             display: inline-block;
             margin-bottom: 15px;
             letter-spacing: 1px;
+        }
+
+        .voted {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+
+        .not-voted {
+            background-color: #dc3545; /* Red */
+            color: white;
         }
 
         .student-name {
@@ -192,10 +213,12 @@
     <main class="main">
         <!-- Main content -->
         <div class="student-info">
-            <span class="voting-status">Voting Status</span>
-            <h1 class="student-name">STUDENT D. NAME</h1>
-            <p class="student-id">21-0-00000</p>
-            <p class="student-course">College of Computer Studies</p>
+            <span class="voting-status <?php echo $user['has_voted'] ? 'voted' : 'not-voted'; ?>">
+                Voting Status: <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
+            </span>
+            <h1 class="student-name"><?php echo htmlspecialchars($user['name']); ?></h1>
+            <p class="student-id"><?php echo htmlspecialchars($user['student_id']); ?></p>
+            <p class="student-course"><?php echo htmlspecialchars($user['college_id']); ?></p>
         </div>
 
         <div class="action-cards">
