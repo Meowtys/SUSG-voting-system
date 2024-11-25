@@ -7,6 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 if (isset($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
+
 ?>
 
 <!DOCTYPE html>

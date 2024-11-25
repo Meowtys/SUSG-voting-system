@@ -9,6 +9,18 @@ if (!isset($_SESSION['user'])) {
 
 // Retrieve user details from the session
 $user = $_SESSION['user'];
+
+// Include database connection
+require_once 'connect.php';
+
+// Check if the user has voted
+$stmt = $pdo->prepare("SELECT has_voted FROM students WHERE student_id = :student_id");
+$stmt->execute(['student_id' => $user['student_id']]);
+$hasVoted = $stmt->fetchColumn();
+
+// Update session data with voting status
+$_SESSION['user']['has_voted'] = $hasVoted;
+$user['has_voted'] = $hasVoted;
 ?>
 
 <!DOCTYPE html>
