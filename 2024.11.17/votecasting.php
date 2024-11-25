@@ -133,14 +133,14 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .candidate-name {
-            font-size: 16px; /* Adjusted font size */
-            font-weight: 500;
+            font-size: 20px; /* Increased font size */
+            font-weight: 600; /* Increased font weight */
             color: #333;
             margin-bottom: 5px;
         }
 
         .candidate-party {
-            font-size: 12px; /* Adjusted font size */
+            font-size: 16px; /* Increased font size */
             color: #666;
             margin-bottom: 10px;
         }
