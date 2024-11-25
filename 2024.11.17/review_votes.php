@@ -1,0 +1,211 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+$user = $_SESSION['user'];
+
+// Retrieve selected votes from session
+$selectedVotes = isset($_SESSION['selectedVotes']) ? $_SESSION['selectedVotes'] : [];
+
+require_once 'connect.php';
+
+// Fetch positions from the database
+$positions_stmt = $pdo->query("SELECT * FROM positions");
+$positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Review Votes</title>
+    <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        main {
+            background-color: #f5e8e7;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .vote-summary-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 80vh;
+        }
+
+        h1.title {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .votes-box {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .votes-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .divider {
+            border: 1px solid #e0e0e0;
+            width: 90%;
+            margin: 10px auto 20px auto;
+        }
+
+        .vote-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .vote-item {
+            flex: 0 0 48%;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .position-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .candidate-summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f8d0d0;
+            padding: 10px;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .candidate-summary:hover {
+            transform: translateY(-5px);
+        }
+
+        .candidate-photo {
+            width: 50px;
+            height: 50px;
+            background-color: #d3a5a5;
+            border-radius: 5px;
+        }
+
+        .candidate-info h4 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .candidate-info p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .back-btn {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .vote-summary {
+                flex-direction: column;
+            }
+
+            .vote-item {
+                width: 100%;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="script/load.js" type="module" defer></script>
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <?php include 'header.php'; ?>
+
+    <main class="vote-summary-container">
+        <h1 class="title">Review Your Votes</h1>
+        <div class="votes-box">
+            <h2 class="votes-title">Your Votes</h2>
+            <hr class="divider">
+            <div class="vote-summary">
+                <?php foreach ($positions as $position): ?>
+                    <?php if (isset($selectedVotes[$position['position_name']])): ?>
+                        <div class="vote-item">
+                            <h3 class="position-title"><?php echo htmlspecialchars($position['position_name']); ?></h3>
+                            <div class="candidate-summary">
+                                <div class="candidate-photo"></div>
+                                <div class="candidate-info">
+                                    <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
+                                    <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="navigateTo('homepage.php')">Back to Homepage</button>
+    </main>
+
+    <!-- Footer Section -->
+    <?php include 'footer.php'; ?>
+    <script>
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+    </script>
+</body>
+</html>

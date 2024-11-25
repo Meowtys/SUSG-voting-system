@@ -260,7 +260,7 @@ $user = $_SESSION['user'];
                     reviewPopup.classList.add('active');
                     overlay.classList.add('active');
                 } else {
-                    navigateTo('votecastingconfirm.php');
+                    navigateTo('review_votes.php');
                 }
             };
 
