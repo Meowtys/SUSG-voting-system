@@ -1,3 +1,36 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+$user = $_SESSION['user'];
+
+require_once 'connect.php';
+
+// Fetch candidates from the database
+function fetchCandidates($pdo, $position_id) {
+    $stmt = $pdo->prepare("
+        SELECT candidates.*, colleges.college_name, positions.position_name 
+        FROM candidates 
+        LEFT JOIN colleges ON candidates.college_id = colleges.college_id 
+        LEFT JOIN positions ON candidates.position_id = positions.position_id 
+        WHERE candidates.position_id = :position_id AND candidates.qualified = 1
+    ");
+    $stmt->execute(['position_id' => $position_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch positions from the database
+$positions_stmt = $pdo->query("SELECT * FROM positions");
+$positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -78,7 +111,12 @@
             border-radius: 10px;
             padding: 20px;
             width: 30%;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .candidate-card.selected {
+            background-color: #d3a5a5;
         }
 
         .candidate-card:hover {
@@ -154,6 +192,59 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
+        .summary-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .summary-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .summary-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-item span {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
         @media (max-width: 768px) {
             .candidates {
                 flex-direction: column;
@@ -224,154 +315,159 @@
             <button class="nav-btn abstain-btn" onclick="abstainVote()">Abstain</button>
             <button class="nav-btn next-btn" onclick="goNext()">Next</button>
         </div>
+
+        <div class="summary-container" id="summaryContainer">
+            <h2 class="summary-title">Summary of Your Votes</h2>
+            <ul class="summary-list" id="summaryList">
+                <!-- Summary items will be loaded here dynamically -->
+            </ul>
+            <button class="submit-btn" onclick="submitVotes()">Submit Votes</button>
+        </div>
     </main>
 
     <!-- Footer Section -->
     <?php include 'footer.php'; ?>
 
     <script>
-        const positions = [
-            { 
-                title: "President (Speaker)", 
-                candidates: [
-                    { name: "Rynz Daval", party: "Tribu Wakwak" },
-                    { name: "Daniel Ray Cal", party: "Tribu Akro" },
-                    { name: "James Ald Teves", party: "Tribu Apokalipto" }
-                ]
-            },
-            { 
-                title: "Vice President (Speaker Pro Tempore)", 
-                candidates: [
-                    { name: "Candidate 1", party: "Party A" },
-                    { name: "Candidate 2", party: "Party B" },
-                    { name: "Candidate 3", party: "Party C" }
-                ]
-            },
-            { 
-                title: "Secretary", 
-                candidates: [
-                    { name: "Candidate 4", party: "Party X" },
-                    { name: "Candidate 5", party: "Party Y" }
-                ]
-            },
-            { 
-                title: "Assistant Secretary", 
-                candidates: [
-                    { name: "Candidate 6", party: "Party X" },
-                    { name: "Candidate 7", party: "Party Y" }
-                ]
-            },
-            { 
-                title: "Treasurer", 
-                candidates: [
-                    { name: "Candidate 8", party: "Party M" },
-                    { name: "Candidate 9", party: "Party N" }
-                ]
-            },
-            { 
-                title: "Majority Floor Leader", 
-                candidates: [
-                    { name: "Candidate 10", party: "Party K" },
-                    { name: "Candidate 11", party: "Party L" }
-                ]
-            }
-        ];
-    
+        const positions = <?php echo json_encode($positions); ?>;
         let currentPositionIndex = 0;
         const selectedVotes = {};
-    
+
+        function fetchCandidates(position_id) {
+            return fetch(`fetch_candidates.php?position_id=${position_id}`)
+                .then(response => response.json());
+        }
+
         function displayPosition() {
             const position = positions[currentPositionIndex];
-            document.getElementById("mainTitle").textContent = position.title;
-            document.getElementById("positionTitle").textContent = position.title;
-    
+            document.getElementById("mainTitle").textContent = position.position_name;
+            document.getElementById("positionTitle").textContent = position.position_name;
+
+            fetchCandidates(position.position_id).then(candidates => {
+                const candidatesContainer = document.getElementById("candidatesContainer");
+                candidatesContainer.innerHTML = "";
+
+                candidates.forEach((candidate, index) => {
+                    const candidateCard = document.createElement("div");
+                    candidateCard.classList.add("candidate-card");
+                    candidateCard.dataset.index = index;
+
+                    candidateCard.innerHTML = `
+                        <div class="candidate-photo"></div>
+                        <h3 class="candidate-name">${candidate.candidate_name}</h3>
+                        <p class="candidate-party">${candidate.college_name}</p>
+                    `;
+
+                    candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
+                    candidatesContainer.appendChild(candidateCard);
+                });
+
+                // Update the selection state of the candidate cards
+                updateSelectionState();
+            });
+        }
+
+        function selectCandidate(candidateCard, candidate, positionName) {
             const candidatesContainer = document.getElementById("candidatesContainer");
-            candidatesContainer.innerHTML = "";
-    
-            position.candidates.forEach((candidate, index) => {
-                const candidateCard = document.createElement("div");
-                candidateCard.classList.add("candidate-card");
-    
-                candidateCard.innerHTML = `
-                    <div class="candidate-photo"></div>
-                    <h3 class="candidate-name">${candidate.name}</h3>
-                    <p class="candidate-party">${candidate.party}</p>
-                    <button class="vote-btn" onclick="voteForCandidate(${currentPositionIndex}, ${index})">Vote</button>
-                `;
-    
-                candidatesContainer.appendChild(candidateCard);
-            });
-    
-            // Disable voting buttons if abstain was chosen or a candidate was already selected for this position
-            updateVoteButtons();
-        }
-    
-        function voteForCandidate(positionIndex, candidateIndex) {
-            const position = positions[positionIndex];
-    
-            // Check if a vote or abstain has already been cast for this position
-            if (selectedVotes[position.title]) {
-                alert(`You have already voted for ${position.title}.`);
-                return;
+            const selectedCard = candidatesContainer.querySelector(".candidate-card.selected");
+
+            if (selectedCard) {
+                selectedCard.classList.remove("selected");
             }
-    
-            selectedVotes[position.title] = position.candidates[candidateIndex];
-            alert(`You have voted for ${position.candidates[candidateIndex].name} as ${position.title}`);
-    
-            updateVoteButtons(); // Update button states after voting
+
+            if (selectedCard !== candidateCard) {
+                candidateCard.classList.add("selected");
+                selectedVotes[positionName] = candidate;
+            } else {
+                delete selectedVotes[positionName];
+            }
+
+            updateSelectionState();
         }
-    
+
         function abstainVote() {
-            const position = positions[currentPositionIndex];
-    
-            // Check if a vote or abstain has already been cast for this position
-            if (selectedVotes[position.title]) {
-                alert(`You have already voted for ${position.title}.`);
-                return;
+            const position = positions[currentPositionIndex].position_name;
+
+            if (selectedVotes[position] === "Abstain") {
+                delete selectedVotes[position];
+            } else {
+                selectedVotes[position] = "Abstain";
             }
-    
-            selectedVotes[position.title] = "Abstain";
-            alert(`You have abstained from voting for ${position.title}`);
-    
-            updateVoteButtons(); // Disable all vote buttons for this position
+
+            updateSelectionState();
         }
-    
-        function updateVoteButtons() {
-            const position = positions[currentPositionIndex];
-            const hasVoted = selectedVotes[position.title] !== undefined;
-    
-            // Toggle the disabled state of vote buttons based on whether the user has already voted or abstained
-            document.querySelectorAll(".vote-btn").forEach(button => {
-                button.disabled = hasVoted;
-                button.style.opacity = hasVoted ? "0.5" : "1";
-                button.style.cursor = hasVoted ? "not-allowed" : "pointer";
-            });
-    
-            // Disable abstain button if a vote has already been cast
-            const abstainButton = document.querySelector(".abstain-btn");
-            abstainButton.disabled = hasVoted;
-            abstainButton.style.opacity = hasVoted ? "0.5" : "1";
-            abstainButton.style.cursor = hasVoted ? "not-allowed" : "pointer";
+
+        function updateSelectionState() {
+            const position = positions[currentPositionIndex].position_name;
+            const candidatesContainer = document.getElementById("candidatesContainer");
+            const selectedCard = candidatesContainer.querySelector(".candidate-card.selected");
+
+            if (selectedVotes[position] === "Abstain") {
+                document.querySelector(".abstain-btn").classList.add("selected");
+                if (selectedCard) {
+                    selectedCard.classList.remove("selected");
+                }
+            } else {
+                document.querySelector(".abstain-btn").classList.remove("selected");
+            }
         }
-    
+
         function goNext() {
             if (currentPositionIndex < positions.length - 1) {
                 currentPositionIndex++;
                 displayPosition();
             } else {
-                alert("You have reached the last position.");
+                showSummary();
             }
         }
-    
+
         function goBack() {
             if (currentPositionIndex > 0) {
                 currentPositionIndex--;
                 displayPosition();
-            } else {
-                alert("You are at the first position.");
             }
         }
-    
+
+        function showSummary() {
+            document.querySelector(".vote-casting-container").style.display = "none";
+            const summaryContainer = document.getElementById("summaryContainer");
+            summaryContainer.style.display = "flex";
+
+            const summaryList = document.getElementById("summaryList");
+            summaryList.innerHTML = "";
+
+            for (const [position, candidate] of Object.entries(selectedVotes)) {
+                const summaryItem = document.createElement("li");
+                summaryItem.classList.add("summary-item");
+
+                summaryItem.innerHTML = `
+                    <span>${position}</span>
+                    <span>${candidate === "Abstain" ? "Abstain" : candidate.candidate_name}</span>
+                `;
+
+                summaryList.appendChild(summaryItem);
+            }
+        }
+
+        function submitVotes() {
+            fetch("submit_votes.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(selectedVotes)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Votes submitted successfully!");
+                    window.location.href = "homepage.php";
+                } else {
+                    alert("Failed to submit votes. Please try again.");
+                }
+            });
+        }
+
         // Initialize the first position display
         displayPosition();
     </script>    
