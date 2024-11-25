@@ -1,3 +1,26 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+$user = $_SESSION['user'];
+
+// Retrieve selected votes from session
+$selectedVotes = isset($_SESSION['selectedVotes']) ? $_SESSION['selectedVotes'] : [];
+
+require_once 'connect.php';
+
+// Fetch positions from the database
+$positions_stmt = $pdo->query("SELECT * FROM positions");
+$positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -186,71 +209,20 @@
             <h2 class="votes-title">Your Votes</h2>
             <hr class="divider">
             <div class="vote-summary">
-                <!-- Adding all positions -->
-                <div class="vote-item">
-                    <h3 class="position-title">PRESIDENT (Speaker)</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate C. Pres</h4>
-                            <p>Saturday Party</p>
+                <?php foreach ($positions as $position): ?>
+                    <?php if (isset($selectedVotes[$position['position_name']])): ?>
+                        <div class="vote-item">
+                            <h3 class="position-title"><?php echo htmlspecialchars($position['position_name']); ?></h3>
+                            <div class="candidate-summary">
+                                <div class="candidate-photo"></div>
+                                <div class="candidate-info">
+                                    <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
+                                    <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <h3 class="position-title">VICE PRESIDENT (Speaker Pro Tempore)</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate V. Pres</h4>
-                            <p>Unity Party</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <h3 class="position-title">SECRETARY</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate S. Secretary</h4>
-                            <p>Unity Party</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <h3 class="position-title">ASSISTANT SECRETARY</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate A. Secretary</h4>
-                            <p>Saturday Party</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <h3 class="position-title">TREASURER</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate T. Treasurer</h4>
-                            <p>Unity Party</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Add remaining positions similarly -->
-                <!-- Example for each additional position -->
-                <div class="vote-item">
-                    <h3 class="position-title">MAJORITY FLOOR LEADER</h3>
-                    <div class="candidate-summary">
-                        <div class="candidate-photo"></div>
-                        <div class="candidate-info">
-                            <h4>Candidate M. Leader</h4>
-                            <p>Saturday Party</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Repeat for each position -->
-
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </div>
         </div>
 
@@ -268,7 +240,7 @@
     <script>
         function returnToVoting() {
             // Navigate back to the vote casting page
-            window.location.href = "votecasting.html";
+            window.location.href = "votecasting.php";
         }
 
         function submitVotes() {
@@ -280,6 +252,24 @@
             submitBtn.disabled = true;
             submitBtn.style.backgroundColor = "gray";
             submitBtn.style.cursor = "not-allowed";
+
+            // Submit the votes
+            fetch("submit_votes.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(<?php echo json_encode($selectedVotes); ?>)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Votes submitted successfully!");
+                    window.location.href = "homepage.php";
+                } else {
+                    alert("Failed to submit votes. Please try again.");
+                }
+            });
         }
     </script>
 </body>
