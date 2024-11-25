@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
 
     if (!empty($errors)) {
         $_SESSION['errors'] = $errors;
-        header('Location: index.php');
+        header('Location: loginasvoter.php');
         exit();
     }
 
@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             'created_at' => $user['created_at']
         ];
 
-        header('Location: home.php');
+        header('Location: homepage.php');
         exit();
     } else {
         $errors['login'] = 'Invalid student ID or password';
         $_SESSION['errors'] = $errors;
-        header('Location: index.php');
+        header('Location: loginasvoter.php');
         exit();
     }
 }
