@@ -396,14 +396,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         function abstainVote() {
             const position = positions[currentPositionIndex].position_name;
-
-            if (selectedVotes[position] === "Abstain") {
-                delete selectedVotes[position];
-            } else {
-                selectedVotes[position] = "Abstain";
-            }
-
-            updateSelectionState();
+            selectedVotes[position] = { candidate_id: 0 };
+            goNext();
         }
 
         function updateSelectionState() {
@@ -491,8 +485,11 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                     alert("Votes submitted successfully!");
                     window.location.href = "homepage.php";
                 } else {
-                    alert("Failed to submit votes. Please try again.");
+                    alert("Failed to submit votes. Please try again. Error: " + data.message);
                 }
+            })
+            .catch(error => {
+                alert("An error occurred: " + error.message);
             });
         }
 
