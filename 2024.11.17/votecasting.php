@@ -53,7 +53,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            min-height: 90vh; /* Reduced min-height */
         }
 
         body {
@@ -65,7 +65,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 20px; /* Increased padding */
         }
 
         .title {
@@ -110,8 +110,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             background-color: #f8d0d0;
             border-radius: 10px;
-            padding: 15px;
-            width: 200px; /* Adjusted width for a more compact design */
+            padding: 20px; /* Increased padding */
+            width: 250px; /* Increased width */
             transition: transform 0.3s ease, background-color 0.3s ease;
             cursor: pointer;
         }
@@ -126,7 +126,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .candidate-photo {
             width: 100%;
-            height: 150px; /* Adjusted height for a more compact design */
+            height: 200px; /* Increased height */
             background-color: #d3a5a5;
             border-radius: 8px;
             margin-bottom: 10px;
@@ -496,4 +496,4 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>    
 </body>
 
-</html> 
+</html>
