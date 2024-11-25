@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (isset($_SESSION['user'])) {
+    $user = $_SESSION['user'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,10 +198,17 @@
     <!-- Dropdown Menu -->
     <nav class="header-menu" id="header-side-menu">
         <div class="header-student-info">
-            <div class="header-name">STUDENT D. NAME</div>
-            <div class="header-id">21-0-00000</div>
-            <div class="header-department">College of Computer Studies</div>
-            <button class="header-voting-status">VOTING STATUS</button>
+            <?php if (isset($user)): ?>
+                <div class="header-name"><?php echo htmlspecialchars($user['student_name']); ?></div>
+                <div class="header-id"><?php echo htmlspecialchars($user['student_id']); ?></div>
+                <div class="header-department"><?php echo htmlspecialchars($user['college_name']); ?></div>
+                <button class="header-voting-status"><?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?></button>
+            <?php else: ?>
+                <div class="header-name">Guest</div>
+                <div class="header-id">N/A</div>
+                <div class="header-department">N/A</div>
+                <button class="header-voting-status">N/A</button>
+            <?php endif; ?>
         </div>
         <ul>
             <li><a href="homepage.php">Home</a></li>
