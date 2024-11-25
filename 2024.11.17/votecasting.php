@@ -414,6 +414,12 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         function goNext() {
+            const position = positions[currentPositionIndex].position_name;
+            if (!selectedVotes[position]) {
+                alert("Please select a candidate or choose to abstain before proceeding.");
+                return;
+            }
+
             if (currentPositionIndex < positions.length - 1) {
                 currentPositionIndex++;
                 displayPosition();
