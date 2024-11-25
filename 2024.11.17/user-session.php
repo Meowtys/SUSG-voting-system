@@ -1,5 +1,5 @@
 <?php
-require_once 'dbConnect.php';
+require_once 'connect.php';
 
 session_start();
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         exit();
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE student_id = :student_id");
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE student_id = :student_id");
     $stmt->execute(['student_id' => $student_id]);
     $user = $stmt->fetch();
 
