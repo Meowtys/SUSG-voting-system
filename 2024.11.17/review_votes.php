@@ -19,15 +19,23 @@ require_once 'connect.php';
 // Fetch positions from the database
 $positions_stmt = $pdo->query("SELECT * FROM positions");
 $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch candidate images from the database
+$candidate_images_stmt = $pdo->query("SELECT candidate_name, candidate_image FROM candidates");
+$candidate_images = $candidate_images_stmt->fetchAll(PDO::FETCH_ASSOC);
+$candidate_images_map = [];
+foreach ($candidate_images as $candidate_image) {
+    $candidate_images_map[$candidate_image['candidate_name']] = $candidate_image['candidate_image'];
+}
+
+// Default image for abstain
+$default_abstain_image = 'path/to/default_abstain_image.png';
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUSG Election System - Review Votes</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -51,8 +59,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
-            min-height: 80vh;
+            padding: 60px 30px;
+            min-height: 90vh;
         }
 
         h1.title {
@@ -119,8 +127,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .candidate-photo {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             background-color: #d3a5a5;
             border-radius: 5px;
         }
@@ -185,11 +193,19 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="vote-item">
                             <h3 class="position-title"><?php echo htmlspecialchars($position['position_name']); ?></h3>
                             <div class="candidate-summary">
-                                <div class="candidate-photo"></div>
-                                <div class="candidate-info">
-                                    <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
-                                    <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
-                                </div>
+                                <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
+                                    <div class="candidate-info">
+                                        <h4>Abstain</h4>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="candidate-photo">
+                                        <img src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']]); ?>" alt="Candidate Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+                                    <div class="candidate-info">
+                                        <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
+                                        <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>
