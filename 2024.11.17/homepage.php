@@ -216,9 +216,9 @@ $user = $_SESSION['user'];
             <span class="voting-status <?php echo $user['has_voted'] ? 'voted' : 'not-voted'; ?>">
                 Voting Status: <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
             </span>
-            <h1 class="student-name"><?php echo htmlspecialchars($user['name']); ?></h1>
+            <h1 class="student-name"><?php echo htmlspecialchars($user['student_name']); ?></h1>
             <p class="student-id"><?php echo htmlspecialchars($user['student_id']); ?></p>
-            <p class="student-course"><?php echo htmlspecialchars($user['college_id']); ?></p>
+            <p class="student-course"><?php echo htmlspecialchars($user['college_name']); ?></p>
         </div>
 
         <div class="action-cards">

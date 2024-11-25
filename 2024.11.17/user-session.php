@@ -27,7 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         exit();
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE student_id = :student_id");
+    $stmt = $pdo->prepare("
+        SELECT students.*, colleges.college_name 
+        FROM students 
+        LEFT JOIN colleges ON students.college_id = colleges.college_id 
+        WHERE student_id = :student_id
+    ");
     $stmt->execute(['student_id' => $student_id]);
     $user = $stmt->fetch();
 
@@ -42,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['user'] = [
             'student_id' => $user['student_id'],
-            'student_name' => $user['student_name'],
-            'college_id' => $user['college_id'],
+            'studet_name' => $user['student_name'],
+            'college_name' => $user['college_name'],
             'has_voted' => $user['has_voted'],
         ];
 
