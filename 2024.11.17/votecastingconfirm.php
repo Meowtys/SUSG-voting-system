@@ -214,15 +214,18 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="vote-item">
                             <h3 class="position-title"><?php echo htmlspecialchars($position['position_name']); ?></h3>
                             <div class="candidate-summary">
-                                <div class="candidate-photo"></div>
-                                <div class="candidate-info">
-                                    <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
+                                <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
+                                    <div class="candidate-photo"></div>
+                                    <div class="candidate-info">
                                         <h4>Abstain</h4>
-                                    <?php else: ?>
+                                    </div>
+                                <?php else: ?>
+                                    <img class="candidate-photo" src="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_image']); ?>" alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                    <div class="candidate-info">
                                         <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
                                         <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
-                                    <?php endif; ?>
-                                </div>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endif; ?>
