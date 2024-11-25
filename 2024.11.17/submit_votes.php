@@ -23,6 +23,11 @@ try {
         $stmt->execute();
     }
 
+    // Update the has_voted column in the students table
+    $updateStmt = $pdo->prepare("UPDATE students SET has_voted = 1 WHERE student_id = :student_id");
+    $updateStmt->bindParam(':student_id', $user_id);
+    $updateStmt->execute();
+
     $pdo->commit();
     echo json_encode(['success' => true]);
 } catch (Exception $e) {
