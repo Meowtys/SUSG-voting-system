@@ -42,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['user'] = [
             'student_id' => $user['student_id'],
+            'name' => $user['name'],
+            'college_id' => $user['college_id'],
+            'has_voted' => $user['has_voted'],
         ];
 
         header('Location: homepage.php');
