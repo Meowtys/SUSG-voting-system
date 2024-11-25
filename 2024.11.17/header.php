@@ -228,9 +228,11 @@ if (isset($_SESSION['user'])) {
     <header class="header">
         <img src="asset/susglogo.png" alt="Logo" class="header-logo">
         <span class="header-title">SUSG Election System</span>
+        <?php if ($user): ?>
         <div class="header-icons">
             <img src="asset/menu.png" alt="Menu" class="header-menu-icon" id="header-menu-toggle">
         </div>
+        <?php endif; ?>
     </header>
 
     <!-- Overlay -->
@@ -243,6 +245,7 @@ if (isset($_SESSION['user'])) {
     </div>
 
     <!-- Dropdown Menu -->
+    <?php if ($user): ?>
     <nav class="header-menu" id="header-side-menu">
         <div class="header-student-info">
             <?php if ($user): ?>
@@ -269,6 +272,7 @@ if (isset($_SESSION['user'])) {
             <li><a href="logout.php">Logout</a></li>
         </ul>
     </nav>
+    <?php endif; ?>
 
     <!-- JavaScript for toggling menu and popup message -->
     <script>
