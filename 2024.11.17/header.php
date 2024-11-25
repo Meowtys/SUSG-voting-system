@@ -99,8 +99,6 @@ if (isset($_SESSION['user'])) {
         }
 
         .header-voting-status {
-            background-color: #f04e23;
-            color: white;
             border: none;
             padding: 8px 16px;
             font-weight: bold;
@@ -110,6 +108,16 @@ if (isset($_SESSION['user'])) {
             text-align: center;
             margin-top: 10px;
             border-radius: 5px;
+        }
+
+        .voted {
+            background-color: #28a745; /* Use the same green color as the homepage */
+            color: white;
+        }
+
+        .not-voted {
+            background-color: #dc3545; /* Use the same red color as the homepage */
+            color: white;
         }
 
         .header-menu ul li {
@@ -238,19 +246,20 @@ if (isset($_SESSION['user'])) {
                 <div class="header-name"><?php echo htmlspecialchars($user['student_name']); ?></div>
                 <div class="header-id"><?php echo htmlspecialchars($user['student_id']); ?></div>
                 <div class="header-department"><?php echo htmlspecialchars($user['college_name']); ?></div>
-                <button class="header-voting-status"><?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?></button>
+                <button class="header-voting-status <?php echo $user['has_voted'] ? 'voted' : 'not-voted'; ?>">
+                    <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
+                </button>
             <?php else: ?>
                 <div class="header-name">Guest</div>
                 <div class="header-id">N/A</div>
                 <div class="header-department">N/A</div>
-                <button class="header-voting-status">N/A</button>
+                <button class="header-voting-status not-voted">N/A</button>
             <?php endif; ?>
         </div>
         <ul>
             <li><a href="homepage.php">Home</a></li>
             <li><a href="votecasting.php" onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">Vote</a></li>
             <li><a href="liveresult.php">Live Tally</a></li>
-            <li><a href="votecastingconfirm.php">Vote Casting</a></li>
             <li><a href="countdown.php">Countdown</a></li>
             <li><a href="faq.php">FAQ</a></li>
             <li><a href="feedback.php">Leave a Feedback</a></li>
