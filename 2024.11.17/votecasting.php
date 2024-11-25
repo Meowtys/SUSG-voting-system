@@ -16,7 +16,7 @@ require_once 'connect.php';
 // Fetch candidates from the database
 function fetchCandidates($pdo, $position_id) {
     $stmt = $pdo->prepare("
-        SELECT candidates.*, colleges.college_name, positions.position_name 
+        SELECT candidates.*, colleges.college_name, positions.position_name, candidates.candidate_image, candidates.candidate_party 
         FROM candidates 
         LEFT JOIN colleges ON candidates.college_id = colleges.college_id 
         LEFT JOIN positions ON candidates.position_id = positions.position_id 
@@ -357,9 +357,9 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                     candidateCard.dataset.index = index;
 
                     candidateCard.innerHTML = `
-                        <div class="candidate-photo"></div>
+                        <img class="candidate-photo" src="${candidate.candidate_image}" alt="${candidate.candidate_name}">
                         <h3 class="candidate-name">${candidate.candidate_name}</h3>
-                        <p class="candidate-party">${candidate.college_name}</p>
+                        <p class="candidate-party">${candidate.candidate_party}</p>
                     `;
 
                     candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
