@@ -38,7 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         error_log("User not found");
     }
 
-    if ($user && password_verify($password, $user['password'])) {
+    // Compare plain text passwords
+    if ($user && $password === $user['password']) {
         $_SESSION['user'] = [
             'student_id' => $user['student_id'],
         ];
