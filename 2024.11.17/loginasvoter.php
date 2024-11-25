@@ -58,6 +58,7 @@ if (isset($_SESSION['errors'])) {
             text-align: center;
             width: 320px;
             position: relative;
+            box-sizing: border-box; /* Ensure padding is included in the width */
         }
 
         .login-page-logo {
@@ -85,12 +86,13 @@ if (isset($_SESSION['errors'])) {
 
         .login-page-input-group input {
             margin-top: 5px;
-            width: 100%;
+            width: 100%; /* Adjust width to take full container width */
             padding: 10px;
             font-size: 14px;
             border: 2px solid #ccc;
             border-radius: 5px;
             transition: border 0.3s ease;
+            box-sizing: border-box; /* Ensure padding is included in the width */
         }
 
         .login-page-input-group input:focus {
@@ -105,9 +107,7 @@ if (isset($_SESSION['errors'])) {
             padding: 10px;
             border: none;
             border-radius: 5px;
-            width: 80%;
-            display: inline-flexbox;
-            margin-left: 16px;
+            width: 100%; /* Adjust width to take full container width */
             font-size: 16px;
             align-items: center;
             justify-content: center;
