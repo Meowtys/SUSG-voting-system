@@ -51,8 +51,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
-            min-height: 80vh;
+            padding: 60px 30px;
+            min-height: 90vh;
         }
 
         h1.title {
@@ -93,7 +93,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .vote-item {
             flex: 0 0 48%;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-align: left;
         }
 
@@ -109,7 +109,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             gap: 10px;
             background-color: #f8d0d0;
-            padding: 10px;
+            padding: 20px;
             border-radius: 8px;
             transition: transform 0.3s ease;
         }
@@ -119,8 +119,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         .candidate-photo {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             background-color: #d3a5a5;
             border-radius: 5px;
         }
