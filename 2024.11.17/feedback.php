@@ -1,3 +1,37 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+// Retrieve user details from the session
+$user = $_SESSION['user'];
+
+// Include database connection
+require_once 'connect.php';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
+    $suggestion = isset($_POST['suggestion']) ? trim($_POST['suggestion']) : '';
+
+    // Insert feedback into the database
+    $stmt = $pdo->prepare("INSERT INTO feedbacks (student_id, experience, suggestion) VALUES (:student_id, :experience, :suggestion)");
+    $stmt->execute([
+        'student_id' => $user['student_id'],
+        'experience' => $experience,
+        'suggestion' => $suggestion
+    ]);
+
+    // Return a success response
+    echo json_encode(['success' => true]);
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,6 +191,34 @@
             margin-top: 15px;
             display: none;
         }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1002;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #c41f1f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -165,32 +227,46 @@
     <!-- Header Section -->
     <?php include 'header.php'; ?>
 
+    <!-- Popup Messages -->
+    <div class="popup" id="feedback-popup">
+        <p>Feedback submitted. Thank you!</p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="error-popup">
+        <p id="error-message"></p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
     <!-- Main Section -->
     <main>
         <div class="feedback-container">
             <div class="feedback-title">Leave us your feedback!</div>
-            <div class="rating-section">
-                How would you rate your experience?
-            </div>
-            <div class="rating-options">
-                <div class="rating-option">1</div>
-                <div class="rating-option">2</div>
-                <div class="rating-option">3</div>
-                <div class="rating-option">4</div>
-                <div class="rating-option">5</div>
-            </div>
-            <div class="rating-description">
-                <span>1 - Bad</span>
-                <span>5 - Excellent</span>
-            </div>
-            <div class="suggestion-section">
-                Do you have any suggestions to make the website or the service better?
-            </div>
-            <textarea class="suggestion-box" placeholder="Type here..."></textarea>
-            <div class="actions">
-                <button class="btn cancel-btn">CANCEL</button>
-                <button class="btn submit-btn">SUBMIT</button>
-            </div>
+            <form id="feedback-form">
+                <div class="rating-section">
+                    How would you rate your experience?
+                </div>
+                <div class="rating-options">
+                    <div class="rating-option" data-value="1">1</div>
+                    <div class="rating-option" data-value="2">2</div>
+                    <div class="rating-option" data-value="3">3</div>
+                    <div class="rating-option" data-value="4">4</div>
+                    <div class="rating-option" data-value="5">5</div>
+                </div>
+                <input type="hidden" name="experience" id="experience" value="0">
+                <div class="rating-description">
+                    <span>1 - Bad</span>
+                    <span>5 - Excellent</span>
+                </div>
+                <div class="suggestion-section">
+                    Do you have any suggestions to make the website or the service better?
+                </div>
+                <textarea class="suggestion-box" name="suggestion" placeholder="Type here..."></textarea>
+                <div class="actions">
+                    <button type="button" class="btn cancel-btn" onclick="navigateTo('homepage.php')">CANCEL</button>
+                    <button type="submit" class="btn submit-btn">SUBMIT</button>
+                </div>
+            </form>
         </div>
     </main>
 
@@ -200,50 +276,57 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const ratingOptions = document.querySelectorAll('.rating-option');
-            const suggestionBox = document.querySelector('.suggestion-box');
-            const submitBtn = document.querySelector('.submit-btn');
-            const cancelBtn = document.querySelector('.cancel-btn');
-            const successMessage = document.createElement('div');
+            const experienceInput = document.getElementById('experience');
+            const feedbackForm = document.getElementById('feedback-form');
+            const feedbackPopup = document.getElementById('feedback-popup');
+            const errorPopup = document.getElementById('error-popup');
+            const errorMessage = document.getElementById('error-message');
 
-            // Add success message element
-            successMessage.className = 'success-message';
-            successMessage.textContent = "Thank you for your feedback!";
-            document.querySelector('.feedback-container').appendChild(successMessage);
-
-            // Rating selection event
             ratingOptions.forEach(option => {
                 option.addEventListener('click', function () {
-                    ratingOptions.forEach(o => o.classList.remove('selected'));
+                    ratingOptions.forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
+                    experienceInput.value = option.getAttribute('data-value');
                 });
             });
 
-            // Submit button event
-            submitBtn.addEventListener('click', function (event) {
-                event.preventDefault(); // Prevent form submission
-                
-                // Clear the feedback fields
-                suggestionBox.value = '';
-                ratingOptions.forEach(option => option.classList.remove('selected'));
+            feedbackForm.addEventListener('submit', function (event) {
+                event.preventDefault();
 
-                // Display success message
-                successMessage.style.display = 'block';
+                const experience = experienceInput.value;
+                const suggestion = feedbackForm.querySelector('textarea[name="suggestion"]').value.trim();
 
-                // Hide the message after 3 seconds
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 3000);
-            });
+                if (experience === "0" || suggestion === "") {
+                    errorMessage.textContent = "Please provide a rating and a suggestion.";
+                    errorPopup.classList.add('active');
+                    return;
+                }
 
-            // Cancel button event
-            cancelBtn.addEventListener('click', function () {
-                // Remove the selected class from rating options
-                ratingOptions.forEach(option => option.classList.remove('selected'));
+                const formData = new FormData(feedbackForm);
 
-                // Clear the suggestion box
-                suggestionBox.value = '';
+                fetch('feedback.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        feedbackPopup.classList.add('active');
+                        feedbackForm.reset();
+                        ratingOptions.forEach(opt => opt.classList.remove('selected'));
+                        experienceInput.value = "0";
+                    }
+                });
             });
         });
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function closePopup() {
+            document.querySelectorAll('.popup').forEach(popup => popup.classList.remove('active'));
+        }
     </script>
 </body>
 </html>
