@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'suggestion' => $suggestion
     ]);
 
-    // Return a success response
-    echo json_encode(['success' => true]);
+    // Redirect to a thank you page or show a success message
+    header('Location: feedback.php');
     exit();
 }
 ?>
@@ -191,34 +191,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 15px;
             display: none;
         }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1002;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .popup.active {
-            display: block;
-        }
-
-        .popup button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #c41f1f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -227,22 +199,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Header Section -->
     <?php include 'header.php'; ?>
 
-    <!-- Popup Messages -->
+    <!-- Overlay -->
+    <div class="header-overlay" id="header-overlay"></div>
+
+    <!-- Popup Message -->
     <div class="popup" id="feedback-popup">
-        <p>Feedback submitted. Thank you!</p>
+        <p>Thank you for leaving a feedback.</p>
         <button onclick="closePopup()">Close</button>
     </div>
 
+    <!-- Error Popup Message -->
     <div class="popup" id="error-popup">
-        <p id="error-message"></p>
-        <button onclick="closePopup()">Close</button>
+        <p>Please provide a rating and feedback.</p>
+        <button onclick="closeErrorPopup()">Close</button>
     </div>
 
     <!-- Main Section -->
     <main>
         <div class="feedback-container">
             <div class="feedback-title">Leave us your feedback!</div>
-            <form id="feedback-form">
+            <form method="POST" action="feedback.php" onsubmit="validateForm(event)">
                 <div class="rating-section">
                     How would you rate your experience?
                 </div>
@@ -277,10 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function () {
             const ratingOptions = document.querySelectorAll('.rating-option');
             const experienceInput = document.getElementById('experience');
-            const feedbackForm = document.getElementById('feedback-form');
+            const overlay = document.getElementById('header-overlay');
             const feedbackPopup = document.getElementById('feedback-popup');
             const errorPopup = document.getElementById('error-popup');
-            const errorMessage = document.getElementById('error-message');
 
             ratingOptions.forEach(option => {
                 option.addEventListener('click', function () {
@@ -290,43 +265,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             });
 
-            feedbackForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const experience = experienceInput.value;
-                const suggestion = feedbackForm.querySelector('textarea[name="suggestion"]').value.trim();
-
-                if (experience === "0" || suggestion === "") {
-                    errorMessage.textContent = "Please provide a rating and a suggestion.";
+            window.validateForm = function(event) {
+                const suggestion = document.querySelector('.suggestion-box').value.trim();
+                if (experienceInput.value === "0" || suggestion === "") {
+                    event.preventDefault();
                     errorPopup.classList.add('active');
-                    return;
+                    overlay.classList.add('active');
+                } else {
+                    showPopup(event);
                 }
+            };
 
-                const formData = new FormData(feedbackForm);
+            window.showPopup = function(event) {
+                event.preventDefault();
+                feedbackPopup.classList.add('active');
+                overlay.classList.add('active');
+            };
 
-                fetch('feedback.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        feedbackPopup.classList.add('active');
-                        feedbackForm.reset();
-                        ratingOptions.forEach(opt => opt.classList.remove('selected'));
-                        experienceInput.value = "0";
-                    }
-                });
-            });
+            window.closePopup = function() {
+                feedbackPopup.classList.remove('active');
+                overlay.classList.remove('active');
+                document.querySelector('form').reset();
+                document.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+                experienceInput.value = "0";
+            };
+
+            window.closeErrorPopup = function() {
+                errorPopup.classList.remove('active');
+                overlay.classList.remove('active');
+            };
+
+            window.navigateTo = function(page) {
+                window.location.href = page;
+            };
         });
-
-        function navigateTo(page) {
-            window.location.href = page;
-        }
-
-        function closePopup() {
-            document.querySelectorAll('.popup').forEach(popup => popup.classList.remove('active'));
-        }
     </script>
 </body>
 </html>
