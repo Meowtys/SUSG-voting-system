@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    header('Location: loginasvoter.php');
+    exit();
+}
+
+// Retrieve user details from the session
+$user = $_SESSION['user'];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,6 +196,20 @@
     <!-- Header Section -->
     <?php include 'header.php'; ?>
 
+    <!-- Overlay -->
+    <div class="header-overlay" id="header-overlay"></div>
+
+    <!-- Popup Message -->
+    <div class="popup" id="vote-popup">
+        <p>You have already voted.</p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <div class="popup" id="review-popup">
+        <p>You have not voted yet.</p>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
     <!-- Main Section -->
     <main class="countdown-container">
         <h2 class="countdown-title">ELECTION COUNTDOWN</h2>
@@ -203,8 +230,8 @@
         </div>
 
         <div class="actions">
-            <button id="vote-btn" class="btn vote-btn">VOTE NOW</button>
-            <button id="review-btn" class="btn review-btn">YOUR VOTES</button>
+            <button id="vote-btn" class="btn vote-btn" onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">VOTE NOW</button>
+            <button id="review-btn" class="btn review-btn" onclick="checkVotingStatus2(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">REVIEW VOTES</button>
         </div>
     </main>
 
@@ -212,6 +239,42 @@
     <?php include 'footer.php'; ?>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const overlay = document.getElementById('header-overlay');
+            const votePopup = document.getElementById('vote-popup');
+            const reviewPopup = document.getElementById('review-popup');
+
+            window.checkVotingStatus = function(event, hasVoted) {
+                if (hasVoted) {
+                    event.preventDefault();
+                    votePopup.classList.add('active');
+                    overlay.classList.add('active');
+                } else {
+                    navigateTo('votecasting.php');
+                }
+            };
+
+            window.checkVotingStatus2 = function(event, hasVoted) {
+                if (hasVoted == false) {
+                    event.preventDefault();
+                    reviewPopup.classList.add('active');
+                    overlay.classList.add('active');
+                } else {
+                    navigateTo('votecastingconfirm.php');
+                }
+            };
+
+            window.closePopup = function() {
+                votePopup.classList.remove('active');
+                reviewPopup.classList.remove('active');
+                overlay.classList.remove('active');
+            };
+
+            window.navigateTo = function(page) {
+                window.location.href = page;
+            };
+        });
+
         // Countdown settings
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + 5); // Set to 5 days from now
@@ -223,16 +286,6 @@
         const messageEl = document.getElementById('countdown-message');
         const voteBtn = document.getElementById('vote-btn');
         const reviewBtn = document.getElementById('review-btn');
-
-        // Redirect to votecasting.html on clicking the "Vote Now" button
-        voteBtn.addEventListener('click', () => {
-            window.location.href = 'votecasting.php';
-        });
-
-        // Redirect to votecastingconfirm.html on clicking the "Your Votes" button
-        reviewBtn.addEventListener('click', () => {
-            window.location.href = 'votecastingconfirm.php';
-        });
 
         function updateCountdown() {
             const now = new Date().getTime();
