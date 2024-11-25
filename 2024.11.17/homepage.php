@@ -17,7 +17,7 @@ $user = $_SESSION['user'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUSG Election System - Dashboard</title>
+    <title>SUSG Election System - Homepage</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -48,7 +48,9 @@ $user = $_SESSION['user'];
         }
 
         .voting-status {
-            font-size: 14px;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
             text-transform: uppercase;
             padding: 5px 10px;
             border-radius: 5px;
@@ -58,16 +60,20 @@ $user = $_SESSION['user'];
         }
 
         .voted {
+            color: green;
             background-color: #28a745; /* Green */
             color: white;
         }
 
         .not-voted {
+            color: red;
             background-color: #dc3545; /* Red */
             color: white;
         }
 
         .student-name {
+            font-size: 24px;
+            font-weight: bold;
             font-size: 36px;
             font-weight: 600;
             color: #333;
@@ -131,6 +137,18 @@ $user = $_SESSION['user'];
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .btn:hover {
@@ -139,6 +157,8 @@ $user = $_SESSION['user'];
         }
 
         .vote-btn {
+            background-color: #28a745;
+            color: white;
             background-color: #dc3545;
         }
 
@@ -146,7 +166,14 @@ $user = $_SESSION['user'];
             background-color: #c82333;
         }
 
+        .vote-btn:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+
         .tally-btn {
+            background-color: #007bff;
+            color: white;
             background-color: #28a745;
         }
 
@@ -227,7 +254,7 @@ $user = $_SESSION['user'];
                     <h3>Current Results</h3>
                     <p>10% Voted</p>
                 </div>
-                <button class="btn vote-btn" onclick="navigateTo('votecasting.php')">Vote Now</button>
+                <button class="btn vote-btn" onclick="navigateTo('votecasting.php')" <?php echo $user['has_voted'] ? 'disabled' : ''; ?>>Vote Now</button>
             </div>
             <div class="card">
                 <div class="card-content">
