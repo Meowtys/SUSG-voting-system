@@ -1,0 +1,220 @@
+<?php
+// Start the session to store user data
+session_start();
+
+// Database connection details
+$host = "localhost";
+$username = "root";
+$password = "";
+$dbname = "susg_project";
+
+// Create database connection
+$conn = new mysqli($host, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Initialize error message
+$errorMessage = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Fetch form inputs
+    $inputUsername = $conn->real_escape_string($_POST['username']);
+    $inputPassword = $conn->real_escape_string($_POST['password']);
+
+    // Query to fetch non-admin users
+    $sql = "SELECT * FROM students WHERE username = ? AND is_admin = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $inputUsername);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+
+        // Check if password matches
+        if ($inputPassword === $user['password']) { // Replace with password_verify if passwords are hashed
+            // Store user data in session
+            $_SESSION['user_id'] = $user['student_id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['stud_name'] = $user['stud_name'];
+            $_SESSION['college_id'] = $user['college_id'];
+            $_SESSION['is_admin'] = $user['is_admin'];
+            $_SESSION['has_voted'] = $user['has_voted'];
+
+            // Redirect to homepage for voters
+            header("Location: homepage.php");
+            exit();
+        } else {
+            $errorMessage = "Incorrect password.";
+        }
+    } else {
+        $errorMessage = "User not found or not a voter.";
+    }
+}
+// Close the database connection
+$conn->close();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Login as Voter</title>
+    <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        /* General body and layout styling */
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        /* Header styling */
+        #header {
+            width: 100%;
+        }
+
+        /* Main content area styling */
+        .main {
+            margin-top: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .login-page-box {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 320px;
+            position: relative;
+        }
+
+        .login-page-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .login-page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .login-page-input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .login-page-input-group label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .login-page-input-group input {
+            margin-top: 5px;
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            transition: border 0.3s ease;
+        }
+
+        .login-page-input-group input:focus {
+            border-color: #c41f1f;
+            outline: none;
+        }
+
+        .login-page-btn {
+            margin-top: 15px;
+            background-color: #c41f1f;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            width: 80%;
+            display: inline-flexbox;
+            margin-left: 16px;
+            font-size: 16px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-page-btn:hover {
+            background-color: #b01919;
+        }
+
+        .login-page-error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        /* Footer styling */
+        #footer {
+            width: 100%;
+            padding: 10px 0;
+            background-color: #f5f5f5;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .login-page-box {
+                width: 90%;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <?php include 'loginpageheader.php'; ?>
+
+    <!-- Main Content Section -->
+    <main class="main">
+        <div class="login-page-box">
+            <img src="asset/sulogo.png" alt="University Logo" class="login-page-logo">
+            <h2 class="login-page-title">Login as Voter</h2>
+            
+            <form id="loginForm" method="POST" action="loginasvoter.php">
+                <div class="login-page-input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="login-page-input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-page-btn">Login</button>
+                <?php if (!empty($errorMessage)): ?>
+                    <p id="login-page-error-message" class="login-page-error-message"><?php echo $errorMessage; ?></p>
+                <?php endif; ?>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <?php include 'footer.php'; ?>
+</body>
+</html>
