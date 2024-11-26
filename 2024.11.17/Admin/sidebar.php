@@ -119,6 +119,7 @@
         <div class="sections">
             <div class="section">
                 <h2>SUSG COMELEC</h2>
+                <a href="admin-home.php" class="nav-link <?php echo $current_page == 'admin-home.php' ? 'active' : ''; ?>"><i class="fas fa-home icon"></i>Home</a>
                 <a href="admin-liveresults.php" class="nav-link <?php echo $current_page == 'admin-liveresults.php' ? 'active' : ''; ?>"><i class="fas fa-chart-bar icon"></i>Live Results</a>
             </div>
             <div class="section">
