@@ -296,26 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             ratingOptions.forEach(option => {
                 option.addEventListener('click', function () {
-        </div>
-    </main>
-
-    <!-- Footer Section -->
-    <?php include 'footer.php'; ?>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const ratingOptions = document.querySelectorAll('.rating-option');
-            const experienceInput = document.getElementById('experience');
-            const feedbackForm = document.getElementById('feedback-form');
-            const feedbackPopup = document.getElementById('feedback-popup');
-            const errorPopup = document.getElementById('error-popup');
-            const errorMessage = document.getElementById('error-message');
-            const overlay = document.getElementById('header-overlay');
-            const closeFeedbackPopupButton = document.getElementById('close-feedback-popup');
-            const closeErrorPopupButton = document.getElementById('close-error-popup');
-
-            ratingOptions.forEach(option => {
-                option.addEventListener('click', function () {
                     ratingOptions.forEach(opt => opt.classList.remove('selected'));
                     option.classList.add('selected');
                     experienceInput.value = option.getAttribute('data-value');
@@ -329,9 +309,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const suggestion = feedbackForm.querySelector('textarea[name="suggestion"]').value.trim();
 
                 if (experience === "0" || suggestion === "") {
-                    errorMessage.textContent = "Please provide a rating and a suggestion.";
-                    errorPopup.classList.add('active');
-                    overlay.classList.add('active');
+                    alert("Please provide a rating and a suggestion.");
                     return;
                 }
 
@@ -344,28 +322,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        feedbackPopup.classList.add('active');
-                        overlay.classList.add('active');
+                        alert("Feedback submitted. Thank you!");
                         feedbackForm.reset();
                         ratingOptions.forEach(opt => opt.classList.remove('selected'));
                         experienceInput.value = "0";
                     }
                 });
             });
-
-            closeFeedbackPopupButton.addEventListener('click', closePopup);
-            closeErrorPopupButton.addEventListener('click', closePopup);
-            overlay.addEventListener('click', closePopup);
         });
 
         function navigateTo(page) {
             window.location.href = page;
         }
-
-        function closePopup() {
-            document.querySelectorAll('.popup').forEach(popup => popup.classList.remove('active'));
-            document.getElementById('header-overlay').classList.remove('active');
-        }
     </script>
 </body>
-</html>
+</html> 
