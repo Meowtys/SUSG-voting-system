@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['comelec_name'] = $user['comelec_name'];
 
-        header('Location: Admin/admin-analytics.php');
+        header('Location: Admin/admin-home.php');
         exit();
     } else {
         $errors['login'] = 'Invalid Username or Password';
