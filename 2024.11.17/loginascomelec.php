@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (isset($_SESSION['errors'])) {
+  $errors = $_SESSION['errors'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -151,18 +158,31 @@
                 <img src="asset/sulogo.png" alt="University Logo" class="login-page-logo">
                 <h2 class="login-page-title">Login as Comelec</h2>
                 
-                <form id="loginForm">
+                <form id="loginForm" method="POST" action="user-session.php">
                     <div class="login-page-input-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" required>
+                        <?php
+                        if (isset($errors['username'])) {
+                            echo '<div class="error"><p>' . $errors['username'] . '</p></div>';
+                        }
+                        ?>
                     </div>
                     <div class="login-page-input-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required>
+                        <?php
+                        if (isset($errors['password'])) {
+                            echo '<div class="error"><p>' . $errors['password'] . '</p></div>';
+                        }
+                        ?>
                     </div>
-                    <button type="submit" class="login-page-btn">Login</button>
-                    <p id="login-page-error-message" class="login-page-error-message"></p>
-                
+                    <button type="submit" name="signin_comelec" class="login-page-btn">Login</button>
+                    <?php
+                    if (isset($errors['login'])) {
+                        echo '<p class="login-page-error-message">' . $errors['login'] . '</p>';
+                    }
+                    ?>
                 </form>
             </div>
         </main>
@@ -174,3 +194,8 @@
 
 </body>
 </html>
+<?php
+if (isset($_SESSION['errors'])) {
+  unset($_SESSION['errors']);
+}
+?>

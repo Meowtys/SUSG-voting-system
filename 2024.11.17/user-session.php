@@ -61,3 +61,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         exit();
     }
 }
+
+// New code for Comelec login
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $password = $_POST['password'];
+
+    // Debugging: Log the received username and password
+    error_log("Received Username: $username");
+    error_log("Received Password: $password");
+
+    if (empty($username)) {
+        $errors['username'] = 'Username cannot be empty';
+    }
+
+    if (empty($password)) {
+        $errors['password'] = 'Password cannot be empty';
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        header('Location: loginascomelec.php');
+        exit();
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM comelec WHERE comelec_name = :username");
+    $stmt->execute(['username' => $username]);
+    $user = $stmt->fetch();
+
+    // Debugging: Log the fetched user data
+    if ($user) {
+        error_log("Comelec user found: " . print_r($user, true));
+    } else {
+        error_log("Comelec user not found");
+    }
+
+    // Compare plain text passwords
+    if ($user && $password === $user['password']) {
+        $_SESSION['comelec_name'] = $user['comelec_name'];
+
+        header('Location: Admin/admin-analytics.php');
+        exit();
+    } else {
+        $errors['login'] = 'Invalid Username or Password';
+        $_SESSION['errors'] = $errors;
+        header('Location: loginascomelec.php');
+        exit();
+    }
+}
+?> 
