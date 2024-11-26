@@ -105,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
     // Compare plain text passwords
     if ($user && $password === $user['password']) {
         $_SESSION['comelec_name'] = $user['comelec_name'];
+        $_SESSION['is_comelec_logged_in'] = true; // Add session variable to track Comelec login
 
         header('Location: Admin/admin-home.php');
         exit();

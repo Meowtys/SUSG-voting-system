@@ -1,3 +1,17 @@
+<?php
+session_start();
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
+}
+
+require_once '../connect.php';
+
+// Fetch feedbacks from the database
+$stmt = $pdo->prepare("SELECT f.*, s.student_name FROM feedbacks f JOIN students s ON f.student_id = s.student_id ORDER BY f.feedback_timestamp DESC");
+$stmt->execute();
+$feedbacks = $stmt->fetchAll();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,33 +107,6 @@
             opacity: 0.8;
         }
     </style>
-    <script>
-        // JavaScript for removing rows
-        document.addEventListener('DOMContentLoaded', function () {
-            const removeButtons = document.querySelectorAll('.remove-btn');
-            removeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const row = this.parentNode.parentNode;
-                    row.parentNode.removeChild(row);
-                });
-            });
-        });
-
-        // Sidebar active link handling
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarLinks = document.querySelectorAll('.sidebar a');
-
-            // Remove 'active' class from all links
-            sidebarLinks.forEach(link => link.classList.remove('active'));
-
-            // Set 'active' class based on current URL
-            sidebarLinks.forEach(link => {
-                if (link.href === window.location.href) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
 </head>
 <body>
 
@@ -141,21 +128,57 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Larry King</td><td class="comment">I kept encountering errors while submitting my vote. Please fix this issue pretty please</td><td>11/1/2024 at 1:00pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Lorainne Magdana</td><td class="comment">Had a hard time navigating through the website. Took too long to figure out how to vote kek</td><td>11/1/2024 at 4:10pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Marie Caster</td><td class="comment">Very smooth process! I had no issues. Kudos to the team!</td><td>11/3/2024 at 3:30pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Josephine Pata</td><td class="comment">Site looks amazing but some links are a bit slow.</td><td>11/3/2024 at 4:20pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Chew Win</td><td class="comment">Can we add an option to review our vote before final submission?</td><td>11/4/2024 at 9:00am</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Red Fox</td><td class="comment">Some options in the dropdown menu are glitching, please check.</td><td>11/4/2024 at 12:40pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Sarah Martin</td><td class="comment">Loved the interface, easy to understand and navigate!</td><td>11/4/2024 at 2:10pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Kenneth Dow</td><td class="comment">Everything worked perfectly, great work!</td><td>11/4/2024 at 5:30pm</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Elena Miles</td><td class="comment">Accidentally submitted my vote too early. Maybe add a confirmation?</td><td>11/5/2024 at 8:00am</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Nick Jonas</td><td class="comment">Fantastic job on the new voting system!</td><td>11/5/2024 at 10:15am</td><td><button class="remove-btn">Remove</button></td></tr>
-                        <tr><td>Miguel Rivera</td><td class="comment">Is it possible to add a dark mode for the site?</td><td>11/5/2024 at 1:45pm</td><td><button class="remove-btn">Remove</button></td></tr>
+                        <?php foreach ($feedbacks as $feedback): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($feedback['student_name']); ?></td>
+                            <td class="comment"><?php echo htmlspecialchars($feedback['suggestion']); ?></td>
+                            <td><?php echo date('m/d/Y \a\t h:ia', strtotime($feedback['feedback_timestamp'])); ?></td>
+                            <td><button class="remove-btn" data-id="<?php echo $feedback['feedback_id']; ?>">Remove</button></td>
+                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
+    <script>
+        // JavaScript for removing rows
+        document.addEventListener('DOMContentLoaded', function () {
+            const removeButtons = document.querySelectorAll('.remove-btn');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const feedbackId = this.getAttribute('data-id');
+                    if (confirm('Do you really want to delete this feedback?')) {
+                        fetch(`remove-feedback.php?id=${feedbackId}`, {
+                            method: 'GET'
+                        }).then(response => response.json())
+                          .then(data => {
+                              if (data.success) {
+                                  const row = this.parentNode.parentNode;
+                                  row.parentNode.removeChild(row);
+                              } else {
+                                  alert('Failed to remove feedback.');
+                              }
+                          });
+                    }
+                });
+            });
+        });
+
+        // Sidebar active link handling
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+
+            // Remove 'active' class from all links
+            sidebarLinks.forEach(link => link.classList.remove('active'));
+
+            // Set 'active' class based on current URL
+            sidebarLinks.forEach(link => {
+                if (link.href === window.location.href) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
