@@ -1,4 +1,21 @@
 <?php
+session_start();
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
+}
+
+require_once '../connect.php';
+
+// Fetch candidates from the database
+$stmt = $pdo->query("
+    SELECT candidates.*, colleges.college_name, positions.position_name 
+    FROM candidates 
+    LEFT JOIN colleges ON candidates.college_id = colleges.college_id 
+    LEFT JOIN positions ON candidates.position_id = positions.position_id
+");
+$candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Start output buffering
 ob_start();
 ?>
@@ -184,18 +201,26 @@ ob_start();
                             <th>Candidate Name</th>
                             <th>Party</th>
                             <th>Position</th>
+                            <th>College</th>
+                            <th>Qualified</th>
+                            <th>Remarks</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <?php foreach ($candidates as $candidate): ?>
                         <tr>
-                            <td>James Teves</td>
-                            <td>Tribu Wakwak</td>
-                            <td>President</td>
+                            <td><?php echo htmlspecialchars($candidate['candidate_name']); ?></td>
+                            <td><?php echo htmlspecialchars($candidate['candidate_party']); ?></td>
+                            <td><?php echo htmlspecialchars($candidate['position_name']); ?></td>
+                            <td><?php echo htmlspecialchars($candidate['college_name']); ?></td>
+                            <td><?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?></td>
+                            <td><?php echo htmlspecialchars($candidate['remarks']); ?></td>
                             <td><button class="edit-btn">Edit</button></td>
                             <td><button class="delete-btn">Delete</button></td>
                         </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -219,10 +244,7 @@ ob_start();
                     <option value="">Select Position</option>
                     <option value="President">President</option>
                     <option value="Vice President">Vice President</option>
-                    <option value="Secretary">Secretary</option>
-                    <option value="Assistant Secretary">Assistant Secretary</option>
-                    <option value="Treasurer">Treasurer</option>
-                    <option value="Majority Floor Leader">Majority Floor Leader</option>
+                    <option value="Secretary">Representative</option>
                 </select>
 
                 <label for="college">College/Department:</label>
@@ -246,6 +268,19 @@ ob_start();
                     <option value="SPAG">SPAG</option>
                     <option value="SHS">SHS</option>
                 </select>
+
+                <label for="candidateImage">Candidate Image:</label>
+                <input type="file" id="candidateImage" name="candidateImage" accept="image/*" required>
+
+                <label for="qualified">Qualified:</label>
+                <select id="qualified" name="qualified" required>
+                    <option value="">Select Qualification</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+
+                <label for="remarks">Remarks:</label>
+                <input type="text" id="remarks" name="remarks">
 
                 <button type="submit">Submit</button>
             </form>
@@ -284,6 +319,8 @@ ob_start();
             const partyName = document.getElementById("partyName").value;
             const position = document.getElementById("position").value;
             const college = document.getElementById("college").value;
+            const qualified = document.getElementById("qualified").value;
+            const remarks = document.getElementById("remarks").value;
 
             const table = document.querySelector(".mngment-table tbody");
             const newRow = table.insertRow();
@@ -292,6 +329,9 @@ ob_start();
                 <td>${candidateName}</td>
                 <td>${partyName}</td>
                 <td>${position}</td>
+                <td>${college}</td>
+                <td>${qualified}</td>
+                <td>${remarks}</td>
                 <td><button class="edit-btn">Edit</button></td>
                 <td><button class="delete-btn">Delete</button></td>
             `;
