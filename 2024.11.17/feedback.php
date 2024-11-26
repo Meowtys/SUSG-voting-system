@@ -18,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
     $suggestion = isset($_POST['suggestion']) ? trim($_POST['suggestion']) : '';
 
+    // Debugging: Check received data
+    error_log("Received experience: $experience, suggestion: $suggestion");
+
     // Insert feedback into the database
     $stmt = $pdo->prepare("INSERT INTO feedbacks (student_id, experience, suggestion) VALUES (:student_id, :experience, :suggestion)");
     $stmt->execute([
@@ -26,8 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'suggestion' => $suggestion
     ]);
 
-    // Redirect to a thank you page or show a success message
-    header('Location: feedback.php');
+    // Debugging: Check if insertion was successful
+    if ($stmt->rowCount() > 0) {
+        error_log("Feedback inserted successfully.");
+    } else {
+        error_log("Failed to insert feedback.");
+    }
+
+    // Return a success response
+    echo json_encode(['success' => true]);
     exit();
 }
 ?>
@@ -191,6 +201,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 15px;
             display: none;
         }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1002;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #c41f1f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Overlay styling */
+        .header-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .header-overlay.active {
+            display: block;
+        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -199,26 +253,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Header Section -->
     <?php include 'header.php'; ?>
 
-    <!-- Overlay -->
-    <div class="header-overlay" id="header-overlay"></div>
-
-    <!-- Popup Message -->
-    <div class="popup" id="feedback-popup">
-        <p>Thank you for leaving a feedback.</p>
-        <button onclick="closePopup()">Close</button>
-    </div>
-
-    <!-- Error Popup Message -->
-    <div class="popup" id="error-popup">
-        <p>Please provide a rating and feedback.</p>
-        <button onclick="closeErrorPopup()">Close</button>
-    </div>
-
     <!-- Main Section -->
     <main>
         <div class="feedback-container">
             <div class="feedback-title">Leave us your feedback!</div>
-            <form method="POST" action="feedback.php" onsubmit="validateForm(event)">
+            <form id="feedback-form">
                 <div class="rating-section">
                     How would you rate your experience?
                 </div>
@@ -253,9 +292,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function () {
             const ratingOptions = document.querySelectorAll('.rating-option');
             const experienceInput = document.getElementById('experience');
-            const overlay = document.getElementById('header-overlay');
+            const feedbackForm = document.getElementById('feedback-form');
+
+            ratingOptions.forEach(option => {
+                option.addEventListener('click', function () {
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <?php include 'footer.php'; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ratingOptions = document.querySelectorAll('.rating-option');
+            const experienceInput = document.getElementById('experience');
+            const feedbackForm = document.getElementById('feedback-form');
             const feedbackPopup = document.getElementById('feedback-popup');
             const errorPopup = document.getElementById('error-popup');
+            const errorMessage = document.getElementById('error-message');
+            const overlay = document.getElementById('header-overlay');
+            const closeFeedbackPopupButton = document.getElementById('close-feedback-popup');
+            const closeErrorPopupButton = document.getElementById('close-error-popup');
 
             ratingOptions.forEach(option => {
                 option.addEventListener('click', function () {
@@ -265,40 +322,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             });
 
-            window.validateForm = function(event) {
-                const suggestion = document.querySelector('.suggestion-box').value.trim();
-                if (experienceInput.value === "0" || suggestion === "") {
-                    event.preventDefault();
+            feedbackForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const experience = experienceInput.value;
+                const suggestion = feedbackForm.querySelector('textarea[name="suggestion"]').value.trim();
+
+                if (experience === "0" || suggestion === "") {
+                    errorMessage.textContent = "Please provide a rating and a suggestion.";
                     errorPopup.classList.add('active');
                     overlay.classList.add('active');
-                } else {
-                    showPopup(event);
+                    return;
                 }
-            };
 
-            window.showPopup = function(event) {
-                event.preventDefault();
-                feedbackPopup.classList.add('active');
-                overlay.classList.add('active');
-            };
+                const formData = new FormData(feedbackForm);
 
-            window.closePopup = function() {
-                feedbackPopup.classList.remove('active');
-                overlay.classList.remove('active');
-                document.querySelector('form').reset();
-                document.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
-                experienceInput.value = "0";
-            };
+                fetch('feedback.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        feedbackPopup.classList.add('active');
+                        overlay.classList.add('active');
+                        feedbackForm.reset();
+                        ratingOptions.forEach(opt => opt.classList.remove('selected'));
+                        experienceInput.value = "0";
+                    }
+                });
+            });
 
-            window.closeErrorPopup = function() {
-                errorPopup.classList.remove('active');
-                overlay.classList.remove('active');
-            };
-
-            window.navigateTo = function(page) {
-                window.location.href = page;
-            };
+            closeFeedbackPopupButton.addEventListener('click', closePopup);
+            closeErrorPopupButton.addEventListener('click', closePopup);
+            overlay.addEventListener('click', closePopup);
         });
+
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        function closePopup() {
+            document.querySelectorAll('.popup').forEach(popup => popup.classList.remove('active'));
+            document.getElementById('header-overlay').classList.remove('active');
+        }
     </script>
 </body>
 </html>
