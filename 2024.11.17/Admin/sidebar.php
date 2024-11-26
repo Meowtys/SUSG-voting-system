@@ -1,3 +1,16 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if the user is logged in
+if (isset($_SESSION['user'])) {
+    $user = $_SESSION['user'];
+} else {
+    $user = null;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,16 +116,6 @@
     <?php
     // Determine the current page for dynamic highlighting
     $current_page = basename($_SERVER['PHP_SELF']);
-
-    // Logout function
-    if (isset($_GET['action']) && $_GET['action'] == 'logout') {
-        // Destroy the session
-        session_destroy();
-
-        // Redirect to start.html
-        header("Location: ../start.html");
-        exit();
-    }
     ?>
     <!-- Side Bar Content -->
     <div class="sidebar">
@@ -135,7 +138,7 @@
                 <a href="admin-analytics.php" class="nav-link <?php echo $current_page == 'admin-analytics.php' ? 'active' : ''; ?>"><i class="fas fa-chart-pie icon"></i>Analytics</a>
             </div>
             <div class="section">
-                <a href="../start.html" class="nav-link"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
+                <a href="../logout.php" class="nav-link"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
             </div>
         </div>
     </div>
