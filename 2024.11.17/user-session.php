@@ -3,6 +3,12 @@ require_once 'connect.php';
 
 session_start();
 
+// Redirect to homepage if user is already logged in
+if (isset($_SESSION['user'])) {
+    header('Location: homepage.php');
+    exit();
+}
+
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
@@ -109,4 +115,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
         exit();
     }
 }
-?> 
+?>

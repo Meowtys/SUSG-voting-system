@@ -1,6 +1,13 @@
 <?php
 
 session_start();
+
+// Redirect to homepage if user is already logged in
+if (isset($_SESSION['user'])) {
+    header('Location: homepage.php');
+    exit();
+}
+
 if (isset($_SESSION['errors'])) {
   $errors = $_SESSION['errors'];
 }
