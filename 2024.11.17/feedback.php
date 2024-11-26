@@ -22,12 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Received experience: $experience, suggestion: $suggestion");
 
     // Insert feedback into the database
-    $stmt = $pdo->prepare("INSERT INTO feedbacks (student_id, experience, suggestion, feedback_timestamp) VALUES (:student_id, :experience, :suggestion, :feedback_timestamp)");
+    $stmt = $pdo->prepare("INSERT INTO feedbacks (student_id, experience, suggestion, feedback_timestamp) VALUES (:student_id, :experience, :suggestion, NOW())");
     $stmt->execute([
         'student_id' => $user['student_id'],
         'experience' => $experience,
-        'suggestion' => $suggestion,
-        'feedback_timestamp' => date('Y-m-d H:i:s')
+        'suggestion' => $suggestion
     ]);
 
     // Debugging: Check if insertion was successful
