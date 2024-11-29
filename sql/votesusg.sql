@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2024 at 04:21 AM
+-- Generation Time: Nov 29, 2024 at 11:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,7 +44,7 @@ CREATE TABLE `candidates` (
 
 INSERT INTO `candidates` (`candidate_id`, `candidate_name`, `college_id`, `position_id`, `qualified`, `remarks`, `candidate_image`, `candidate_party`) VALUES
 (0, 'Abstain', 0, 1, 0, NULL, '', ''),
-(1, 'Westen', 1, 1, 1, NULL, 'candidate_images\\images.jpg', 'CAUSE'),
+(1, 'Westen', 1, 1, 1, '', 'candidate_images\\images.jpg', 'CAUSE'),
 (3, 'Homer', 3, 1, 1, NULL, 'candidate_images\\cat03.jpg', 'Independent'),
 (10, 'Harry', 2, 3, 1, NULL, 'candidate_images\\harry.jpg', 'Independent'),
 (11, 'Goku', 12, 2, 1, NULL, 'candidate_images\\goku.png', 'Independent');
@@ -108,6 +108,21 @@ INSERT INTO `comelec` (`comelec_id`, `comelec_name`, `password`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `elections`
+--
+
+CREATE TABLE `elections` (
+  `election_id` int(50) NOT NULL,
+  `start_datetime` datetime NOT NULL,
+  `end_datetime` datetime NOT NULL,
+  `status` enum('Scheduled','Ongoing','Completed','') NOT NULL DEFAULT 'Scheduled',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `feedbacks`
 --
 
@@ -165,7 +180,7 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`student_id`, `student_name`, `college_id`, `password`, `has_voted`) VALUES
-('21-1-01417', 'John Westen Rey Dasig', 1, 'westengwapo', 1);
+('21-1-01417', 'John Westen Rey Dasig', 1, 'westengwapo', 0);
 
 -- --------------------------------------------------------
 
@@ -180,15 +195,6 @@ CREATE TABLE `votes` (
   `position_id` int(3) NOT NULL,
   `vote_timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `votes`
---
-
-INSERT INTO `votes` (`vote_id`, `student_id`, `candidate_id`, `position_id`, `vote_timestamp`) VALUES
-(37, '21-1-01417', 0, 1, '2024-11-26 01:46:12'),
-(38, '21-1-01417', 0, 2, '2024-11-26 01:46:12'),
-(39, '21-1-01417', 0, 3, '2024-11-26 01:46:12');
 
 --
 -- Indexes for dumped tables
@@ -213,6 +219,12 @@ ALTER TABLE `colleges`
 --
 ALTER TABLE `comelec`
   ADD PRIMARY KEY (`comelec_id`);
+
+--
+-- Indexes for table `elections`
+--
+ALTER TABLE `elections`
+  ADD PRIMARY KEY (`election_id`);
 
 --
 -- Indexes for table `feedbacks`
@@ -251,7 +263,7 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `candidates`
 --
 ALTER TABLE `candidates`
-  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `colleges`
@@ -266,10 +278,16 @@ ALTER TABLE `comelec`
   MODIFY `comelec_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `elections`
+--
+ALTER TABLE `elections`
+  MODIFY `election_id` int(50) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `positions`
@@ -281,7 +299,7 @@ ALTER TABLE `positions`
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- Constraints for dumped tables
