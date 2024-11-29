@@ -1,4 +1,24 @@
 <?php
+require_once '../connect.php';
+
+// Fetch positions from the database
+$positionsStmt = $pdo->query("SELECT * FROM positions");
+$positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch live results from the database
+function getLiveResults($pdo, $positionId) {
+    $stmt = $pdo->prepare("
+        SELECT candidates.candidate_name, candidates.candidate_party, COUNT(votes.vote_id) AS votes
+        FROM votes
+        JOIN candidates ON votes.candidate_id = candidates.candidate_id
+        WHERE votes.position_id = ?
+        GROUP BY candidates.candidate_id
+        ORDER BY votes DESC
+    ");
+    $stmt->execute([$positionId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Start output buffering if needed
 ob_start();
 ?>
@@ -134,56 +154,31 @@ ob_start();
     <script src="../script/adminload.js" type="module" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const candidateData = {
-                "president": [
-                    { name: "James Teves", party: "Tribu Wakwak", votes: 567 },
-                    { name: "Rynz Daval", party: "Tribu Akru", votes: 300 },
-                    { name: "Danyel Ray", party: "Tribu Treskilion", votes: 150 }
-                ],
-                "vice_president": [
-                    { name: "John Doe", party: "Foam Party", votes: 350 },
-                    { name: "Elliot Montgomery", party: "Disco Party", votes: 290 },
-                    { name: "Westen Naval", party: "Ozone Party", votes: 210 }
-                ],
-                "secretary": [
-                    { name: "Emilio Aguinaldo", party: "Mason", votes: 450 },
-                    { name: "Andres Bonifacio", party: "Katipuneros", votes: 400 },
-                    { name: "Jose Rizal", party: "Bayani", votes: 350 }
-                ],
-                "assistant_secretary": [
-                    { name: "Kuya Kim", party: "Matanglawin", votes: 200 },
-                    { name: "Vice Ganda", party: "Gandang Gabi Vice", votes: 180 },
-                    { name: "Tito Boy", party: "Boy Abunda", votes: 150 }
-                ],
-                "treasurer": [
-                    { name: "James Teves", party: "Tribu Wakwak", votes: 320 },
-                    { name: "Rynz Daval", party: "Tribu Akru", votes: 270 },
-                    { name: "Danyel Ray", party: "Tribu Treskilion", votes: 120 }
-                ],
-                "majority_floor_leader": [
-                    { name: "John Doe", party: "Foam Party", votes: 380 },
-                    { name: "Elliot Montgomery", party: "Disco Party", votes: 360 },
-                    { name: "Westen Naval", party: "Ozone Party", votes: 140 }
-                ]
-            };
-
             const positionSelect = document.getElementById("position");
             const resultsContainer = document.querySelector(".results");
 
             positionSelect.addEventListener("change", function () {
                 const selectedPosition = positionSelect.value;
-                updateResults(selectedPosition);
+                fetchResults(selectedPosition);
             });
 
-            function updateResults(position) {
+            function fetchResults(positionId) {
+                fetch(`fetch_results.php?position_id=${positionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateResults(data);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            function updateResults(candidates) {
                 resultsContainer.innerHTML = ""; // Clear previous results
 
-                const candidates = candidateData[position];
                 candidates.forEach(candidate => {
                     const resultElement = document.createElement("div");
                     resultElement.className = "candidate-result";
                     resultElement.innerHTML = `
-                        <p>${candidate.name} (${candidate.party})</p>
+                        <p>${candidate.candidate_name} (${candidate.candidate_party})</p>
                         <span class="percentage">${candidate.votes}</span>
                     `;
                     resultsContainer.appendChild(resultElement);
@@ -191,7 +186,7 @@ ob_start();
             }
 
             // Initialize with the first position
-            updateResults("president");
+            fetchResults(positionSelect.value);
 
             // Countdown timer functionality
             function startCountdown(duration) {
@@ -236,12 +231,11 @@ ob_start();
                 <div class="dropdown">
                     <label for="position">Position: </label>
                     <select id="position">
-                        <option value="president">President (Speaker)</option>
-                        <option value="vice_president">Vice President (Speaker Pro Tempore)</option>
-                        <option value="secretary">Secretary</option>
-                        <option value="assistant_secretary">Assistant Secretary</option>
-                        <option value="treasurer">Treasurer</option>
-                        <option value="majority_floor_leader">Majority Floor Leader</option>
+                        <?php foreach ($positions as $position): ?>
+                            <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
+                                <?php echo htmlspecialchars($position['position_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="divider"></div>
