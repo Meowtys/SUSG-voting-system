@@ -230,7 +230,7 @@ ob_start();
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Add New Student</h2>
+            <h2 id="modalTitle">Add New Student</h2>
             <form class="modal-form" id="studentForm" method="POST" action="create_student.php">
                 <input type="hidden" id="studentFormId" name="studentFormId">
                 <label for="studentId">Student ID:</label>
@@ -265,6 +265,7 @@ ob_start();
         const modal = document.getElementById("myModal");
         const openModalBtn = document.getElementById("openModalBtn");
         const closeBtns = document.querySelectorAll(".close");
+        const modalTitle = document.getElementById("modalTitle");
 
         openModalBtn.addEventListener("click", () => {
             document.getElementById('studentForm').action = 'create_student.php';
@@ -273,6 +274,7 @@ ob_start();
             document.getElementById('studentName').value = '';
             document.getElementById('college').value = '';
             document.getElementById('hasVoted').value = '0';
+            modalTitle.textContent = "Add New Student";
             modal.style.display = "block";
         });
         closeBtns.forEach(btn => btn.addEventListener("click", () => modal.style.display = "none"));
@@ -290,6 +292,7 @@ ob_start();
                 document.getElementById('studentName').value = student.student_name;
                 document.getElementById('college').value = student.college_id;
                 document.getElementById('hasVoted').value = student.has_voted;
+                modalTitle.textContent = "Edit Student";
                 modal.style.display = "block";
             });
         });
