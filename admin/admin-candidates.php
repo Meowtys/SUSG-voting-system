@@ -296,6 +296,19 @@ ob_start();
         window.addEventListener("click", (event) => {
             if (event.target == modal) modal.style.display = "none";
         });
+
+        // Client-side validation for image file type
+        document.getElementById('newCandidateForm').addEventListener('submit', function(event) {
+            const fileInput = document.getElementById('candidateImage');
+            const filePath = fileInput.value;
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+
+            if (!allowedExtensions.exec(filePath)) {
+                alert('Only JPG, JPEG, and PNG files are allowed.');
+                fileInput.value = '';
+                event.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
