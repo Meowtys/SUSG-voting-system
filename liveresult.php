@@ -12,12 +12,14 @@ $user = $_SESSION['user'];
 
 // Include database connection
 require_once 'connect.php';
-?>
 
+// Fetch positions from the database
+$positionsStmt = $pdo->query("SELECT * FROM positions");
+$positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,6 +111,18 @@ require_once 'connect.php';
         transform: translateY(-5px);
     }
 
+    .candidate-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+    .candidate-info {
+        display: flex;
+        align-items: center;
+    }
+
     .percentage {
         background-color: #d3a5a5;
         padding: 10px;
@@ -132,37 +146,28 @@ require_once 'connect.php';
         color: #333;
     }
 
-    .navigation-buttons {
+    .position-buttons {
         display: flex;
-        justify-content: space-between;
-        width: 100%;
-        max-width: 600px;
-        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 25px;
     }
 
-    .nav-btn {
+    .position-button {
         padding: 10px 20px;
         font-size: 16px;
-        font-weight: 600;
         border: none;
         border-radius: 5px;
+        background-color: #b82323; 
+        color: white;
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    .back-btn {
-        background-color: #a5a5a5;
-        color: white;
-    }
-
-    .next-btn {
-        background-color: #333;
-        color: white;
-    }
-
-    .nav-btn:hover {
+    .position-button:hover {
+        background-color: #d9534f; 
         transform: scale(1.05);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     @media (max-width: 768px) {
@@ -175,17 +180,61 @@ require_once 'connect.php';
             width: 100%;
         }
 
-        .navigation-buttons {
+        .position-buttons {
             flex-direction: column;
             gap: 10px;
         }
 
-        .nav-btn {
+        .position-button {
             width: 100%;
         }
     }
     </style>
-    <script src="script/load.js" type="module" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const resultsContainer = document.querySelector(".results");
+            const currentPositionElement = document.querySelector(".current-position");
+
+            function fetchResults(positionId, positionName) {
+                fetch(`admin/fetch_results.php?position_id=${positionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        updateResults(data, positionName);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            function updateResults(candidates, positionName) {
+                resultsContainer.innerHTML = ""; // Clear previous results
+                currentPositionElement.textContent = `Position: ${positionName}`;
+
+                candidates.forEach(candidate => {
+                    const resultElement = document.createElement("div");
+                    resultElement.className = "candidate-result";
+                    resultElement.innerHTML = `
+                        <div class="candidate-info">
+                            <img class="candidate-photo" src="${candidate.candidate_image}" alt="${candidate.candidate_name}">
+                            <p>${candidate.candidate_name} (${candidate.candidate_party})</p>
+                        </div>
+                        <span class="percentage">${candidate.votes}</span>
+                    `;
+                    resultsContainer.appendChild(resultElement);
+                });
+            }
+
+            // Initialize with the first position
+            fetchResults(<?php echo $positions[0]['position_id']; ?>, "<?php echo $positions[0]['position_name']; ?>");
+
+            // Add event listeners to position buttons
+            document.querySelectorAll('.position-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.getAttribute('data-position-id');
+                    const positionName = this.textContent;
+                    fetchResults(positionId, positionName);
+                });
+            });
+        });
+    </script>
 </head>
 <body>
 
@@ -194,65 +243,25 @@ require_once 'connect.php';
 
     <main class="results-container">
         <!-- Main Contents -->
-        <h1 class="title">Results</h1>
+        <h1 class="title">Live Tally</h1>
         <div class="results-box">
             <h2 class="results-title">Live Results (All Position)</h2>
+            <div class="position-buttons">
+                <?php foreach ($positions as $position): ?>
+                    <button class="position-button" data-position-id="<?php echo htmlspecialchars($position['position_id']); ?>">
+                        <?php echo htmlspecialchars($position['position_name']); ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
             <hr class="divider">
 
-            <div class="results">
-                <div class="position-column">
-                    <h3 class="position-title">PRESIDENT:</h3>
-                    <div class="candidate-result main-result">
-                        <div class="percentage">60%</div>
-                        <p>Candidate A</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">23%</div>
-                        <p>Candidate B</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">17%</div>
-                        <p>Candidate C</p>
-                    </div>
-                </div>
-
-                <div class="position-column">
-                    <h3 class="position-title">VICE-PRESIDENT:</h3>
-                    <div class="candidate-result main-result">
-                        <div class="percentage">73%</div>
-                        <p>Candidate D</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">10%</div>
-                        <p>Candidate E</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">7%</div>
-                        <p>Candidate F</p>
-                    </div>
-                </div>
-
-                <div class="position-column">
-                    <h3 class="position-title">DEPARTMENT REP 1:</h3>
-                    <div class="candidate-result main-result">
-                        <div class="percentage">42%</div>
-                        <p>Candidate G</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">31%</div>
-                        <p>Candidate H</p>
-                    </div>
-                    <div class="candidate-result">
-                        <div class="percentage">27%</div>
-                        <p>Candidate I</p>
-                    </div>
-                </div>
+            <div class="current-position">
+                <!-- Current position will be displayed here -->
             </div>
-        </div>
 
-        <div class="navigation-buttons">
-            <button class="nav-btn back-btn">Back</button>
-            <button class="nav-btn next-btn">Next</button>
+            <div class="results">
+                <!-- Dynamic results will be inserted here -->
+            </div>
         </div>
     </main>
 
