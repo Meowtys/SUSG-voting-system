@@ -15,8 +15,8 @@ $stmt = $pdo->query("
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch colleges from the database
-$collegesStmt = $pdo->query("SELECT * FROM colleges");
+// Fetch colleges from the database, excluding "Abstain"
+$collegesStmt = $pdo->query("SELECT * FROM colleges WHERE college_name != 'Abstain'");
 $colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Start output buffering
@@ -232,6 +232,9 @@ ob_start();
             <span class="close">&times;</span>
             <h2>Add New Student</h2>
             <form class="modal-form" id="newStudentForm" method="POST" action="create_student.php">
+                <label for="studentId">Student ID:</label>
+                <input type="text" id="studentId" name="studentId" required>
+
                 <label for="studentName">Student Name:</label>
                 <input type="text" id="studentName" name="studentName" required>
 
@@ -245,8 +248,8 @@ ob_start();
                     <?php endforeach; ?>
                 </select>
 
-                <label for="hasVotes">Has Voted:</label>
-                <select id="hasVotes" name="hasVotes" required>
+                <label for="hasVoted">Has Voted:</label>
+                <select id="hasVoted" name="hasVoted" required>
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </select>
@@ -269,4 +272,4 @@ ob_start();
         });
     </script>
 </body>
-</html>
+</html> 
