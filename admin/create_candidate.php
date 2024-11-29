@@ -1,13 +1,46 @@
-
 <?php
 require_once '../connect.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $candidateName = $_POST['candidateName'];
+    $partyName = $_POST['partyName'];
+    $position = $_POST['position'];
+    $college = $_POST['college'];
+    $qualified = $_POST['qualified'];
+    $remarks = $_POST['remarks'];
 
-if ($data) {
-    $stmt = $pdo->prepare("INSERT INTO candidates (candidate_name, candidate_party, position_id, college_id, qualified, remarks) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$data['candidateName'], $data['partyName'], $data['position'], $data['college'], $data['qualified'], $data['remarks']]);
-    echo json_encode(["message" => "Candidate successfully created!"]);
+    // Handle file upload
+    if (isset($_FILES['candidateImage']) && $_FILES['candidateImage']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['candidateImage']['tmp_name'];
+        $fileName = $_FILES['candidateImage']['name'];
+        $fileSize = $_FILES['candidateImage']['size'];
+        $fileType = $_FILES['candidateImage']['type'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
+
+        $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+        $uploadFileDir = '../candidate_images/';
+        $dest_path = $uploadFileDir . $newFileName;
+
+        if (move_uploaded_file($fileTmpPath, $dest_path)) {
+            $candidateImage = 'candidate_images/' . $newFileName;
+        } else {
+            $candidateImage = null;
+        }
+    } else {
+        $candidateImage = null;
+    }
+
+    // Insert new candidate into the database
+    $stmt = $pdo->prepare("
+        INSERT INTO candidates (candidate_name, candidate_party, position_id, college_id, qualified, remarks, candidate_image) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ");
+    $stmt->execute([$candidateName, $partyName, $position, $college, $qualified, $remarks, $candidateImage]);
+
+    // Redirect back to the candidates page
+    header('Location: admin-candidates.php');
+    exit();
 } else {
     http_response_code(400);
     echo json_encode(["message" => "Invalid data!"]);

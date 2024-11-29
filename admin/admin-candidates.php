@@ -240,7 +240,7 @@ ob_start();
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>File New Candidacy</h2>
-            <form class="modal-form" id="newCandidateForm">
+            <form class="modal-form" id="newCandidateForm" method="POST" action="create_candidate.php" enctype="multipart/form-data">
                 <label for="candidateName">Candidate Name:</label>
                 <input type="text" id="candidateName" name="candidateName" required>
 
@@ -295,31 +295,6 @@ ob_start();
         closeBtn.addEventListener("click", () => modal.style.display = "none");
         window.addEventListener("click", (event) => {
             if (event.target == modal) modal.style.display = "none";
-        });
-
-        // Add candidate functionality
-        document.getElementById("newCandidateForm").addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const candidateName = document.getElementById("candidateName").value;
-            const partyName = document.getElementById("partyName").value;
-            const position = document.getElementById("position").value;
-            const college = document.getElementById("college").value;
-            const qualified = document.getElementById("qualified").value;
-            const remarks = document.getElementById("remarks").value;
-
-            const response = await fetch("create_candidate.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ candidateName, partyName, position, college, qualified, remarks })
-            });
-
-            if (response.ok) {
-                alert("Candidate successfully added!");
-                location.reload();
-            } else {
-                alert("Failed to add candidate.");
-            }
         });
     </script>
 </body>
