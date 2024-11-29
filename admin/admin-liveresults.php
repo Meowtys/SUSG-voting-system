@@ -119,17 +119,28 @@ ob_start();
             text-align: center;
         }
 
-        .dropdown {
+        .position-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
             margin-top: 25px;
-            display: inline-block;
         }
 
-        .dropdown select {
-            padding: 10px;
+        .position-button {
+            padding: 10px 20px;
             font-size: 16px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 5px;
-            width: 200px;
+            background-color: #b82323; 
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .position-button:hover {
+            background-color: #d9534f; 
+            transform: scale(1.05);
         }
 
         .election-countdown {
@@ -166,13 +177,7 @@ ob_start();
     <script src="../script/adminload.js" type="module" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const positionSelect = document.getElementById("position");
             const resultsContainer = document.querySelector(".results");
-
-            positionSelect.addEventListener("change", function () {
-                const selectedPosition = positionSelect.value;
-                fetchResults(selectedPosition);
-            });
 
             function fetchResults(positionId) {
                 fetch(`fetch_results.php?position_id=${positionId}`)
@@ -201,7 +206,7 @@ ob_start();
             }
 
             // Initialize with the first position
-            fetchResults(positionSelect.value);
+            fetchResults(<?php echo $positions[0]['position_id']; ?>);
 
             // Countdown timer functionality
             function startCountdown(duration) {
@@ -229,6 +234,14 @@ ob_start();
 
             // Set countdown to 5 days (in seconds)
             startCountdown(5 * 24 * 60 * 60);
+
+            // Add event listeners to position buttons
+            document.querySelectorAll('.position-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const positionId = this.getAttribute('data-position-id');
+                    fetchResults(positionId);
+                });
+            });
         });
     </script>
 </head>
@@ -243,15 +256,12 @@ ob_start();
             <h1>Live Results</h1>
             <div class="results-box">
                 <h2 class="results-title">Candidate Results</h2>
-                <div class="dropdown">
-                    <label for="position">Position: </label>
-                    <select id="position">
-                        <?php foreach ($positions as $position): ?>
-                            <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
-                                <?php echo htmlspecialchars($position['position_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="position-buttons">
+                    <?php foreach ($positions as $position): ?>
+                        <button class="position-button" data-position-id="<?php echo htmlspecialchars($position['position_id']); ?>">
+                            <?php echo htmlspecialchars($position['position_name']); ?>
+                        </button>
+                    <?php endforeach; ?>
                 </div>
                 <div class="divider"></div>
     
