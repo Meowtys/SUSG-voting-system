@@ -66,6 +66,13 @@ ob_start();
             margin-bottom: 20px;
         }
 
+        .current-position {
+            font-size: 24px;
+            font-weight: 500;
+            color: #b82323;
+            margin-bottom: 20px;
+        }
+
         .divider {
             border: 1px solid #e0e0e0;
             width: 90%;
@@ -178,18 +185,20 @@ ob_start();
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const resultsContainer = document.querySelector(".results");
+            const currentPositionElement = document.querySelector(".current-position");
 
-            function fetchResults(positionId) {
+            function fetchResults(positionId, positionName) {
                 fetch(`fetch_results.php?position_id=${positionId}`)
                     .then(response => response.json())
                     .then(data => {
-                        updateResults(data);
+                        updateResults(data, positionName);
                     })
                     .catch(error => console.error('Error:', error));
             }
 
-            function updateResults(candidates) {
+            function updateResults(candidates, positionName) {
                 resultsContainer.innerHTML = ""; // Clear previous results
+                currentPositionElement.textContent = `Position: ${positionName}`;
 
                 candidates.forEach(candidate => {
                     const resultElement = document.createElement("div");
@@ -206,7 +215,7 @@ ob_start();
             }
 
             // Initialize with the first position
-            fetchResults(<?php echo $positions[0]['position_id']; ?>);
+            fetchResults(<?php echo $positions[0]['position_id']; ?>, "<?php echo $positions[0]['position_name']; ?>");
 
             // Countdown timer functionality
             function startCountdown(duration) {
@@ -239,7 +248,8 @@ ob_start();
             document.querySelectorAll('.position-button').forEach(button => {
                 button.addEventListener('click', function() {
                     const positionId = this.getAttribute('data-position-id');
-                    fetchResults(positionId);
+                    const positionName = this.textContent;
+                    fetchResults(positionId, positionName);
                 });
             });
         });
@@ -264,6 +274,10 @@ ob_start();
                     <?php endforeach; ?>
                 </div>
                 <div class="divider"></div>
+    
+                <div class="current-position">
+                    <!-- Current position will be displayed here -->
+                </div>
     
                 <div class="results">
                     <!-- Dynamic results will be inserted here -->
