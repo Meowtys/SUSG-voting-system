@@ -225,7 +225,7 @@ ob_start();
                             <td><?php echo htmlspecialchars($candidate['college_name']); ?></td>
                             <td><?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?></td>
                             <td><?php echo htmlspecialchars($candidate['remarks']); ?></td>
-                            <td><button class="edit-btn">Edit</button></td>
+                            <td><button class="edit-btn" data-candidate='<?php echo json_encode($candidate); ?>'>Edit</button></td>
                             <td><button class="delete-btn">Delete</button></td>
                         </tr>
                         <?php endforeach; ?>
@@ -267,7 +267,7 @@ ob_start();
                     <?php endforeach; ?>
                 </select>
 
-                <label for="candidateImage">Candidate Image:</label>
+                <label for="candidateImage">Candidate Image (JPG, JPEG, PNG only):</label>
                 <input type="file" id="candidateImage" name="candidateImage" accept="image/*" required>
 
                 <label for="qualified">Qualified:</label>
@@ -285,16 +285,71 @@ ob_start();
         </div>
     </div>
 
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Candidacy</h2>
+            <form class="modal-form" id="editCandidateForm" method="POST" action="edit_candidate.php" enctype="multipart/form-data">
+                <input type="hidden" id="editCandidateId" name="candidateId">
+                <label for="editCandidateName">Candidate Name:</label>
+                <input type="text" id="editCandidateName" name="candidateName" required>
+
+                <label for="editPartyName">Party Name:</label>
+                <input type="text" id="editPartyName" name="partyName" required>
+
+                <label for="editPosition">Position:</label>
+                <select id="editPosition" name="position" required>
+                    <option value="">Select Position</option>
+                    <?php foreach ($positions as $position): ?>
+                        <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
+                            <?php echo htmlspecialchars($position['position_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label for="editCollege">College/Department:</label>
+                <select id="editCollege" name="college" required>
+                    <option value="">Select College</option>
+                    <?php foreach ($colleges as $college): ?>
+                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                            <?php echo htmlspecialchars($college['college_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label for="editCandidateImage">Candidate Image (JPG, JPEG, PNG only):</label>
+                <input type="file" id="editCandidateImage" name="candidateImage" accept="image/*">
+
+                <label for="editQualified">Qualified:</label>
+                <select id="editQualified" name="qualified" required>
+                    <option value="">Select Qualification</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+
+                <label for="editRemarks">Remarks:</label>
+                <input type="text" id="editRemarks" name="remarks">
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Modal functionality
         const modal = document.getElementById("myModal");
         const openModalBtn = document.getElementById("openModalBtn");
-        const closeBtn = document.querySelector(".close");
+        const closeBtns = document.querySelectorAll(".close");
+        const editModal = document.getElementById("editModal");
 
         openModalBtn.addEventListener("click", () => modal.style.display = "block");
-        closeBtn.addEventListener("click", () => modal.style.display = "none");
+        closeBtns.forEach(btn => btn.addEventListener("click", () => {
+            modal.style.display = "none";
+            editModal.style.display = "none";
+        }));
         window.addEventListener("click", (event) => {
             if (event.target == modal) modal.style.display = "none";
+            if (event.target == editModal) editModal.style.display = "none";
         });
 
         // Client-side validation for image file type
@@ -308,6 +363,33 @@ ob_start();
                 fileInput.value = '';
                 event.preventDefault();
             }
+        });
+
+        document.getElementById('editCandidateForm').addEventListener('submit', function(event) {
+            const fileInput = document.getElementById('editCandidateImage');
+            const filePath = fileInput.value;
+            const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+
+            if (filePath && !allowedExtensions.exec(filePath)) {
+                alert('Only JPG, JPEG, and PNG files are allowed.');
+                fileInput.value = '';
+                event.preventDefault();
+            }
+        });
+
+        // Edit button functionality
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const candidate = JSON.parse(this.getAttribute('data-candidate'));
+                document.getElementById('editCandidateId').value = candidate.candidate_id;
+                document.getElementById('editCandidateName').value = candidate.candidate_name;
+                document.getElementById('editPartyName').value = candidate.candidate_party;
+                document.getElementById('editPosition').value = candidate.position_id;
+                document.getElementById('editCollege').value = candidate.college_id;
+                document.getElementById('editQualified').value = candidate.qualified;
+                document.getElementById('editRemarks').value = candidate.remarks;
+                editModal.style.display = "block";
+            });
         });
     </script>
 </body>
