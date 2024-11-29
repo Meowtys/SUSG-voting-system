@@ -8,7 +8,7 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 // Fetch live results from the database
 function getLiveResults($pdo, $positionId) {
     $stmt = $pdo->prepare("
-        SELECT candidates.candidate_name, candidates.candidate_party, COUNT(votes.vote_id) AS votes
+        SELECT candidates.candidate_name, candidates.candidate_party, candidates.candidate_image, COUNT(votes.vote_id) AS votes
         FROM votes
         JOIN candidates ON votes.candidate_id = candidates.candidate_id
         WHERE votes.position_id = ?
@@ -96,6 +96,18 @@ ob_start();
             transform: translateY(-5px);
         }
 
+        .candidate-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .candidate-info {
+            display: flex;
+            align-items: center;
+        }
+
         .percentage {
             background-color: #d3a5a5;
             padding: 15px;
@@ -178,7 +190,10 @@ ob_start();
                     const resultElement = document.createElement("div");
                     resultElement.className = "candidate-result";
                     resultElement.innerHTML = `
-                        <p>${candidate.candidate_name} (${candidate.candidate_party})</p>
+                        <div class="candidate-info">
+                            <img class="candidate-photo" src="../${candidate.candidate_image}" alt="${candidate.candidate_name}">
+                            <p>${candidate.candidate_name} (${candidate.candidate_party})</p>
+                        </div>
                         <span class="percentage">${candidate.votes}</span>
                     `;
                     resultsContainer.appendChild(resultElement);

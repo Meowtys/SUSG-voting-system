@@ -1,4 +1,3 @@
-
 <?php
 require_once '../connect.php';
 
@@ -6,7 +5,7 @@ if (isset($_GET['position_id'])) {
     $positionId = $_GET['position_id'];
 
     $stmt = $pdo->prepare("
-        SELECT candidates.candidate_name, candidates.candidate_party, COUNT(votes.vote_id) AS votes
+        SELECT candidates.candidate_name, candidates.candidate_party, candidates.candidate_image, COUNT(votes.vote_id) AS votes
         FROM votes
         JOIN candidates ON votes.candidate_id = candidates.candidate_id
         WHERE votes.position_id = ?
