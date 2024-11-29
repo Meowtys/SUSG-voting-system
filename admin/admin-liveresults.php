@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
+}
+
 require_once '../connect.php';
 
 // Fetch positions from the database
