@@ -226,7 +226,7 @@ ob_start();
                             <td><?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?></td>
                             <td><?php echo htmlspecialchars($candidate['remarks']); ?></td>
                             <td><button class="edit-btn" data-candidate='<?php echo json_encode($candidate); ?>'>Edit</button></td>
-                            <td><button class="delete-btn">Delete</button></td>
+                            <td><button class="delete-btn" data-candidate-id="<?php echo $candidate['candidate_id']; ?>">Delete</button></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -389,6 +389,31 @@ ob_start();
                 document.getElementById('editQualified').value = candidate.qualified;
                 document.getElementById('editRemarks').value = candidate.remarks;
                 editModal.style.display = "block";
+            });
+        });
+
+        // Delete button functionality
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const candidateId = this.getAttribute('data-candidate-id');
+                if (confirm('Are you sure you want to delete this candidate?')) {
+                    fetch('delete_candidate.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ candidateId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            alert('Failed to delete candidate. Please try again.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
             });
         });
     </script>
