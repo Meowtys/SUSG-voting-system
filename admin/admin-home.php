@@ -1,22 +1,49 @@
+<?php
+session_start();
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
+}
+
+require_once '../connect.php';
+
+// Fetch current election details
+$electionStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC LIMIT 1");
+$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
+
+// Fetch all elections
+$allElectionsStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC");
+$allElections = $allElectionsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['election_name'])) {
+        $electionName = $_POST['election_name'];
+        $startDatetime = $_POST['start_datetime'];
+        $endDatetime = $_POST['end_datetime'];
+        $status = 'Scheduled';
+
+        $stmt = $pdo->prepare("INSERT INTO elections (election_name, start_datetime, end_datetime, status) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$electionName, $startDatetime, $endDatetime, $status]);
+
+        header('Location: admin-home.php');
+        exit();
+    } elseif (isset($_POST['toggle_election'])) {
+        $electionId = $_POST['election_id'];
+        $newStatus = $_POST['new_status'];
+
+        $stmt = $pdo->prepare("UPDATE elections SET status = ? WHERE election_id = ?");
+        $stmt->execute([$newStatus, $electionId]);
+
+        header('Location: admin-home.php');
+        exit();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="icon" href="../asset/susglogo.png" type="image/png">
-    <style>
-        body, html {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-            height: 100%;
-            width: 100%;
-        }
-
-        body {
-            display: flex;
             min-height: 100vh;
         }
 
@@ -124,7 +151,125 @@
         .button:hover {
             background-color: #0056b3;
         }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-group input[type="datetime-local"] {
+            padding: 8px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background-color: #218838;
+        }
+
+        .election-status {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .election-status h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .election-status p {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .countdown-box {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-size: 24px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-box div {
+            background-color: #b82323;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 80px;
+            text-align: center;
+        }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const countdownBox = document.querySelector('.countdown-box');
+            <?php if ($currentElection): ?>
+            const startDatetime = new Date("<?php echo $currentElection['start_datetime']; ?>").getTime();
+            const endDatetime = new Date("<?php echo $currentElection['end_datetime']; ?>").getTime();
+            <?php else: ?>
+            const startDatetime = null;
+            const endDatetime = null;
+            <?php endif; ?>
+
+            function updateCountdown() {
+                if (!startDatetime || !endDatetime) {
+                    countdownBox.innerHTML = "No election scheduled.";
+                    return;
+                }
+
+                const now = new Date().getTime();
+                let distance = startDatetime - now;
+
+                if (now >= startDatetime && now <= endDatetime) {
+                    distance = endDatetime - now;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdownBox.innerHTML = `
+                    <div>${days} DAYS</div>
+                    <div>${hours} HOURS</div>
+                    <div>${minutes} MINUTES</div>
+                    <div>${seconds} SECONDS</div>
+                `;
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    countdownBox.innerHTML = "Election has ended.";
+                }
+            }
+
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+        });
+    </script>
 </head>
 <body>
     <!-- Include Sidebar -->
@@ -134,6 +279,37 @@
     <main>
         <div class="content">
             <h1>Admin Home</h1>
+
+            <form method="POST" class="election-form">
+                <div class="form-group">
+                    <label for="election_name">Election Name/Title</label>
+                    <input type="text" id="election_name" name="election_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_datetime">Start Date and Time</label>
+                    <input type="datetime-local" id="start_datetime" name="start_datetime" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_datetime">End Date and Time</label>
+                    <input type="datetime-local" id="end_datetime" name="end_datetime" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Save Election</button>
+                </div>
+            </form>
+
+            <div class="election-status">
+                <h2>Current Election Status</h2>
+                <?php if ($currentElection): ?>
+                    <p>Name: <?php echo htmlspecialchars($currentElection['election_name']); ?></p>
+                    <p>Status: <?php echo htmlspecialchars($currentElection['status']); ?></p>
+                <?php else: ?>
+                    <p>No election scheduled.</p>
+                <?php endif; ?>
+                <div class="countdown-box">
+                    <!-- Countdown will dynamically populate here -->
+                </div>
+            </div>
         </div>
     </main>
 </body>
