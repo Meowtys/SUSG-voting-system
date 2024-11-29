@@ -201,7 +201,7 @@ ob_start();
     <main>
         <div class="content">
             <h1>Candidates</h1>
-            <button class="add-btn" id="openModalBtn">File New Candidates</button>
+            <button class="add-btn" id="openModalBtn">File New Candidate</button>
             <div class="mngment-box">
                 <table class="mngment-table">
                     <thead>

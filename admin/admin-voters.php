@@ -1,4 +1,24 @@
 <?php
+session_start();
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
+}
+
+require_once '../connect.php';
+
+// Fetch students from the database
+$stmt = $pdo->query("
+    SELECT students.*, colleges.college_name 
+    FROM students 
+    LEFT JOIN colleges ON students.college_id = colleges.college_id
+");
+$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch colleges from the database
+$collegesStmt = $pdo->query("SELECT * FROM colleges");
+$colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Start output buffering
 ob_start();
 ?>
@@ -12,12 +32,19 @@ ob_start();
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
 
     <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
         .content {
             flex-grow: 1;
             padding: 40px;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
         }
-
+    
         h1 {
             font-size: 32px;
             margin-bottom: 30px;
@@ -25,6 +52,7 @@ ob_start();
             color: #333;
         }
 
+        /* Management CSS */
         .mngment-box {
             background-color: #fff;
             border-radius: 10px;
@@ -37,16 +65,33 @@ ob_start();
         }
 
         .mngment-table {
-            width: 90%;
+            width: 100%;
             border-collapse: collapse;
             margin: 0 auto;
             font-size: 17px;
             text-align: left;
         }
 
+        .mngment-table tr {
+            border-bottom: 1px solid #cfcfcf;
+        }
+
         .mngment-table th, .mngment-table td {
             padding: 10px;
-            border-bottom: 1px solid #cfcfcf;
+        }
+
+        /* Buttons */
+        .add-btn {
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            font-size: 17px;
+            border-radius: 4px;
+            background-color: #b82323; 
+            color: white;
+            width: 200px;
+            float: right;
+            margin-bottom: 12px;
         }
 
         .edit-btn, .delete-btn {
@@ -58,115 +103,89 @@ ob_start();
         }
 
         .edit-btn {
-            background-color: #4CAF50;
+            background-color: #4CAF50; 
             color: white;
         }
 
         .delete-btn {
-            background-color: #f44336;
+            background-color: #f44336; 
             color: white;
         }
 
-        .edit-btn:hover, .delete-btn:hover {
-            opacity: 0.8;
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        .sidebar .active {
-            background-color: white;
-            color: #b82323;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-form label {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .modal-form input, .modal-form select {
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .modal-form button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 17px;
+            background-color: #b82323;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
         }
     </style>
     <script src="../script/adminload.js" type="module" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Voters Data
-            const votersData = [
-                { id: "21-1-0001", name: "Juan Dela Cruz", department: "CCS" },
-                { id: "22-1-0002", name: "Johnny Smith", department: "CAS" },
-                { id: "24-1-0003", name: "David Salon", department: "CBA" },
-                { id: "20-1-0004", name: "Dinosaur King", department: "CED" },
-                { id: "21-1-0955", name: "Joanna Lopez", department: "CCS" },
-                { id: "23-1-0090", name: "Maria Santos", department: "CAS" },
-                { id: "20-1-0456", name: "Pedro Cruz", department: "ENG" },
-                { id: "19-2-0321", name: "Anna Garcia", department: "NURSING" },
-                { id: "22-3-0112", name: "Eddie Bautista", department: "LAW" },
-                { id: "21-4-0147", name: "Lara Rodriguez", department: "MED" },
-                { id: "23-1-0009", name: "Kyle Ortega", department: "CAS" },
-                { id: "24-2-0342", name: "Cindy Lim", department: "ENG" },
-                { id: "22-1-0567", name: "Mark Tan", department: "CCS" },
-                { id: "20-1-0890", name: "Stephanie Yee", department: "CBA" },
-                { id: "21-2-0678", name: "Carlos Perez", department: "CAS" },
-                { id: "24-1-0785", name: "Sandy Ong", department: "NURSING" },
-                { id: "22-1-0454", name: "Tommy Chang", department: "LAW" },
-                { id: "23-2-0345", name: "Diane Nolasco", department: "CCS" },
-                { id: "21-3-0123", name: "Rico Martinez", department: "MED" },
-                { id: "22-1-0765", name: "Patricia Wu", department: "CED" }
-            ];
-
-            const tableBody = document.querySelector(".mngment-table tbody");
-
-            function renderTable() {
-                tableBody.innerHTML = "";
-                votersData.forEach((voter, index) => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${voter.id}</td>
-                        <td contenteditable="false">${voter.name}</td>
-                        <td contenteditable="false">${voter.department}</td>
-                        <td><button class="edit-btn" onclick="editVoter(${index})">Edit</button></td>
-                        <td><button class="delete-btn" onclick="deleteVoter(${index})">Delete</button></td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-
-            window.editVoter = function (index) {
-                const row = tableBody.rows[index];
-                const nameCell = row.cells[1];
-                const departmentCell = row.cells[2];
-                const editButton = row.cells[3].querySelector(".edit-btn");
-
-                if (editButton.textContent === "Edit") {
-                    nameCell.contentEditable = "true";
-                    departmentCell.contentEditable = "true";
-                    editButton.textContent = "Save";
-                    nameCell.focus();
-                } else {
-                    nameCell.contentEditable = "false";
-                    departmentCell.contentEditable = "false";
-                    editButton.textContent = "Edit";
-
-                    // Save updated data back to the array
-                    votersData[index].name = nameCell.textContent.trim();
-                    votersData[index].department = departmentCell.textContent.trim();
-                }
-            };
-
-            window.deleteVoter = function (index) {
-                if (confirm("Are you sure you want to delete this voter?")) {
-                    votersData.splice(index, 1);
-                    renderTable();
-                }
-            };
-
-            renderTable();
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarLinks = document.querySelectorAll('.sidebar a');
-
-            // Remove 'active' class from all links
-            sidebarLinks.forEach(link => link.classList.remove('active'));
-
-            // Set 'active' class based on current URL
-            sidebarLinks.forEach(link => {
-                if (link.href === window.location.href) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
 </head>
 <body>
 
@@ -177,23 +196,77 @@ ob_start();
     <main>
         <div class="content">
             <h1>Voters</h1>
+            <button class="add-btn" id="openModalBtn">Add New Student</button>
             <div class="mngment-box">
                 <table class="mngment-table">
                     <thead>
                         <tr>
-                            <th>SU ID</th>
-                            <th>Name</th>
-                            <th>Department</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>College</th>
+                            <th>Has Voted</th>
                             <th>Edit</th>
                             <th>Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Data will be rendered here by JavaScript -->
+                        <?php foreach ($students as $student): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($student['student_id']); ?></td>
+                            <td><?php echo htmlspecialchars($student['student_name']); ?></td>
+                            <td><?php echo htmlspecialchars($student['college_name']); ?></td>
+                            <td><?php echo $student['has_voted'] ? 'Yes' : 'No'; ?></td>
+                            <td><button class="edit-btn" data-student='<?php echo json_encode($student); ?>'>Edit</button></td>
+                            <td><button class="delete-btn" data-student-id="<?php echo $student['student_id']; ?>">Delete</button></td>
+                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
+
+    <!-- Modal Structure -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Student</h2>
+            <form class="modal-form" id="newStudentForm" method="POST" action="create_student.php">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" name="studentName" required>
+
+                <label for="college">College/Department:</label>
+                <select id="college" name="college" required>
+                    <option value="">Select College</option>
+                    <?php foreach ($colleges as $college): ?>
+                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                            <?php echo htmlspecialchars($college['college_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <label for="hasVotes">Has Voted:</label>
+                <select id="hasVotes" name="hasVotes" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById("myModal");
+        const openModalBtn = document.getElementById("openModalBtn");
+        const closeBtns = document.querySelectorAll(".close");
+
+        openModalBtn.addEventListener("click", () => modal.style.display = "block");
+        closeBtns.forEach(btn => btn.addEventListener("click", () => modal.style.display = "none"));
+        window.addEventListener("click", (event) => {
+            if (event.target == modal) modal.style.display = "none";
+        });
+    </script>
 </body>
 </html>
