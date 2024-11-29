@@ -291,26 +291,14 @@ ob_start();
         const openModalBtn = document.getElementById("openModalBtn");
         const closeBtn = document.querySelector(".close");
 
-        // Open modal
-        openModalBtn.addEventListener("click", () => {
-            modal.style.display = "block";
-        });
-
-        // Close modal
-        closeBtn.addEventListener("click", () => {
-            modal.style.display = "none";
-        });
-
-        // Close modal on outside click
+        openModalBtn.addEventListener("click", () => modal.style.display = "block");
+        closeBtn.addEventListener("click", () => modal.style.display = "none");
         window.addEventListener("click", (event) => {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+            if (event.target == modal) modal.style.display = "none";
         });
 
         // Add candidate functionality
-        const form = document.getElementById("newCandidateForm");
-        form.addEventListener("submit", (event) => {
+        document.getElementById("newCandidateForm").addEventListener("submit", async (event) => {
             event.preventDefault();
 
             const candidateName = document.getElementById("candidateName").value;
@@ -320,22 +308,18 @@ ob_start();
             const qualified = document.getElementById("qualified").value;
             const remarks = document.getElementById("remarks").value;
 
-            const table = document.querySelector(".mngment-table tbody");
-            const newRow = table.insertRow();
+            const response = await fetch("create_candidate.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ candidateName, partyName, position, college, qualified, remarks })
+            });
 
-            newRow.innerHTML = `
-                <td>${candidateName}</td>
-                <td>${partyName}</td>
-                <td>${position}</td>
-                <td>${college}</td>
-                <td>${qualified}</td>
-                <td>${remarks}</td>
-                <td><button class="edit-btn">Edit</button></td>
-                <td><button class="delete-btn">Delete</button></td>
-            `;
-
-            modal.style.display = "none";
-            form.reset();
+            if (response.ok) {
+                alert("Candidate successfully added!");
+                location.reload();
+            } else {
+                alert("Failed to add candidate.");
+            }
         });
     </script>
 </body>
