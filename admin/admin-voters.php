@@ -232,7 +232,7 @@ ob_start();
             <span class="close">&times;</span>
             <h2>Add New Student</h2>
             <form class="modal-form" id="studentForm" method="POST" action="create_student.php">
-                <input type="hidden" id="studentFormId" name="studentId">
+                <input type="hidden" id="studentFormId" name="studentFormId">
                 <label for="studentId">Student ID:</label>
                 <input type="text" id="studentId" name="studentId" required>
 
