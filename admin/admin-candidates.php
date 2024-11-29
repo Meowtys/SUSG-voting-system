@@ -16,6 +16,14 @@ $stmt = $pdo->query("
 ");
 $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch positions from the database
+$positionsStmt = $pdo->query("SELECT * FROM positions");
+$positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch colleges from the database, excluding "Abstain"
+$collegesStmt = $pdo->query("SELECT * FROM colleges WHERE college_name != 'Abstain'");
+$colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Start output buffering
 ob_start();
 ?>
@@ -242,31 +250,21 @@ ob_start();
                 <label for="position">Position:</label>
                 <select id="position" name="position" required>
                     <option value="">Select Position</option>
-                    <option value="President">President</option>
-                    <option value="Vice President">Vice President</option>
-                    <option value="Secretary">Representative</option>
+                    <?php foreach ($positions as $position): ?>
+                        <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
+                            <?php echo htmlspecialchars($position['position_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
 
                 <label for="college">College/Department:</label>
                 <select id="college" name="college" required>
                     <option value="">Select College</option>
-                    <option value="CCS">CCS</option>
-                    <option value="AGRI">AGRI</option>
-                    <option value="CAS">CAS</option>
-                    <option value="CBA">CBA</option>
-                    <option value="EDUC">EDUC</option>
-                    <option value="CED">CED</option>
-                    <option value="LAW">LAW</option>
-                    <option value="CMC">CMC</option>
-                    <option value="CON">CON</option>
-                    <option value="COPVA">COPVA</option>
-                    <option value="ICLS">ICLS</option>
-                    <option value="IEMS">IEMS</option>
-                    <option value="IRS">IRS</option>
-                    <option value="JHS">JHS</option>
-                    <option value="MEDICAL SCHOOL">MEDICAL SCHOOL</option>
-                    <option value="SPAG">SPAG</option>
-                    <option value="SHS">SHS</option>
+                    <?php foreach ($colleges as $college): ?>
+                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                            <?php echo htmlspecialchars($college['college_name']); ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
 
                 <label for="candidateImage">Candidate Image:</label>
@@ -275,8 +273,8 @@ ob_start();
                 <label for="qualified">Qualified:</label>
                 <select id="qualified" name="qualified" required>
                     <option value="">Select Qualification</option>
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
                 </select>
 
                 <label for="remarks">Remarks:</label>
