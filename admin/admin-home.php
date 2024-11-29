@@ -44,6 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="../asset/susglogo.png" type="image/png">
+    <style>
+        body, html {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
             min-height: 100vh;
         }
 
@@ -146,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 5px;
             text-decoration: none;
             transition: background-color 0.3s ease;
+            cursor: pointer;
         }
 
         .button:hover {
@@ -223,6 +239,185 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             min-width: 80px;
             text-align: center;
         }
+
+        .toggle-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffc107;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-button:hover {
+            background-color: #e0a800;
+        }
+
+        .election-management {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        .election-management h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+
+        .election-management form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .election-management .form-group {
+            margin-bottom: 0;
+        }
+
+        .election-management .form-group select {
+            padding: 10px;
+        }
+
+        .election-management .form-group button {
+            background-color: #007bff;
+        }
+
+        .election-management .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .election-list {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 40px;
+        }
+
+        .election-list table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .election-list th, .election-list td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .election-list th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+
+        .election-list td {
+            background-color: #fff;
+        }
+
+        .election-list tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        .election-list .status-scheduled {
+            color: blue;
+        }
+
+        .election-list .status-ongoing {
+            color: green;
+            animation: blink 1s step-start infinite;
+        }
+
+        .election-list .status-completed {
+            color: grey;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-buttons button {
+            padding: 5px 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-buttons .edit-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .action-buttons .edit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .action-buttons .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .action-buttons .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .action-buttons .view-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .action-buttons .view-button:hover {
+            background-color: #218838;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -268,6 +463,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             const countdownInterval = setInterval(updateCountdown, 1000);
             updateCountdown();
+
+            // Modal functionality
+            const modal = document.getElementById("newElectionModal");
+            const btn = document.getElementById("newElectionBtn");
+            const span = document.getElementsByClassName("close")[0];
+
+            btn.onclick = function() {
+                modal.style.display = "block";
+            }
+
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
         });
     </script>
 </head>
@@ -280,23 +494,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="content">
             <h1>Admin Home</h1>
 
-            <form method="POST" class="election-form">
-                <div class="form-group">
-                    <label for="election_name">Election Name/Title</label>
-                    <input type="text" id="election_name" name="election_name" required>
+            <button id="newElectionBtn" class="button">+ Schedule New Election</button>
+
+            <div id="newElectionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <form method="POST" class="election-form">
+                        <div class="form-group">
+                            <label for="election_name">Election Name/Title</label>
+                            <input type="text" id="election_name" name="election_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_datetime">Start Date and Time</label>
+                            <input type="datetime-local" id="start_datetime" name="start_datetime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_datetime">End Date and Time</label>
+                            <input type="datetime-local" id="end_datetime" name="end_datetime" required>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit">Save Election</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="form-group">
-                    <label for="start_datetime">Start Date and Time</label>
-                    <input type="datetime-local" id="start_datetime" name="start_datetime" required>
-                </div>
-                <div class="form-group">
-                    <label for="end_datetime">End Date and Time</label>
-                    <input type="datetime-local" id="end_datetime" name="end_datetime" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit">Save Election</button>
-                </div>
-            </form>
+            </div>
 
             <div class="election-status">
                 <h2>Current Election Status</h2>
@@ -309,6 +530,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="countdown-box">
                     <!-- Countdown will dynamically populate here -->
                 </div>
+            </div>
+
+            <div class="election-list">
+                <h2>Scheduled Elections</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Election Name</th>
+                            <th>Start Date and Time</th>
+                            <th>End Date and Time</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($allElections as $election): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($election['election_name']); ?></td>
+                                <td><?php echo htmlspecialchars($election['start_datetime']); ?></td>
+                                <td><?php echo htmlspecialchars($election['end_datetime']); ?></td>
+                                <td class="status-<?php echo strtolower($election['status']); ?>">
+                                    <?php echo htmlspecialchars($election['status']); ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($election['created_at']); ?></td>
+                                <td><?php echo htmlspecialchars($election['updated_at']); ?></td>
+                                <td class="action-buttons">
+                                    <button class="edit-button">Edit</button>
+                                    <button class="delete-button">Delete</button>
+                                    <button class="view-button">View</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
