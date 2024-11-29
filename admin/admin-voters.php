@@ -231,7 +231,8 @@ ob_start();
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Add New Student</h2>
-            <form class="modal-form" id="newStudentForm" method="POST" action="create_student.php">
+            <form class="modal-form" id="studentForm" method="POST" action="create_student.php">
+                <input type="hidden" id="studentFormId" name="studentId">
                 <label for="studentId">Student ID:</label>
                 <input type="text" id="studentId" name="studentId" required>
 
@@ -265,11 +266,33 @@ ob_start();
         const openModalBtn = document.getElementById("openModalBtn");
         const closeBtns = document.querySelectorAll(".close");
 
-        openModalBtn.addEventListener("click", () => modal.style.display = "block");
+        openModalBtn.addEventListener("click", () => {
+            document.getElementById('studentForm').action = 'create_student.php';
+            document.getElementById('studentFormId').value = '';
+            document.getElementById('studentId').value = '';
+            document.getElementById('studentName').value = '';
+            document.getElementById('college').value = '';
+            document.getElementById('hasVoted').value = '0';
+            modal.style.display = "block";
+        });
         closeBtns.forEach(btn => btn.addEventListener("click", () => modal.style.display = "none"));
         window.addEventListener("click", (event) => {
             if (event.target == modal) modal.style.display = "none";
         });
+
+        // Edit button functionality
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const student = JSON.parse(this.getAttribute('data-student'));
+                document.getElementById('studentForm').action = 'edit_student.php';
+                document.getElementById('studentFormId').value = student.student_id;
+                document.getElementById('studentId').value = student.student_id;
+                document.getElementById('studentName').value = student.student_name;
+                document.getElementById('college').value = student.college_id;
+                document.getElementById('hasVoted').value = student.has_voted;
+                modal.style.display = "block";
+            });
+        });
     </script>
 </body>
-</html> 
+</html>
