@@ -118,7 +118,8 @@ CREATE TABLE `elections` (
   `status` enum('Scheduled','Ongoing','Completed','') NOT NULL DEFAULT 'Scheduled',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `election_name` varchar(100) NOT NULL
+  `election_name` varchar(100) NOT NULL,
+  `is_current` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
