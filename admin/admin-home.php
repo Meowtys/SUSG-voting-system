@@ -16,7 +16,7 @@ $allElectionsStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DE
 $allElections = $allElectionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['election_name'])) {
+    if (isset($_POST['election_name']) && !isset($_POST['edit_election'])) {
         $electionName = $_POST['election_name'];
         $startDatetime = $_POST['start_datetime'];
         $endDatetime = $_POST['end_datetime'];
@@ -36,18 +36,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         header('Location: admin-home.php');
         exit();
+    } elseif (isset($_POST['edit_election'])) {
+        $electionId = $_POST['election_id'];
+        $electionName = $_POST['election_name'];
+        $startDatetime = $_POST['start_datetime'];
+        $endDatetime = $_POST['end_datetime'];
+
+        $stmt = $pdo->prepare("UPDATE elections SET election_name = ?, start_datetime = ?, end_datetime = ? WHERE election_id = ?");
+        $stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId]);
+
+        header('Location: admin-home.php');
+        exit();
+    } elseif (isset($_POST['delete_election'])) {
+        $electionId = $_POST['election_id'];
+
+        $stmt = $pdo->prepare("DELETE FROM elections WHERE election_id = ?");
+        $stmt->execute([$electionId]);
+
+        header('Location: admin-home.php');
+        exit();
+    } elseif (isset($_POST['set_current_election'])) {
+        $electionId = $_POST['election_id'];
+
+        $stmt = $pdo->prepare("UPDATE elections SET status = 'Scheduled' WHERE status = 'Ongoing'");
+        $stmt->execute();
+
+        $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE election_id = ?");
+        $stmt->execute([$electionId]);
+
+        header('Location: admin-home.php');
+        exit();
+    }
+
+    // Handle AJAX request for setting current election
+    if (isset($_POST['set_current_election']) && isset($_POST['ajax'])) {
+        $electionId = $_POST['election_id'];
+
+        // Update the statuses
+        $pdo->prepare("UPDATE elections SET status = 'Scheduled' WHERE status = 'Ongoing'")->execute();
+        $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE election_id = ?");
+        $stmt->execute([$electionId]);
+
+        // Fetch the updated current election
+        $stmt = $pdo->prepare("SELECT * FROM elections WHERE election_id = ?");
+        $stmt->execute([$electionId]);
+        $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Return JSON response
+        echo json_encode([
+            'success' => true,
+            'election_name' => htmlspecialchars($currentElection['election_name']),
+            'status' => htmlspecialchars($currentElection['status'])
+        ]);
+        exit();
     }
 }
+
+// Fetch current election details again after any changes
+$electionStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC LIMIT 1");
+$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <style>
         body, html {
             font-family: 'Poppins', sans-serif;
@@ -300,21 +353,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            /* Change table-layout to auto */
+            table-layout: auto;
         }
 
+        /* Remove fixed widths to allow columns to size based on content */
         .election-list th, .election-list td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
+            word-wrap: break-word;
         }
 
-        .election-list th {
-            background-color: #f2f2f2;
-            font-weight: 600;
-        }
-
-        .election-list td {
-            background-color: #fff;
+        /* Optionally, set a minimum width for the Actions column */
+        .election-list th:nth-child(7),
+        .election-list td:nth-child(7) {
+            min-width: 150px;
         }
 
         .election-list tr:nth-child(even) td {
@@ -342,10 +396,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
         }
 
         .action-buttons button {
+            flex: 1;
             padding: 5px 10px;
             font-size: 14px;
             border: none;
@@ -482,6 +538,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     modal.style.display = "none";
                 }
             }
+
+            // Modal functionality for edit
+            const editButtons = document.querySelectorAll('.edit-button');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const row = button.closest('tr');
+                    const electionId = row.dataset.electionId;
+                    const electionName = row.querySelector('.election-name').textContent;
+                    const startDatetime = row.querySelector('.start-datetime').textContent;
+                    const endDatetime = row.querySelector('.end-datetime').textContent;
+
+                    document.getElementById('edit_election_id').value = electionId;
+                    document.getElementById('edit_election_name').value = electionName;
+                    document.getElementById('edit_start_datetime').value = startDatetime;
+                    document.getElementById('edit_end_datetime').value = endDatetime;
+
+                    document.getElementById('editElectionModal').style.display = 'block';
+                });
+            });
+
+            // Modal functionality for delete
+            const deleteButtons = document.querySelectorAll('.delete-button');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const electionId = button.closest('tr').dataset.electionId;
+                    if (confirm('Are you sure you want to delete this election?')) {
+                        document.getElementById('delete_election_id').value = electionId;
+                        document.getElementById('deleteElectionForm').submit();
+                    }
+                });
+            });
+
+            // Modify the Set as Current button to use AJAX
+            const setCurrentButtons = document.querySelectorAll('.view-button');
+            setCurrentButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const electionId = button.closest('tr').dataset.electionId;
+                    if (confirm('Are you sure you want to set this election as current?')) {
+                        // Send AJAX request
+                        fetch('admin-home.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `set_current_election=1&election_id=${electionId}&ajax=1`
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Update the Current Election Status section
+                                const electionStatusDiv = document.querySelector('.election-status');
+                                electionStatusDiv.innerHTML = `
+                                    <h2>Current Election Status</h2>
+                                    <p>Name: ${data.election_name}</p>
+                                    <p>Status: ${data.status}</p>
+                                `;
+                                alert('Current election updated successfully.');
+                            } else {
+                                alert('Failed to update current election.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while setting the current election.');
+                        });
+                    }
+                });
+            });
+
+            // Close modal
+            const closeModalButtons = document.querySelectorAll('.close');
+            closeModalButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    button.closest('.modal').style.display = 'none';
+                });
+            });
+
+            window.onclick = function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.style.display = 'none';
+                }
+            }
         });
     </script>
 </head>
@@ -519,6 +655,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
 
+            <div class="countdown-box">
+                    <!-- Countdown will dynamically populate here -->
+            </div>
+
+            <!-- Add the Current Election Status section -->
             <div class="election-status">
                 <h2>Current Election Status</h2>
                 <?php if ($currentElection): ?>
@@ -527,9 +668,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php else: ?>
                     <p>No election scheduled.</p>
                 <?php endif; ?>
-                <div class="countdown-box">
-                    <!-- Countdown will dynamically populate here -->
-                </div>
             </div>
 
             <div class="election-list">
@@ -548,10 +686,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </thead>
                     <tbody>
                         <?php foreach ($allElections as $election): ?>
-                            <tr>
-                                <td><?php echo htmlspecialchars($election['election_name']); ?></td>
-                                <td><?php echo htmlspecialchars($election['start_datetime']); ?></td>
-                                <td><?php echo htmlspecialchars($election['end_datetime']); ?></td>
+                            <tr data-election-id="<?php echo htmlspecialchars($election['election_id']); ?>">
+                                <td class="election-name"><?php echo htmlspecialchars($election['election_name']); ?></td>
+                                <td class="start-datetime"><?php echo htmlspecialchars($election['start_datetime']); ?></td>
+                                <td class="end-datetime"><?php echo htmlspecialchars($election['end_datetime']); ?></td>
                                 <td class="status-<?php echo strtolower($election['status']); ?>">
                                     <?php echo htmlspecialchars($election['status']); ?>
                                 </td>
@@ -560,7 +698,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td class="action-buttons">
                                     <button class="edit-button">Edit</button>
                                     <button class="delete-button">Delete</button>
-                                    <button class="view-button">View</button>
+                                    <button class="view-button">Set as Current</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -569,5 +707,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </main>
+
+    <!-- Edit Election Modal -->
+    <div id="editElectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <form method="POST" class="election-form">
+                <input type="hidden" id="edit_election_id" name="election_id">
+                <div class="form-group">
+                    <label for="edit_election_name">Election Name/Title</label>
+                    <input type="text" id="edit_election_name" name="election_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_start_datetime">Start Date and Time</label>
+                    <input type="datetime-local" id="edit_start_datetime" name="start_datetime" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_end_datetime">End Date and Time</label>
+                    <input type="datetime-local" id="edit_end_datetime" name="end_datetime" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" name="edit_election">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Election Form -->
+    <form id="deleteElectionForm" method="POST" style="display: none;">
+        <input type="hidden" id="delete_election_id" name="election_id">
+        <input type="hidden" name="delete_election" value="1">
+        <button type="submit">Delete Election</button>
+    </form>
+
+    <!-- Set Current Election Form -->
+    <form id="setCurrentElectionForm" method="POST" style="display: none;">
+        <input type="hidden" id="set_current_election_id" name="election_id">
+        <button type="submit" name="set_current_election">Set Current Election</button>
+    </form>
 </body>
-</html>
+</html> 
