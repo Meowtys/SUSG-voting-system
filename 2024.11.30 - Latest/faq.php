@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Frequently Asked Questions</title>
+    <link rel="icon" href="asset/susglogo.png" type="image/png">
+
+    <style>
+        /* Global styling */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body, html {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header and footer */
+        #header, #footer {
+            width: 100%;
+        }
+
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: 50px;
+            margin-bottom: 25px;
+        }
+
+        /* FAQ container */
+        .faq-container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .faq-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* FAQ item */
+        .faq-item {
+            margin-bottom: 10px;
+        }
+
+        .question-item {
+            background-color: #FF967E;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .question-item:hover {
+            background-color: #FF967E;
+            color: #fff;
+        }
+
+        .question-item.active {
+            background-color: #FF967E;
+            color: #fff;
+        }
+
+        /* Answer item */
+        .answer-item {
+            display: none;
+            background-color: #FF967E;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Display the answer when the question item is active */
+        .question-item.active + .answer-item {
+            display: block;
+        }
+
+        /* Icon */
+        .icon {
+            font-size: 20px;
+            color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        /* Rotate icon when active */
+        .question-item.active .icon {
+            transform: rotate(45deg);
+        }
+    </style>
+    <script src="script/load.js" type="module" defer></script>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <?php include 'header.php'; ?>
+
+    <!-- Main Section -->
+    <main>
+        <div class="faq-container">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+
+            <!-- FAQ Items -->
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 1 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>1. What is the SUSG Election System?</p>
+                    <p>The SUSG Election System is an online platform designed to manage and facilitate the election process for the Silliman University Student Government.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 2 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>2. Who can access the SUSG Election System?</p>
+                    <p>Only registered students of Silliman University are allowed access to the SUSG Election System. Each student must log in using their university credentials to cast their vote.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 3 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>3. How do I log in to the SUSG Election System?</p>
+                    <p>You can log in using your university-issued email and password. If you have trouble logging in, ensure you are using the correct credentials or contact support.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 4 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>4. Can I vote more than once?</p>
+                    <p>No, each student can vote only once per election. Once a vote is submitted, it cannot be changed or cast again to maintain fairness and integrity.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 5 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>5. Are my votes confidential?</p>
+                    <p>Yes, your votes are strictly confidential. The SUSG Election System uses secure protocols to ensure that your choices are private and only the final results are made public.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="question-item" onclick="toggleAnswer(this)">
+                    Question 6 <span class="icon">+</span>
+                </div>
+                <div class="answer-item">
+                    <p>6. How are my votes counted in the SUSG Election System?</p>
+                    <p>The votes are automatically counted by the system after submission. The system ensures accuracy and transparency by using secure algorithms to tally votes and present the results without any manual interference.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <?php include 'footer.php'; ?>
+
+    <script>
+        function toggleAnswer(element) {
+            // Toggle active class for the question item
+            element.classList.toggle('active');
+
+            // Toggle the icon between + and -
+            const icon = element.querySelector('.icon');
+            icon.textContent = element.classList.contains('active') ? '-' : '+';
+        }
+    </script>
+</body>
+</html>
