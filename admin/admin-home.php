@@ -7,6 +7,22 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
+// Function to update election statuses based on current time
+function updateElectionStatuses($pdo) {
+    $now = date('Y-m-d H:i:s');
+
+    // Set elections to 'Ongoing' if the current time is between start and end times
+    $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE start_datetime <= ? AND end_datetime >= ? AND status = 'Scheduled'");
+    $stmt->execute([$now, $now]);
+
+    // Set elections to 'Completed' if the current time is past the end time
+    $stmt = $pdo->prepare("UPDATE elections SET status = 'Completed' WHERE end_datetime < ? AND status = 'Ongoing'");
+    $stmt->execute([$now]);
+}
+
+// Update election statuses
+updateElectionStatuses($pdo);
+
 // Fetch current election details
 $electionStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC LIMIT 1");
 $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
@@ -16,91 +32,98 @@ $allElectionsStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DE
 $allElections = $allElectionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['election_name']) && !isset($_POST['edit_election'])) {
-        $electionName = $_POST['election_name'];
-        $startDatetime = $_POST['start_datetime'];
-        $endDatetime = $_POST['end_datetime'];
-        $status = 'Scheduled';
+    if (isset($_POST['ajax']) && $_POST['ajax'] == 1) {
+        // Handle AJAX requests
+        if (isset($_POST['set_current_election'])) {
+            $electionId = $_POST['election_id'];
 
-        $stmt = $pdo->prepare("INSERT INTO elections (election_name, start_datetime, end_datetime, status) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$electionName, $startDatetime, $endDatetime, $status]);
+            // Reset the current election
+            $resetStmt = $pdo->prepare("UPDATE elections SET is_current = 0 WHERE is_current = 1");
+            $resetResult = $resetStmt->execute();
 
-        header('Location: admin-home.php');
-        exit();
-    } elseif (isset($_POST['toggle_election'])) {
-        $electionId = $_POST['election_id'];
-        $newStatus = $_POST['new_status'];
+            // Set the selected election as current
+            $setStmt = $pdo->prepare("UPDATE elections SET is_current = 1 WHERE election_id = ?");
+            $setResult = $setStmt->execute([$electionId]);
 
-        $stmt = $pdo->prepare("UPDATE elections SET status = ? WHERE election_id = ?");
-        $stmt->execute([$newStatus, $electionId]);
+            if ($resetResult && $setResult) {
+                // Fetch the updated current election
+                $stmt = $pdo->prepare("SELECT * FROM elections WHERE election_id = ?");
+                $stmt->execute([$electionId]);
+                $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        header('Location: admin-home.php');
-        exit();
-    } elseif (isset($_POST['edit_election'])) {
-        $electionId = $_POST['election_id'];
-        $electionName = $_POST['election_name'];
-        $startDatetime = $_POST['start_datetime'];
-        $endDatetime = $_POST['end_datetime'];
+                // Return JSON response
+                echo json_encode([
+                    'success' => true,
+                    'election_name' => htmlspecialchars($currentElection['election_name']),
+                    'status' => htmlspecialchars($currentElection['status'])
+                ]);
+            } else {
+                // Handle error
+                echo json_encode(['success' => false, 'message' => 'Failed to set current election.']);
+            }
+            exit();
+        }
+        // ...handle other AJAX actions if necessary...
+    } else {
+        // Handle regular POST requests
+        if (isset($_POST['election_name']) && !isset($_POST['edit_election'])) {
+            $electionName = $_POST['election_name'];
+            $startDatetime = $_POST['start_datetime'];
+            $endDatetime = $_POST['end_datetime'];
+            $status = 'Scheduled';
 
-        $stmt = $pdo->prepare("UPDATE elections SET election_name = ?, start_datetime = ?, end_datetime = ? WHERE election_id = ?");
-        $stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId]);
+            $stmt = $pdo->prepare("INSERT INTO elections (election_name, start_datetime, end_datetime, status) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$electionName, $startDatetime, $endDatetime, $status]);
 
-        header('Location: admin-home.php');
-        exit();
-    } elseif (isset($_POST['delete_election'])) {
-        $electionId = $_POST['election_id'];
+            header('Location: admin-home.php');
+            exit();
+        } elseif (isset($_POST['toggle_election'])) {
+            $electionId = $_POST['election_id'];
+            $newStatus = $_POST['new_status'];
 
-        $stmt = $pdo->prepare("DELETE FROM elections WHERE election_id = ?");
-        $stmt->execute([$electionId]);
+            $stmt = $pdo->prepare("UPDATE elections SET status = ? WHERE election_id = ?");
+            $stmt->execute([$newStatus, $electionId]);
 
-        header('Location: admin-home.php');
-        exit();
-    } elseif (isset($_POST['set_current_election'])) {
-        $electionId = $_POST['election_id'];
+            header('Location: admin-home.php');
+            exit();
+        } elseif (isset($_POST['edit_election'])) {
+            $electionId = $_POST['election_id'];
+            $electionName = $_POST['election_name'];
+            $startDatetime = $_POST['start_datetime'];
+            $endDatetime = $_POST['end_datetime'];
 
-        $stmt = $pdo->prepare("UPDATE elections SET status = 'Scheduled' WHERE status = 'Ongoing'");
-        $stmt->execute();
+            $stmt = $pdo->prepare("UPDATE elections SET election_name = ?, start_datetime = ?, end_datetime = ? WHERE election_id = ?");
+            $stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId]);
 
-        $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE election_id = ?");
-        $stmt->execute([$electionId]);
+            header('Location: admin-home.php');
+            exit();
+        } elseif (isset($_POST['delete_election'])) {
+            $electionId = $_POST['election_id'];
 
-        header('Location: admin-home.php');
-        exit();
-    }
+            $stmt = $pdo->prepare("DELETE FROM elections WHERE election_id = ?");
+            $stmt->execute([$electionId]);
 
-    // Handle AJAX request for setting current election
-    if (isset($_POST['set_current_election']) && isset($_POST['ajax'])) {
-        $electionId = $_POST['election_id'];
-
-        // Update the statuses
-        $pdo->prepare("UPDATE elections SET status = 'Scheduled' WHERE status = 'Ongoing'")->execute();
-        $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE election_id = ?");
-        $stmt->execute([$electionId]);
-
-        // Fetch the updated current election
-        $stmt = $pdo->prepare("SELECT * FROM elections WHERE election_id = ?");
-        $stmt->execute([$electionId]);
-        $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Return JSON response
-        echo json_encode([
-            'success' => true,
-            'election_name' => htmlspecialchars($currentElection['election_name']),
-            'status' => htmlspecialchars($currentElection['status'])
-        ]);
-        exit();
+            header('Location: admin-home.php');
+            exit();
+        }
     }
 }
 
 // Fetch current election details again after any changes
-$electionStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC LIMIT 1");
+$electionStmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$electionStmt->execute();
 $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comelec - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="../asset/susglogo.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body, html {
             font-family: 'Poppins', sans-serif;
@@ -584,17 +607,12 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         })
                         .then(response => response.json())
                         .then(data => {
+                            console.log(data); // For debugging
                             if (data.success) {
-                                // Update the Current Election Status section
-                                const electionStatusDiv = document.querySelector('.election-status');
-                                electionStatusDiv.innerHTML = `
-                                    <h2>Current Election Status</h2>
-                                    <p>Name: ${data.election_name}</p>
-                                    <p>Status: ${data.status}</p>
-                                `;
-                                alert('Current election updated successfully.');
+                                // Reload the page
+                                location.reload();
                             } else {
-                                alert('Failed to update current election.');
+                                alert(data.message || 'Failed to update current election.');
                             }
                         })
                         .catch(error => {
@@ -746,4 +764,4 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
         <button type="submit" name="set_current_election">Set Current Election</button>
     </form>
 </body>
-</html> 
+</html>
