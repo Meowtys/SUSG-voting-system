@@ -51,31 +51,36 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                     return;
                 }
 
-                // Load TensorFlow.js Toxicity Model
-                const threshold = 0.9; // Adjust confidence threshold as needed
-                const model = await toxicity.load(threshold);
-
-                // Prepare feedback suggestions for analysis
-                const sentences = feedbacks.map(f => f.suggestion);
-
-                // Analyze Sentiments using the Toxicity Model
-                const predictions = await model.classify(sentences);
-
                 const sentimentCounts = { Positive: 0, Neutral: 0, Negative: 0 };
+                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // Replace with your MeaningCloud API key
 
-                // Classify each feedback
-                sentences.forEach((sentence, index) => {
-                    const isPositive = predictions.some(p => p.label === 'identity_attack' && p.results[index].match);
-                    const isNegative = predictions.some(p => p.label === 'insult' && p.results[index].match);
+                // Function to get sentiment analysis
+                async function getSentiment(text) {
+                    const params = new URLSearchParams();
+                    params.append('key', apiKey);
+                    params.append('txt', text);
+                    params.append('lang', 'en'); // Set the language code
 
-                    if (isPositive) {
+                    const response = await fetch('https://api.meaningcloud.com/sentiment-2.1', {
+                        method: 'POST',
+                        body: params
+                    });
+
+                    const data = await response.json();
+                    return data.score_tag; // Possible values: 'P+', 'P', 'NEU', 'N', 'N+', 'NONE'
+                }
+
+                // Analyze sentiments for each feedback
+                for (const feedback of feedbacks) {
+                    const sentiment = await getSentiment(feedback.suggestion);
+                    if (sentiment === 'P+' || sentiment === 'P') {
                         sentimentCounts.Positive++;
-                    } else if (isNegative) {
+                    } else if (sentiment === 'N' || sentiment === 'N+') {
                         sentimentCounts.Negative++;
                     } else {
                         sentimentCounts.Neutral++;
                     }
-                });
+                }
 
                 // Render Bar Chart
                 const ctx = document.getElementById('sentimentChart').getContext('2d');
