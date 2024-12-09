@@ -45,42 +45,178 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
         document.addEventListener('DOMContentLoaded', async function () {
             try {
                 const feedbacks = <?= $feedbacksJSON; ?>;
+                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // MeaningCloud API key
 
                 if (!feedbacks || feedbacks.length === 0) {
                     alert("No feedback data available!");
                     return;
                 }
 
-                const sentimentCounts = { Positive: 0, Neutral: 0, Negative: 0 };
-                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // Replace with your MeaningCloud API key
-
-                // Function to get sentiment analysis
-                async function getSentiment(text) {
-                    const params = new URLSearchParams();
-                    params.append('key', apiKey);
-                    params.append('txt', text);
-                    params.append('lang', 'en'); // Set the language code
-
-                    const response = await fetch('https://api.meaningcloud.com/sentiment-2.1', {
-                        method: 'POST',
-                        body: params
-                    });
-
+                // Function to handle API errors
+                async function handleApiResponse(response) {
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status}`);
+                    }
                     const data = await response.json();
-                    return data.score_tag; // Possible values: 'P+', 'P', 'NEU', 'N', 'N+', 'NONE'
+                    if (data.status.code !== '0') {
+                        throw new Error(`MeaningCloud API error: ${data.status.msg}`);
+                    }
+                    return data;
                 }
 
-                // Analyze sentiments for each feedback
-                for (const feedback of feedbacks) {
-                    const sentiment = await getSentiment(feedback.suggestion);
-                    if (sentiment === 'P+' || sentiment === 'P') {
-                        sentimentCounts.Positive++;
-                    } else if (sentiment === 'N' || sentiment === 'N+') {
-                        sentimentCounts.Negative++;
-                    } else {
-                        sentimentCounts.Neutral++;
+                // Function to get detailed sentiment analysis
+                async function getSentiment(text) {
+                    try {
+                        const params = new URLSearchParams();
+                        params.append('key', apiKey);
+                        params.append('txt', text);
+                        params.append('lang', 'en');
+
+                        const response = await fetch('https://api.meaningcloud.com/sentiment-2.1', {
+                            method: 'POST',
+                            body: params
+                        });
+
+                        const data = await handleApiResponse(response);
+                        return {
+                            score_tag: data.score_tag,
+                            confidence: parseInt(data.confidence),
+                            agreement: data.agreement,
+                            subjectivity: data.subjectivity
+                        };
+                    } catch (error) {
+                        console.error('Sentiment analysis failed:', error);
+                        return {
+                            score_tag: 'NEU',
+                            confidence: 0,
+                            agreement: 'DISAGREEMENT',
+                            subjectivity: 'OBJECTIVE'
+                        };
                     }
                 }
+
+                const sentimentCounts = { Positive: 0, Neutral: 0, Negative: 0 };
+                const experienceCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                const experienceSentiments = {
+                    1: { Positive: 0, Neutral: 0, Negative: 0 },
+                    2: { Positive: 0, Neutral: 0, Negative: 0 },
+                    3: { Positive: 0, Neutral: 0, Negative: 0 },
+                    4: { Positive: 0, Neutral: 0, Negative: 0 },
+                    5: { Positive: 0, Neutral: 0, Negative: 0 }
+                };
+
+                // Analyze feedback data
+                for (const feedback of feedbacks) {
+                    const sentimentData = await getSentiment(feedback.suggestion);
+                    const experience = parseInt(feedback.experience);
+                    experienceCounts[experience]++;
+
+                    // Determine sentiment category with confidence threshold
+                    let sentimentCategory;
+                    if (sentimentData.confidence >= 70) { // Only consider high confidence results
+                        if (sentimentData.score_tag === 'P+' || sentimentData.score_tag === 'P') {
+                            sentimentCategory = 'Positive';
+                        } else if (sentimentData.score_tag === 'N' || sentimentData.score_tag === 'N+') {
+                            sentimentCategory = 'Negative';
+                        } else {
+                            sentimentCategory = 'Neutral';
+                        }
+                    } else {
+                        sentimentCategory = 'Neutral';
+                    }
+
+                    sentimentCounts[sentimentCategory]++;
+                    experienceSentiments[experience][sentimentCategory]++;
+                }
+
+                // Add new charts and visualizations
+                const experienceCtx = document.getElementById('experienceChart').getContext('2d');
+                new Chart(experienceCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(experienceCounts),
+                        datasets: [{
+                            label: 'Experience Ratings Distribution',
+                            data: Object.values(experienceCounts),
+                            backgroundColor: '#4caf50'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Experience Ratings Distribution'
+                            }
+                        },
+                        scales: {
+                            x: { 
+                                title: { 
+                                    display: true, 
+                                    text: 'Rating (1-5)' 
+                                }
+                            },
+                            y: { 
+                                beginAtZero: true,
+                                title: { 
+                                    display: true, 
+                                    text: 'Number of Responses' 
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Correlation Matrix Chart
+                const correlationCtx = document.getElementById('correlationChart').getContext('2d');
+                new Chart(correlationCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1', '2', '3', '4', '5'],
+                        datasets: [
+                            {
+                                label: 'Positive',
+                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Positive),
+                                backgroundColor: '#4caf50'
+                            },
+                            {
+                                label: 'Neutral',
+                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Neutral),
+                                backgroundColor: '#ffce56'
+                            },
+                            {
+                                label: 'Negative',
+                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Negative),
+                                backgroundColor: '#f44336'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Experience Rating vs Sentiment Analysis'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Experience Rating'
+                                },
+                                stacked: true
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Number of Feedbacks'
+                                },
+                                stacked: true
+                            }
+                        }
+                    }
+                });
 
                 // Render Bar Chart
                 const ctx = document.getElementById('sentimentChart').getContext('2d');
@@ -151,9 +287,15 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
     
     <main>
         <div class="content">
-            <h1>AI Integrated Analytics <br> Sentiment Analysis </h1>
+            <h1>AI Integrated Analytics</h1>
+            <div class="chart-container">
+                <canvas id="experienceChart"></canvas>
+            </div>
             <div class="chart-container">
                 <canvas id="sentimentChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="correlationChart"></canvas>
             </div>
             <div class="chart-container line-chart-container">
                 <canvas id="trendChart"></canvas>
