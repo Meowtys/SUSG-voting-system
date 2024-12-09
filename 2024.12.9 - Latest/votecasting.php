@@ -4,12 +4,12 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Check if the user is logged in
-if (!isset($_SESSION['user'])) {
+if (!isset($_SESSION['voter'])) {
     header('Location: loginasvoter.php');
     exit();
 }
 
-$user = $_SESSION['user'];
+$user = $_SESSION['voter'];
 
 require_once 'connect.php';
 

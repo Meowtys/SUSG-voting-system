@@ -2,8 +2,8 @@
 
 session_start();
 
-// Redirect to homepage if user is already logged in
-if (isset($_SESSION['user'])) {
+// Redirect to homepage if voter is already logged in
+if (isset($_SESSION['voter'])) {
     header('Location: homepage.php');
     exit();
 }
@@ -186,7 +186,7 @@ if (isset($_SESSION['errors'])) {
                         }
                         ?>
                     </div>
-                    <button type="submit" name="signin" class="login-page-btn">Login</button>
+                    <button type="submit" name="signin_voter" class="login-page-btn">Login</button>
                     <?php
                     if (isset($errors['login'])) {
                         echo '<p class="login-page-error-message">' . $errors['login'] . '</p>';
