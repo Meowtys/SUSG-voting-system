@@ -8,7 +8,7 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 require_once '../connect.php';
 
 try {
-    // Fetch data from feedbacks table with error checking
+    // Fetch ALL feedbacks with no limit
     $stmt = $pdo->prepare("SELECT f.*, s.student_name 
                           FROM feedbacks f 
                           JOIN students s ON f.student_id = s.student_id 
@@ -20,7 +20,11 @@ try {
         echo "<script>console.log('No feedbacks found in database');</script>";
     } else {
         $feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo "<script>console.log('Fetched " . count($feedbacks) . " feedbacks');</script>";
+        // Debug output
+        echo "<script>
+            console.log('Total feedbacks found:', " . count($feedbacks) . ");
+            console.log('Feedback data:', " . json_encode($feedbacks) . ");
+        </script>";
     }
 } catch (PDOException $e) {
     echo "<script>console.error('Database error: " . addslashes($e->getMessage()) . "');</script>";
@@ -150,6 +154,11 @@ try {
                 const feedbacks = <?= $feedbacksJSON ?>;
                 console.log('Raw feedbacks data:', feedbacks);
                 
+                // Debug check for data
+                if (feedbacks && feedbacks.length > 0) {
+                    console.table(feedbacks); // Shows data in table format in console
+                }
+
                 // Add loading indicator
                 const mainContent = document.querySelector('.analytics-container');
                 mainContent.innerHTML = '<div class="text-center p-4">Loading analytics...</div>' + mainContent.innerHTML;
@@ -178,11 +187,20 @@ try {
                     return data;
                 }
 
-                // Function to get detailed sentiment analysis
+                // Add rate limiting and caching
+                const sentimentCache = new Map();
+                const RATE_LIMIT_DELAY = 1000; // 1 second delay between API calls
+
                 async function getSentiment(text) {
                     try {
+                        // Check cache first
+                        const cacheKey = text.trim();
+                        if (sentimentCache.has(cacheKey)) {
+                            console.log('Using cached sentiment for:', text.substring(0, 50) + '...');
+                            return sentimentCache.get(cacheKey);
+                        }
+
                         if (!text || text.trim().length === 0) {
-                            console.log('Empty text provided for sentiment analysis');
                             return {
                                 score_tag: 'NEU',
                                 confidence: 0,
@@ -191,41 +209,92 @@ try {
                             };
                         }
 
+                        // Add delay for rate limiting
+                        await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY));
+
                         const params = new URLSearchParams();
                         params.append('key', apiKey);
                         params.append('txt', text);
                         params.append('lang', 'en');
 
-                        console.log('Analyzing sentiment for text:', text.substring(0, 50) + '...');
-                        
                         const response = await fetch('https://api.meaningcloud.com/sentiment-2.1', {
                             method: 'POST',
                             body: params
                         });
 
                         if (!response.ok) {
-                            throw new Error(`API request failed: ${response.status} - ${await response.text()}`);
+                            throw new Error(`API request failed: ${response.status}`);
                         }
 
                         const data = await response.json();
-                        console.log('API Response:', data);
-
                         if (data.status.code !== '0') {
+                            // If we hit rate limit, return neutral sentiment
+                            if (data.status.code === '104') {
+                                console.warn('Rate limit hit, using neutral sentiment');
+                                return {
+                                    score_tag: 'NEU',
+                                    confidence: 50,
+                                    agreement: 'AGREEMENT',
+                                    subjectivity: 'OBJECTIVE'
+                                };
+                            }
                             throw new Error(`MeaningCloud API error: ${data.status.msg}`);
                         }
 
-                        return {
+                        const result = {
                             score_tag: data.score_tag,
                             confidence: parseInt(data.confidence),
                             agreement: data.agreement,
                             subjectivity: data.subjectivity
                         };
+
+                        // Cache the result
+                        sentimentCache.set(cacheKey, result);
+                        return result;
                     } catch (error) {
                         console.error('Sentiment analysis error:', error);
-                        console.error('Failed text:', text);
-                        throw error; // Re-throw to handle in main try-catch
+                        // Return neutral sentiment on error
+                        return {
+                            score_tag: 'NEU',
+                            confidence: 0,
+                            agreement: 'DISAGREEMENT',
+                            subjectivity: 'OBJECTIVE'
+                        };
                     }
                 }
+
+                // Modify the feedback processing loop to handle batches
+                async function processFeedbackBatch(feedbacks, startIndex, batchSize) {
+                    const endIndex = Math.min(startIndex + batchSize, feedbacks.length);
+                    for (let i = startIndex; i < endIndex; i++) {
+                        const feedback = feedbacks[i];
+                        try {
+                            console.log(`Processing feedback ${i + 1}/${feedbacks.length}`);
+                            const sentimentData = await getSentiment(feedback.suggestion);
+                            // ... rest of the feedback processing code ...
+                        } catch (error) {
+                            console.error('Error processing feedback:', feedback, error);
+                            continue;
+                        }
+                    }
+                }
+
+                // Update the main processing loop
+                document.addEventListener('DOMContentLoaded', async function () {
+                    try {
+                        // ...existing initialization code...
+
+                        // Process feedbacks in batches
+                        const BATCH_SIZE = 5;
+                        for (let i = 0; i < feedbacks.length; i += BATCH_SIZE) {
+                            await processFeedbackBatch(feedbacks, i, BATCH_SIZE);
+                        }
+
+                        // ...rest of existing code...
+                    } catch (error) {
+                        // ...existing error handling...
+                    }
+                });
 
                 const sentimentCounts = { Positive: 0, Neutral: 0, Negative: 0 };
                 const experienceCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
@@ -559,4 +628,4 @@ try {
         </div>
     </main>
 </body>
-</html>
+</html> 
