@@ -315,6 +315,12 @@ try {
                 let processedCount = 0;
                 const totalFeedbacks = feedbacks.length;
 
+                // Initialize mismatch tracking
+                const mismatches = {
+                    lowRatingPositiveFeedback: [],
+                    highRatingNegativeFeedback: []
+                };
+
                 for (const feedback of feedbacks) {
                     try {
                         processedCount++;
@@ -329,8 +335,24 @@ try {
                         if (sentimentData.confidence >= 70) { // Only consider high confidence results
                             if (sentimentData.score_tag === 'P+' || sentimentData.score_tag === 'P') {
                                 sentimentCategory = 'Positive';
+                                // Check for low rating with positive sentiment
+                                if (experience <= 2) {
+                                    mismatches.lowRatingPositiveFeedback.push({
+                                        text: feedback.suggestion,
+                                        rating: experience,
+                                        timestamp: feedback.feedback_timestamp
+                                    });
+                                }
                             } else if (sentimentData.score_tag === 'N' || sentimentData.score_tag === 'N+') {
                                 sentimentCategory = 'Negative';
+                                // Check for high rating with negative sentiment
+                                if (experience >= 4) {
+                                    mismatches.highRatingNegativeFeedback.push({
+                                        text: feedback.suggestion,
+                                        rating: experience,
+                                        timestamp: feedback.feedback_timestamp
+                                    });
+                                }
                             } else {
                                 sentimentCategory = 'Neutral';
                             }
@@ -673,6 +695,81 @@ try {
                 // Remove loading indicator
                 mainContent.querySelector('.text-center')?.remove();
 
+                // Add mismatch chart after other charts
+                const mismatchCtx = document.getElementById('mismatchChart').getContext('2d');
+                new Chart(mismatchCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Low Rating + Positive Feedback', 'High Rating + Negative Feedback'],
+                        datasets: [{
+                            label: 'Number of Mismatches',
+                            data: [
+                                mismatches.lowRatingPositiveFeedback.length,
+                                mismatches.highRatingNegativeFeedback.length
+                            ],
+                            backgroundColor: ['#f59e0b', '#8b5cf6']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Rating-Sentiment Mismatches'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.raw} mismatches found`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Display mismatched feedbacks
+                const positiveMismatchContainer = document.getElementById('positive-mismatch');
+                const negativeMismatchContainer = document.getElementById('negative-mismatch');
+
+                if (mismatches.lowRatingPositiveFeedback.length === 0) {
+                    positiveMismatchContainer.innerHTML = '<p class="text-gray-500 italic">No mismatches found</p>';
+                } else {
+                    mismatches.lowRatingPositiveFeedback.forEach(feedback => {
+                        positiveMismatchContainer.innerHTML += `
+                            <div class="border-l-4 border-yellow-500 pl-3 mb-3">
+                                <p class="text-sm text-gray-600">${feedback.text}</p>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Rating: ${feedback.rating}/5 • ${new Date(feedback.timestamp).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (mismatches.highRatingNegativeFeedback.length === 0) {
+                    negativeMismatchContainer.innerHTML = '<p class="text-gray-500 italic">No mismatches found</p>';
+                } else {
+                    mismatches.highRatingNegativeFeedback.forEach(feedback => {
+                        negativeMismatchContainer.innerHTML += `
+                            <div class="border-l-4 border-purple-500 pl-3 mb-3">
+                                <p class="text-sm text-gray-600">${feedback.text}</p>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    Rating: ${feedback.rating}/5 • ${new Date(feedback.timestamp).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
             } catch (error) {
                 console.error("Error:", error);
                 console.error('Detailed error:', error);
@@ -692,6 +789,7 @@ try {
                 ` + mainContent.innerHTML;
             }
         });
+
     </script>
 </head>
 <body class="bg-gray-100">
@@ -740,6 +838,10 @@ try {
                 <div class="chart-title">Weekly Feedback Activity</div>
                 <canvas id="weeklyActivityChart"></canvas>
             </div>
+            <div class="chart-card">
+                <div class="chart-title">Rating-Sentiment Mismatch Analysis</div>
+                <canvas id="mismatchChart"></canvas>
+            </div>
         </div>
 
         <div class="comments-section">
@@ -766,7 +868,22 @@ try {
             <div id="positive-comments" class="comments-container" style="display: none;"></div>
             <div id="neutral-comments" class="comments-container" style="display: none;"></div>
             <div id="negative-comments" class="comments-container" style="display: none;"></div>
+
+            <!-- Add new section for mismatched feedback -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold mb-4">Rating-Sentiment Mismatches</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-2 text-red-600">Low Rating, Positive Feedback</h3>
+                        <div id="positive-mismatch" class="space-y-2"></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-2 text-green-600">High Rating, Negative Feedback</h3>
+                        <div id="negative-mismatch" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </body>
-</html>
+</html> 
