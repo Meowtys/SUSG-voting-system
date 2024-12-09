@@ -25,22 +25,50 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        .content {
-            flex-grow: 1;
-            padding: 40px;
+        .analytics-container {
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+        .chart-card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .stats-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
             text-align: center;
+            min-width: 150px;
         }
-        .chart-container {
-            width: 80%;
-            max-width: 800px;
-            margin: auto;
-            margin-top: 100px;
-        }
-        .line-chart-container {
-            margin-top: 50px;
-        }
-</style>
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', async function () {
             try {
@@ -275,6 +303,15 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                     }
                 });
 
+                // Update statistics summary
+                document.getElementById('totalFeedbacks').textContent = feedbacks.length;
+                const avgRating = (Object.entries(experienceCounts).reduce((acc, [key, value]) => 
+                    acc + (key * value), 0) / feedbacks.length).toFixed(1);
+                document.getElementById('avgRating').textContent = avgRating;
+                const sentimentScore = ((sentimentCounts.Positive * 100) / 
+                    (sentimentCounts.Positive + sentimentCounts.Neutral + sentimentCounts.Negative)).toFixed(0) + '%';
+                document.getElementById('sentimentScore').textContent = sentimentScore;
+
             } catch (error) {
                 console.error("Error:", error);
                 alert("An error occurred while loading analytics.");
@@ -282,22 +319,42 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
         });
     </script>
 </head>
-<body>
+<body class="bg-gray-100">
     <?php include 'sidebar.php'; ?>
     
-    <main>
-        <div class="content">
-            <h1>AI Integrated Analytics</h1>
-            <div class="chart-container">
+    <main class="analytics-container">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">Analytics Dashboard</h1>
+        
+        <div class="stats-summary">
+            <div class="stat-card">
+                <h3 class="text-lg">Total Feedbacks</h3>
+                <p class="text-2xl font-bold" id="totalFeedbacks">0</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <h3 class="text-lg">Average Rating</h3>
+                <p class="text-2xl font-bold" id="avgRating">0</p>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <h3 class="text-lg">Sentiment Score</h3>
+                <p class="text-2xl font-bold" id="sentimentScore">0</p>
+            </div>
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <div class="chart-title">Experience Ratings Distribution</div>
                 <canvas id="experienceChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-card">
+                <div class="chart-title">Sentiment Analysis</div>
                 <canvas id="sentimentChart"></canvas>
             </div>
-            <div class="chart-container">
+            <div class="chart-card">
+                <div class="chart-title">Experience vs Sentiment Correlation</div>
                 <canvas id="correlationChart"></canvas>
             </div>
-            <div class="chart-container line-chart-container">
+            <div class="chart-card">
+                <div class="chart-title">Feedback Trends</div>
                 <canvas id="trendChart"></canvas>
             </div>
         </div>
