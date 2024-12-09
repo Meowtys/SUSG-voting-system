@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+// Clear any existing user session when accessing this page
+if (isset($_SESSION['user'])) {
+    unset($_SESSION['user']);
+}
+
 if (isset($_SESSION['errors'])) {
   $errors = $_SESSION['errors'];
 }
