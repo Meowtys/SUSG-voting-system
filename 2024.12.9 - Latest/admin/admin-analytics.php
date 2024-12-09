@@ -499,6 +499,84 @@ try {
                     }
                 });
 
+                // Create Sentiment Distribution Pie Chart
+                const pieCtx = document.getElementById('sentimentPieChart').getContext('2d');
+                new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Positive', 'Neutral', 'Negative'],
+                        datasets: [{
+                            data: [
+                                sentimentCounts.Positive,
+                                sentimentCounts.Neutral,
+                                sentimentCounts.Negative
+                            ],
+                            backgroundColor: ['#4caf50', '#ffce56', '#f44336'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Sentiment Distribution'
+                            }
+                        },
+                        cutout: '50%'
+                    }
+                });
+
+                // Create Weekly Activity Chart
+                // Group feedback by day of week
+                const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const weeklyData = new Array(7).fill(0);
+                
+                feedbacks.forEach(feedback => {
+                    const date = new Date(feedback.feedback_timestamp);
+                    const dayOfWeek = date.getDay();
+                    weeklyData[dayOfWeek]++;
+                });
+
+                const weeklyCtx = document.getElementById('weeklyActivityChart').getContext('2d');
+                new Chart(weeklyCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: daysOfWeek,
+                        datasets: [{
+                            label: 'Number of Feedbacks',
+                            data: weeklyData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Feedback Activity by Day of Week'
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+
                 // Update statistics summary
                 document.getElementById('totalFeedbacks').textContent = feedbacks.length;
                 const avgRating = (Object.entries(experienceCounts).reduce((acc, [key, value]) => 
@@ -598,6 +676,14 @@ try {
             <div class="chart-card">
                 <div class="chart-title">Feedback Trends</div>
                 <canvas id="trendChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Rating Distribution by Sentiment</div>
+                <canvas id="sentimentPieChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="chart-title">Weekly Feedback Activity</div>
+                <canvas id="weeklyActivityChart"></canvas>
             </div>
         </div>
 
