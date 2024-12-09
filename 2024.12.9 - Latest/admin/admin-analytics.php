@@ -7,12 +7,36 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
-// Fetch data from feedbacks table
-$stmt = $pdo->query("SELECT * FROM feedbacks");
-$feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    // Fetch data from feedbacks table with error checking
+    $stmt = $pdo->prepare("SELECT f.*, s.student_name 
+                          FROM feedbacks f 
+                          JOIN students s ON f.student_id = s.student_id 
+                          ORDER BY f.feedback_timestamp DESC");
+    $stmt->execute();
+    
+    if ($stmt->rowCount() === 0) {
+        $feedbacks = [];
+        echo "<script>console.log('No feedbacks found in database');</script>";
+    } else {
+        $feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo "<script>console.log('Fetched " . count($feedbacks) . " feedbacks');</script>";
+    }
+} catch (PDOException $e) {
+    echo "<script>console.error('Database error: " . addslashes($e->getMessage()) . "');</script>";
+    $feedbacks = [];
+}
 
-// Encode feedback data into JSON format
-$feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+// Encode feedback data into JSON format with error checking
+try {
+    $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception(json_last_error_msg());
+    }
+} catch (Exception $e) {
+    echo "<script>console.error('JSON encoding error: " . addslashes($e->getMessage()) . "');</script>";
+    $feedbacksJSON = '[]';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,18 +92,80 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
             text-align: center;
             min-width: 150px;
         }
+        .comments-section {
+            margin-top: 2rem;
+            padding: 2rem;
+        }
+        .sentiment-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .sentiment-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .sentiment-tab.active {
+            transform: translateY(-2px);
+        }
+        .comments-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .comment-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .comment-text {
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+        .comment-meta {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
     </style>
     <script>
+        // Define showComments in global scope
+        function showComments(sentiment) {
+            const containers = document.querySelectorAll('.comments-container');
+            const tabs = document.querySelectorAll('.sentiment-tab');
+            
+            containers.forEach(container => container.style.display = 'none');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(`${sentiment.toLowerCase()}-comments`).style.display = 'grid';
+            document.querySelector(`[data-sentiment="${sentiment}"]`).classList.add('active');
+        }
+
         document.addEventListener('DOMContentLoaded', async function () {
             try {
-                const feedbacks = <?= $feedbacksJSON; ?>;
-                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // MeaningCloud API key
+                const feedbacks = <?= $feedbacksJSON ?>;
+                console.log('Raw feedbacks data:', feedbacks);
+                
+                // Add loading indicator
+                const mainContent = document.querySelector('.analytics-container');
+                mainContent.innerHTML = '<div class="text-center p-4">Loading analytics...</div>' + mainContent.innerHTML;
 
                 if (!feedbacks || feedbacks.length === 0) {
-                    alert("No feedback data available!");
+                    mainContent.innerHTML = `
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+                            <p class="font-bold">No Feedback Data</p>
+                            <p>There are currently no feedbacks in the database.</p>
+                        </div>
+                    ` + mainContent.innerHTML;
                     return;
                 }
 
+                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // MeaningCloud API key
+                
                 // Function to handle API errors
                 async function handleApiResponse(response) {
                     if (!response.ok) {
@@ -95,17 +181,39 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                 // Function to get detailed sentiment analysis
                 async function getSentiment(text) {
                     try {
+                        if (!text || text.trim().length === 0) {
+                            console.log('Empty text provided for sentiment analysis');
+                            return {
+                                score_tag: 'NEU',
+                                confidence: 0,
+                                agreement: 'DISAGREEMENT',
+                                subjectivity: 'OBJECTIVE'
+                            };
+                        }
+
                         const params = new URLSearchParams();
                         params.append('key', apiKey);
                         params.append('txt', text);
                         params.append('lang', 'en');
 
+                        console.log('Analyzing sentiment for text:', text.substring(0, 50) + '...');
+                        
                         const response = await fetch('https://api.meaningcloud.com/sentiment-2.1', {
                             method: 'POST',
                             body: params
                         });
 
-                        const data = await handleApiResponse(response);
+                        if (!response.ok) {
+                            throw new Error(`API request failed: ${response.status} - ${await response.text()}`);
+                        }
+
+                        const data = await response.json();
+                        console.log('API Response:', data);
+
+                        if (data.status.code !== '0') {
+                            throw new Error(`MeaningCloud API error: ${data.status.msg}`);
+                        }
+
                         return {
                             score_tag: data.score_tag,
                             confidence: parseInt(data.confidence),
@@ -113,13 +221,9 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                             subjectivity: data.subjectivity
                         };
                     } catch (error) {
-                        console.error('Sentiment analysis failed:', error);
-                        return {
-                            score_tag: 'NEU',
-                            confidence: 0,
-                            agreement: 'DISAGREEMENT',
-                            subjectivity: 'OBJECTIVE'
-                        };
+                        console.error('Sentiment analysis error:', error);
+                        console.error('Failed text:', text);
+                        throw error; // Re-throw to handle in main try-catch
                     }
                 }
 
@@ -132,29 +236,52 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                     4: { Positive: 0, Neutral: 0, Negative: 0 },
                     5: { Positive: 0, Neutral: 0, Negative: 0 }
                 };
+                const commentsBySentiment = {
+                    Positive: [],
+                    Neutral: [],
+                    Negative: []
+                };
 
-                // Analyze feedback data
+                // Single pass analysis for both charts and comments
+                let processedCount = 0;
+                const totalFeedbacks = feedbacks.length;
+
                 for (const feedback of feedbacks) {
-                    const sentimentData = await getSentiment(feedback.suggestion);
-                    const experience = parseInt(feedback.experience);
-                    experienceCounts[experience]++;
+                    try {
+                        processedCount++;
+                        console.log(`Processing feedback ${processedCount}/${totalFeedbacks}`);
+                        
+                        const sentimentData = await getSentiment(feedback.suggestion);
+                        const experience = parseInt(feedback.experience);
+                        experienceCounts[experience]++;
 
-                    // Determine sentiment category with confidence threshold
-                    let sentimentCategory;
-                    if (sentimentData.confidence >= 70) { // Only consider high confidence results
-                        if (sentimentData.score_tag === 'P+' || sentimentData.score_tag === 'P') {
-                            sentimentCategory = 'Positive';
-                        } else if (sentimentData.score_tag === 'N' || sentimentData.score_tag === 'N+') {
-                            sentimentCategory = 'Negative';
+                        // Determine sentiment category with confidence threshold
+                        let sentimentCategory;
+                        if (sentimentData.confidence >= 70) { // Only consider high confidence results
+                            if (sentimentData.score_tag === 'P+' || sentimentData.score_tag === 'P') {
+                                sentimentCategory = 'Positive';
+                            } else if (sentimentData.score_tag === 'N' || sentimentData.score_tag === 'N+') {
+                                sentimentCategory = 'Negative';
+                            } else {
+                                sentimentCategory = 'Neutral';
+                            }
                         } else {
                             sentimentCategory = 'Neutral';
                         }
-                    } else {
-                        sentimentCategory = 'Neutral';
-                    }
 
-                    sentimentCounts[sentimentCategory]++;
-                    experienceSentiments[experience][sentimentCategory]++;
+                        sentimentCounts[sentimentCategory]++;
+                        experienceSentiments[experience][sentimentCategory]++;
+                        commentsBySentiment[sentimentCategory].push({
+                            text: feedback.suggestion,
+                            timestamp: feedback.feedback_timestamp,
+                            rating: feedback.experience
+                        });
+                    } catch (error) {
+                        console.error('Error processing feedback:', feedback);
+                        console.error('Error details:', error);
+                        // Continue with next feedback instead of stopping completely
+                        continue;
+                    }
                 }
 
                 // Add new charts and visualizations
@@ -312,9 +439,55 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                     (sentimentCounts.Positive + sentimentCounts.Neutral + sentimentCounts.Negative)).toFixed(0) + '%';
                 document.getElementById('sentimentScore').textContent = sentimentScore;
 
+                // Update the comments display section
+                const commentsSection = document.querySelector('.comments-section');
+                if (commentsSection) {
+                    Object.keys(commentsBySentiment).forEach(sentiment => {
+                        const comments = commentsBySentiment[sentiment];
+                        const container = document.getElementById(`${sentiment.toLowerCase()}-comments`);
+                        const count = comments.length;
+                        
+                        // Add count to tab
+                        const tab = document.querySelector(`[data-sentiment="${sentiment}"]`);
+                        tab.innerHTML = `${sentiment} Comments (${count})`;
+                        
+                        container.innerHTML = ''; // Clear existing content
+                        comments.forEach(comment => {
+                            container.innerHTML += `
+                                <div class="comment-card">
+                                    <p class="comment-text">${comment.text}</p>
+                                    <div class="comment-meta">
+                                        Rating: ${comment.rating}/5 • ${new Date(comment.timestamp).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    });
+                    
+                    // Call showComments after all tabs are initialized
+                    setTimeout(() => showComments('Positive'), 100);
+                }
+
+                // Remove loading indicator
+                mainContent.querySelector('.text-center')?.remove();
+
             } catch (error) {
                 console.error("Error:", error);
+                console.error('Detailed error:', error);
+                console.error('Stack trace:', error.stack);
                 alert("An error occurred while loading analytics.");
+                
+                // Show error in UI
+                const mainContent = document.querySelector('.analytics-container');
+                mainContent.innerHTML = `
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                        <p class="font-bold">Error Loading Analytics</p>
+                        <p>${error.message}</p>
+                        <button onclick="location.reload()" class="mt-2 bg-red-500 text-white px-4 py-2 rounded">
+                            Retry
+                        </button>
+                    </div>
+                ` + mainContent.innerHTML;
             }
         });
     </script>
@@ -357,6 +530,32 @@ $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX
                 <div class="chart-title">Feedback Trends</div>
                 <canvas id="trendChart"></canvas>
             </div>
+        </div>
+
+        <div class="comments-section">
+            <h2 class="text-2xl font-bold mb-4">Feedback Comments Analysis</h2>
+            
+            <div class="sentiment-tabs">
+                <button class="sentiment-tab" data-sentiment="Positive" 
+                        onclick="showComments('Positive')"
+                        style="background: linear-gradient(135deg, #4caf50, #45a049); color: white;">
+                    Positive Comments
+                </button>
+                <button class="sentiment-tab" data-sentiment="Neutral"
+                        onclick="showComments('Neutral')"
+                        style="background: linear-gradient(135deg, #ffce56, #ffc107); color: white;">
+                    Neutral Comments
+                </button>
+                <button class="sentiment-tab" data-sentiment="Negative"
+                        onclick="showComments('Negative')"
+                        style="background: linear-gradient(135deg, #f44336, #e53935); color: white;">
+                    Negative Comments
+                </button>
+            </div>
+
+            <div id="positive-comments" class="comments-container" style="display: none;"></div>
+            <div id="neutral-comments" class="comments-container" style="display: none;"></div>
+            <div id="negative-comments" class="comments-container" style="display: none;"></div>
         </div>
     </main>
 </body>
