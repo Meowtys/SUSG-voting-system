@@ -228,7 +228,7 @@ foreach ($votes as $vote) {
             </div>
         </div>
 
-        <button class="back-btn" onclick="navigateTo('homepage.php')">Back to Homepage</button>
+        <button class="back-btn" onclick="navigateTo('countdown.php')">Back to Countdown</button>
     </main>
 
     <!-- Footer Section -->
