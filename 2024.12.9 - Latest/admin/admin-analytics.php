@@ -354,30 +354,70 @@ try {
                 }
 
                 // Add new charts and visualizations
+                // Update the experience chart with color-coded ratings
                 const experienceCtx = document.getElementById('experienceChart').getContext('2d');
                 new Chart(experienceCtx, {
                     type: 'bar',
                     data: {
-                        labels: Object.keys(experienceCounts),
+                        labels: ['1', '2', '3', '4', '5'],
                         datasets: [{
                             label: 'Experience Ratings Distribution',
-                            data: Object.values(experienceCounts),
-                            backgroundColor: '#4caf50'
+                            data: [
+                                experienceCounts[1],
+                                experienceCounts[2],
+                                experienceCounts[3],
+                                experienceCounts[4],
+                                experienceCounts[5]
+                            ],
+                            backgroundColor: [
+                                '#ef4444', // Red for rating 1
+                                '#f97316', // Orange for rating 2
+                                '#facc15', // Yellow for rating 3
+                                '#84cc16', // Light green for rating 4
+                                '#22c55e', // Green for rating 5
+                            ],
+                            borderWidth: 1,
+                            borderColor: [
+                                '#dc2626',
+                                '#ea580c',
+                                '#eab308',
+                                '#65a30d',
+                                '#16a34a'
+                            ]
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
+                            legend: {
+                                display: false // Hide legend since colors are self-explanatory
+                            },
                             title: {
                                 display: true,
                                 text: 'Experience Ratings Distribution'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const rating = context.label;
+                                        const count = context.raw;
+                                        const descriptions = {
+                                            '1': 'Very Poor',
+                                            '2': 'Poor',
+                                            '3': 'Average',
+                                            '4': 'Good',
+                                            '5': 'Excellent'
+                                        };
+                                        return `Rating ${rating} (${descriptions[rating]}): ${count} responses`;
+                                    }
+                                }
                             }
                         },
                         scales: {
                             x: { 
                                 title: { 
                                     display: true, 
-                                    text: 'Rating (1-5)' 
+                                    text: 'Rating' 
                                 }
                             },
                             y: { 
