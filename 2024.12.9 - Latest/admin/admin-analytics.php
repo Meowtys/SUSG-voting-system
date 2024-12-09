@@ -391,52 +391,67 @@ try {
                     }
                 });
 
-                // Correlation Matrix Chart
-                const correlationCtx = document.getElementById('correlationChart').getContext('2d');
-                new Chart(correlationCtx, {
-                    type: 'bar',
+                // Replace the correlation chart with feedback length analysis
+                const feedbackLengths = feedbacks.map(f => ({
+                    length: f.suggestion.length,
+                    rating: parseInt(f.experience)
+                }));
+
+                // Group feedback lengths by rating
+                const lengthsByRating = {1: [], 2: [], 3: [], 4: [], 5: []};
+                feedbackLengths.forEach(f => {
+                    lengthsByRating[f.rating].push(f.length);
+                });
+
+                // Calculate average lengths for each rating
+                const avgLengths = Object.entries(lengthsByRating).map(([rating, lengths]) => ({
+                    rating,
+                    avgLength: lengths.length ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0
+                }));
+
+                // Create the feedback length chart
+                const lengthCtx = document.getElementById('feedbackLengthChart').getContext('2d');
+                new Chart(lengthCtx, {
+                    type: 'line',
                     data: {
                         labels: ['1', '2', '3', '4', '5'],
-                        datasets: [
-                            {
-                                label: 'Positive',
-                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Positive),
-                                backgroundColor: '#4caf50'
-                            },
-                            {
-                                label: 'Neutral',
-                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Neutral),
-                                backgroundColor: '#ffce56'
-                            },
-                            {
-                                label: 'Negative',
-                                data: [1,2,3,4,5].map(exp => experienceSentiments[exp].Negative),
-                                backgroundColor: '#f44336'
-                            }
-                        ]
+                        datasets: [{
+                            label: 'Average Feedback Length',
+                            data: avgLengths.map(d => d.avgLength),
+                            borderColor: '#9333ea',
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
                     },
                     options: {
                         responsive: true,
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Experience Rating vs Sentiment Analysis'
+                                text: 'Average Feedback Length by Rating'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Average Length: ${Math.round(context.raw)} characters`;
+                                    }
+                                }
                             }
                         },
                         scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Characters'
+                                }
+                            },
                             x: {
                                 title: {
                                     display: true,
-                                    text: 'Experience Rating'
-                                },
-                                stacked: true
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Number of Feedbacks'
-                                },
-                                stacked: true
+                                    text: 'Rating'
+                                }
                             }
                         }
                     }
@@ -670,8 +685,8 @@ try {
                 <canvas id="sentimentChart"></canvas>
             </div>
             <div class="chart-card">
-                <div class="chart-title">Experience vs Sentiment Correlation</div>
-                <canvas id="correlationChart"></canvas>
+                <div class="chart-title">Feedback Length vs Rating</div>
+                <canvas id="feedbackLengthChart"></canvas>
             </div>
             <div class="chart-card">
                 <div class="chart-title">Feedback Trends</div>
@@ -714,4 +729,4 @@ try {
         </div>
     </main>
 </body>
-</html> 
+</html>
