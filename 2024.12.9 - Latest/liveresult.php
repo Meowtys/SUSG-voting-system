@@ -101,11 +101,11 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
         align-items: center;
         justify-content: space-between;
         background-color: #f8d0d0;
-        padding: 10px;
+        padding: 15px; /* Increased padding */
         border-radius: 8px;
-        margin-bottom: 10px;
+        margin-bottom: 15px; /* Increased margin */
         transition: transform 0.3s ease;
-        min-height: 70px; /* Ensure uniform height */
+        min-height: 80px; /* Increased height */
         width: 100%; /* Ensure uniform width */
     }
 
@@ -114,10 +114,10 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     .candidate-photo {
-        width: 50px;
-        height: 50px;
+        width: 60px; /* Increased size */
+        height: 60px; /* Increased size */
         border-radius: 50%;
-        margin-right: 15px;
+        margin-right: 20px; /* Increased margin */
     }
 
     .candidate-info {
@@ -129,29 +129,29 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
     .candidate-info p {
         flex-grow: 1;
-        margin: 0 10px; /* Add margin for spacing */
+        margin: 0 15px; /* Increased margin */
     }
 
     .percentage {
         background-color: #d3a5a5;
-        padding: 10px;
+        padding: 15px; /* Increased padding */
         border-radius: 5px;
         color: white;
         font-weight: 600;
-        min-width: 50px;
+        min-width: 60px; /* Increased width */
         text-align: center;
     }
 
     .main-result .percentage {
-        font-size: 18px;
+        font-size: 20px; /* Increased font size */
     }
 
     .main-result p {
-        font-size: 18px;
+        font-size: 20px; /* Increased font size */
     }
 
     .candidate-result p {
-        font-size: 14px;
+        font-size: 16px; /* Increased font size */
         color: #333;
     }
 
@@ -159,13 +159,13 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
-        margin-top: 25px;
+        gap: 15px; /* Increased gap */
+        margin-top: 30px; /* Increased margin */
     }
 
     .position-button {
-        padding: 10px 20px;
-        font-size: 16px;
+        padding: 15px 25px; /* Increased padding */
+        font-size: 18px; /* Increased font size */
         border: none;
         border-radius: 5px;
         background-color: #b82323; 
