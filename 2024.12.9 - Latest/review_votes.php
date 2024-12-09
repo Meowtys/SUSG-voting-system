@@ -11,9 +11,6 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 
-// Retrieve selected votes from session
-$selectedVotes = isset($_SESSION['selectedVotes']) ? $_SESSION['selectedVotes'] : [];
-
 require_once 'connect.php';
 
 // Fetch positions from the database
@@ -30,6 +27,25 @@ foreach ($candidate_images as $candidate_image) {
 
 // Default image for abstain
 $default_abstain_image = 'path/to/default_abstain_image.png';
+
+// Retrieve selected votes from the database
+$selectedVotes = [];
+$votes_stmt = $pdo->prepare("SELECT v.candidate_id, c.candidate_name, c.college_id, p.position_name, col.college_name 
+                             FROM votes v
+                             JOIN candidates c ON v.candidate_id = c.candidate_id
+                             JOIN positions p ON v.position_id = p.position_id
+                             JOIN colleges col ON c.college_id = col.college_id
+                             WHERE v.student_id = ?");
+$votes_stmt->execute([$user['student_id']]);
+$votes = $votes_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($votes as $vote) {
+    $selectedVotes[$vote['position_name']] = [
+        'candidate_id' => $vote['candidate_id'],
+        'candidate_name' => $vote['candidate_name'],
+        'college_name' => $vote['college_name']
+    ];
+}
 ?>
 
 <!DOCTYPE html>
