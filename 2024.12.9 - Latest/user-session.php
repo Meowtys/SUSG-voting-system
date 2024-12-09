@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
             'college_name' => $user['college_name'],
             'has_voted' => $user['has_voted'],
         ];
-        $_SESSION['voter'] = $user['student_id']; // Add session variable to track voter login
 
         header('Location: homepage.php');
         exit();
@@ -107,7 +106,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['comelec_name'] = $user['comelec_name'];
         $_SESSION['is_comelec_logged_in'] = true; // Add session variable to track Comelec login
-        $_SESSION['comelec'] = $user['comelec_name']; // Add session variable to track Comelec login
 
         header('Location: Admin/admin-home.php');
         exit();

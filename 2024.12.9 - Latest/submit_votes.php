@@ -6,7 +6,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 $data = json_decode(file_get_contents('php://input'), true);
-$user_id = $_SESSION['voter']['student_id'];
+$user_id = $_SESSION['user']['student_id'];
 
 try {
     $pdo->beginTransaction();

@@ -1,12 +1,5 @@
 <?php
 session_start();
-
-// Redirect to homepage if Comelec user is already logged in
-if (isset($_SESSION['comelec'])) {
-    header('Location: comelec_homepage.php');
-    exit();
-}
-
 if (isset($_SESSION['errors'])) {
   $errors = $_SESSION['errors'];
 }

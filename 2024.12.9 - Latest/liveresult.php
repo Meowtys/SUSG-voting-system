@@ -2,13 +2,13 @@
 session_start();
 
 // Check if the user is logged in
-if (!isset($_SESSION['voter'])) {
+if (!isset($_SESSION['user'])) {
     header('Location: loginasvoter.php');
     exit();
 }
 
 // Retrieve user details from the session
-$user = $_SESSION['voter'];
+$user = $_SESSION['user'];
 
 // Include database connection
 require_once 'connect.php';

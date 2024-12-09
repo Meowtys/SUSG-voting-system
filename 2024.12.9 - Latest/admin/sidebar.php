@@ -4,8 +4,8 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Check if the user is logged in
-if (isset($_SESSION['comelec'])) {
-    $user = $_SESSION['comelec'];
+if (isset($_SESSION['user'])) {
+    $user = $_SESSION['user'];
 } else {
     $user = null;
 }
