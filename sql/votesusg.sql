@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 29, 2024 at 11:47 PM
+-- Generation Time: Dec 09, 2024 at 09:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,11 +43,12 @@ CREATE TABLE `candidates` (
 --
 
 INSERT INTO `candidates` (`candidate_id`, `candidate_name`, `college_id`, `position_id`, `qualified`, `remarks`, `candidate_image`, `candidate_party`) VALUES
-(0, 'Abstain', 0, 1, 0, NULL, '', ''),
-(1, 'Westen', 1, 1, 1, '', 'candidate_images\\images.jpg', 'CAUSE'),
-(3, 'Homer', 3, 1, 1, NULL, 'candidate_images\\cat03.jpg', 'Independent'),
-(10, 'Harry', 2, 3, 1, NULL, 'candidate_images\\harry.jpg', 'Independent'),
-(11, 'Goku', 12, 2, 1, NULL, 'candidate_images\\goku.png', 'Independent');
+(0, 'Abstain', 0, 1, 0, NULL, 'candidate_images/abstain.png', ''),
+(30, 'Westen Dasig', 1, 1, 1, '', 'candidate_images/e5856f869da279842602d67aa7226912.png', 'CAUSE'),
+(31, 'George Russell', 6, 1, 1, '', 'candidate_images/c8e03540375b1029edaa12a7be22b75e.jpg', 'Mercedes'),
+(32, 'Max Verstappen', 3, 2, 1, '', 'candidate_images/b0b2275ec0af41d01d8f9992a539be03.jpg', 'Redbull'),
+(33, 'Lewis Hamilton', 7, 2, 1, '', 'candidate_images/cce6f1466f9bdf5921fa249bfba3a627.jpg', 'Mercedes'),
+(34, 'Carlos Sainz', 8, 3, 1, '', 'candidate_images/f942d3bdcd52b9fe6ab24b846e86bb14.jpg', 'Ferrari');
 
 -- --------------------------------------------------------
 
@@ -119,8 +120,16 @@ CREATE TABLE `elections` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `election_name` varchar(100) NOT NULL,
-  `is_current` TINYINT(1) NOT NULL DEFAULT 0
+  `is_current` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `elections`
+--
+
+INSERT INTO `elections` (`election_id`, `start_datetime`, `end_datetime`, `status`, `created_at`, `updated_at`, `election_name`, `is_current`) VALUES
+(17, '2024-12-01 08:00:00', '2024-12-10 20:00:00', 'Ongoing', '2024-11-30 00:29:05', '2024-11-30 00:29:05', 'Election 1', 0),
+(18, '2024-11-30 08:00:00', '2024-12-01 08:30:00', 'Scheduled', '2024-11-30 00:30:45', '2024-11-30 00:30:45', 'Election 2', 1);
 
 -- --------------------------------------------------------
 
@@ -265,7 +274,7 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `candidates`
 --
 ALTER TABLE `candidates`
-  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `colleges`
@@ -283,7 +292,7 @@ ALTER TABLE `comelec`
 -- AUTO_INCREMENT for table `elections`
 --
 ALTER TABLE `elections`
-  MODIFY `election_id` int(50) NOT NULL AUTO_INCREMENT;
+  MODIFY `election_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
@@ -301,7 +310,7 @@ ALTER TABLE `positions`
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- Constraints for dumped tables
