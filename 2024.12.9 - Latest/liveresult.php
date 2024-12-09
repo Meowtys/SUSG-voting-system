@@ -46,42 +46,42 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
         align-items: center;
         justify-content: center;
         min-height: 80vh;
-        padding: 40px 20px;
+        padding: 60px 30px; /* Increased padding */
     }
 
     h1.title {
-        font-size: 36px;
+        font-size: 42px; /* Increased font size */
         color: #333;
-        margin-bottom: 30px;
+        margin-bottom: 40px; /* Increased margin */
     }
 
     .results-box {
         background-color: #fff;
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 20px;
+        padding: 30px; /* Increased padding */
         width: 100%;
-        max-width: 900px;
+        max-width: 1000px; /* Increased max-width */
         text-align: center;
     }
 
     .results-title {
-        font-size: 24px;
+        font-size: 28px; /* Increased font size */
         font-weight: 600;
         color: #333;
-        margin-bottom: 15px;
+        margin-bottom: 20px; /* Increased margin */
     }
 
     .divider {
         border: 1px solid #e0e0e0;
         width: 90%;
-        margin: 10px auto 20px auto;
+        margin: 20px auto 30px auto; /* Increased margin */
     }
 
     .results {
         display: flex;
         justify-content: space-between;
-        gap: 20px;
+        gap: 30px; /* Increased gap */
     }
 
     .position-column {
@@ -90,21 +90,23 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     .position-title {
-        font-size: 18px;
+        font-size: 20px; /* Increased font size */
         font-weight: 600;
         color: #333;
-        margin-bottom: 15px;
+        margin-bottom: 20px; /* Increased margin */
     }
 
     .candidate-result {
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: space-between;
         background-color: #f8d0d0;
         padding: 10px;
         border-radius: 8px;
         margin-bottom: 10px;
         transition: transform 0.3s ease;
+        min-height: 70px; /* Ensure uniform height */
+        width: 100%; /* Ensure uniform width */
     }
 
     .candidate-result:hover {
@@ -121,6 +123,13 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
     .candidate-info {
         display: flex;
         align-items: center;
+        flex-grow: 1;
+        justify-content: space-between; /* Ensure uniform spacing */
+    }
+
+    .candidate-info p {
+        flex-grow: 1;
+        margin: 0 10px; /* Add margin for spacing */
     }
 
     .percentage {
