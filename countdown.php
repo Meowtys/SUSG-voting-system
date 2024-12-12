@@ -51,14 +51,21 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             let targetDate = null;
 
             // Determine which countdown to use (start or end)
-            if (startDatetime && new Date(startDatetime).getTime() > Date.now()) {
-                targetDate = new Date(startDatetime).getTime();
+            const now = new Date().getTime();
+            const startTime = new Date(startDatetime).getTime();
+            const endTime = new Date(endDatetime).getTime();
+
+            if (startDatetime && now < startTime) {
+                targetDate = startTime;
                 messageEl.textContent = "ELECTION STARTS IN";
-            } else if (endDatetime && new Date(endDatetime).getTime() > Date.now()) {
-                targetDate = new Date(endDatetime).getTime();
-                messageEl.textContent = "CAST YOUR VOTES NOW";
+                messageEl.className = "bg-red-500 px-4 py-1 rounded-full";
+            } else if (endDatetime && now <= endTime) {
+                targetDate = endTime;
+                messageEl.textContent = "ELECTION TIME REMAINING";
+                messageEl.className = "bg-green-500 px-4 py-1 rounded-full";
             } else {
-                messageEl.textContent = "VOTES ARE CLOSED";
+                messageEl.textContent = "ELECTION ENDED";
+                messageEl.className = "bg-gray-500 px-4 py-1 rounded-full";
                 daysEl.textContent = "00";
                 hoursEl.textContent = "00";
                 minutesEl.textContent = "00";
@@ -85,18 +92,18 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 if (isBeforeStart) {
                     // Before election starts
                     messageEl.textContent = "ELECTION STARTS IN";
-                    messageEl.className = "bg-yellow-500 px-4 py-1 rounded-full";
-                    disableVoting("Voting has not started yet");
+                    messageEl.className = "bg-red-500 px-4 py-1 rounded-full";
+                    disableVoting('not-started');
                 } else if (isDuringElection) {
                     // During election
-                    messageEl.textContent = "CAST YOUR VOTES NOW";
+                    messageEl.textContent = "ELECTION TIME REMAINING";
                     messageEl.className = "bg-green-500 px-4 py-1 rounded-full";
                     enableVoting();
                 } else {
                     // After election ends
-                    messageEl.textContent = "VOTES ARE CLOSED";
+                    messageEl.textContent = "ELECTION ENDED";
                     messageEl.className = "bg-gray-500 px-4 py-1 rounded-full";
-                    disableVoting("Voting period has ended");
+                    disableVoting('ended');
                 }
 
                 // Update countdown display
@@ -137,21 +144,25 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 }
             }
 
-            function disableVoting(message) {
+            function disableVoting(state) {
                 const voteBtn = document.getElementById('vote-btn');
                 const reviewBtn = document.getElementById('review-btn');
 
                 voteBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
-                voteBtn.setAttribute('title', message);
+                
+                // Update vote button click handler based on election state
                 voteBtn.onclick = function(e) {
                     e.preventDefault();
-                    alert(message);
+                    if (state === 'not-started') {
+                        showNotStartedPopup();
+                    } else if (state === 'ended') {
+                        showEndedPopup();
+                    }
                 };
                 
                 // Still allow review if user has voted
                 if (!<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
                     reviewBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
-                    reviewBtn.setAttribute('title', 'No votes to review');
                 }
             }
 
@@ -268,6 +279,29 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
         </div>
     </div>
 
+    <!-- Add new modals for different election states -->
+    <div id="not-started-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full">
+                <p class="text-xl font-semibold mb-4">Election hasn't started yet.</p>
+                <button onclick="closeAllPopups()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ended-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full">
+                <p class="text-xl font-semibold mb-4">Election has ended.</p>
+                <button onclick="closeAllPopups()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <?php include 'footer.php'; ?>
 
     <script>
@@ -275,6 +309,8 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
         function closeAllPopups() {
             document.getElementById('vote-popup').classList.add('hidden');
             document.getElementById('review-popup').classList.add('hidden');
+            document.getElementById('not-started-popup').classList.add('hidden');
+            document.getElementById('ended-popup').classList.add('hidden');
         }
 
         // Also close popups when clicking outside the modal
@@ -290,6 +326,14 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
 
         function showReviewPopup() {
             document.getElementById('review-popup').classList.remove('hidden');
+        }
+
+        function showNotStartedPopup() {
+            document.getElementById('not-started-popup').classList.remove('hidden');
+        }
+
+        function showEndedPopup() {
+            document.getElementById('ended-popup').classList.remove('hidden');
         }
 
         // Update voting status checks
