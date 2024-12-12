@@ -170,14 +170,14 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
 
             <!-- Action Buttons -->
             <div class="flex justify-center gap-4">
-                <button id="vote-btn" 
-                        onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                <a href="votecasting.php" id="vote-btn" 
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed 
+                    <?php echo ($user['has_voted'] ? 'pointer-events-none opacity-50' : ''); ?>">
                     VOTE NOW
-                </button>
+                </a>
                 <button id="review-btn"
-                        onclick="checkVotingStatus2(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
-                        class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    onclick="checkVotingStatus2(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
+                    class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
                     REVIEW VOTES
                 </button>
             </div>
@@ -235,21 +235,21 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
         // Update voting status checks
         window.checkVotingStatus = function(event, hasVoted) {
             if (hasVoted) {
-                event.preventDefault();
                 showVotePopup();
             } else {
                 window.location.href = 'votecasting.php';
             }
         };
 
-        window.checkVotingStatus2 = function(event, hasVoted) {
+        // Simplified voting status checks
+        function checkVotingStatus2(event, hasVoted) {
+            event.preventDefault();
             if (!hasVoted) {
-                event.preventDefault();
                 showReviewPopup();
             } else {
                 window.location.href = 'review_votes.php';
             }
-        };
+        }
     </script>
 </body>
 </html>
