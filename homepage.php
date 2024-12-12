@@ -31,250 +31,79 @@ $user['has_voted'] = $hasVoted;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Homepage</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 40px 0;
-            height: 80vh;
-        }
-
-        .student-info {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .voting-status {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-
-        .voted {
-            color: green;
-            background-color: #28a745; /* Green */
-            color: white;
-        }
-
-        .not-voted {
-            color: red;
-            background-color: #dc3545; /* Red */
-            color: white;
-        }
-
-        .student-name {
-            font-size: 24px;
-            font-weight: bold;
-            font-size: 36px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .student-id,
-        .student-course {
-            font-size: 18px;
-            color: #666;
-        }
-
-        .action-cards {
-            display: flex;
-            justify-content: space-between;
-            width: 70%;
-            max-width: 900px;
-        }
-
-        .card {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            text-align: center;
-            width: 45%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-        }
-
-        .card-content {
-            margin-bottom: 20px;
-        }
-
-        .card-content h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .card-content p {
-            font-size: 18px;
-            color: #666;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #dc3545;
-            color: white;
-            font-size: 16px;
-            font-weight: 500;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn:hover {
-            background-color: #c82333;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .vote-btn {
-            background-color: #28a745;
-            color: white;
-            background-color: #dc3545;
-        }
-
-        .vote-btn:hover {
-            background-color: #c82333;
-        }
-
-        .vote-btn:disabled {
-            background-color: gray;
-            cursor: not-allowed;
-        }
-
-        .tally-btn {
-            background-color: #007bff;
-            color: white;
-            background-color: #28a745;
-        }
-
-        .tally-btn:hover {
-            background-color: #218838;
-        }
-
-        @media (max-width: 768px) {
-            .student-name {
-                font-size: 28px;
-            }
-
-            .student-id, .student-course {
-                font-size: 16px;
-            }
-
-            .action-cards {
-                flex-direction: column;
-                width: 100%;
-                gap: 15px;
-            }
-
-            .card {
-                width: 100%;
-                margin-bottom: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .student-name {
-                font-size: 24px;
-            }
-
-            .student-id, .student-course {
-                font-size: 14px;
-            }
-
-            .voting-status {
-                font-size: 12px;
-                padding: 3px 8px;
-            }
-
-            .btn {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            .card-content h3 {
-                font-size: 20px;
-            }
-
-            .card-content p {
-                font-size: 16px;
-            }
-        }
-    </style>
-    <script src="script/load.js" type="module" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-50">
 
     <!-- Placeholder for Header -->
     <?php include 'header.php'; ?>
 
-    <main class="main">
-        <!-- Main content -->
-        <div class="student-info">
-            <span class="voting-status <?php echo $user['has_voted'] ? 'voted' : 'not-voted'; ?>">
-                Voting Status: <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
-            </span>
-            <h1 class="student-name"><?php echo htmlspecialchars($user['student_name']); ?></h1>
-            <p class="student-id"><?php echo htmlspecialchars($user['student_id']); ?></p>
-            <p class="student-course"><?php echo htmlspecialchars($user['college_name']); ?></p>
-        </div>
-
-        <div class="action-cards">
-            <div class="card">
-                <div class="card-content">
-                    <h3>Current Results</h3>
-                    <p>10% Students Voted</p>
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto bg-white rounded-xl p-8
+            border border-gray-200
+            shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] 
+            hover:shadow-[rgba(17,_17,_26,_0.1)_0px_4px_20px,_rgba(239,68,68,_0.15)_0px_4px_12px]
+            transition-all duration-300">
+            <div class="text-center mb-8">
+                <div class="inline-block mb-4">
+                    <span class="<?php echo $user['has_voted'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?> text-lg font-semibold px-4 py-2 rounded-full">
+                        Voting Status: <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
+                    </span>
                 </div>
-                <button class="btn vote-btn" onclick="navigateTo('votecasting.php')" <?php echo $user['has_voted'] ? 'disabled' : ''; ?>>Vote Now</button>
+                <!-- Increased width from max-w-lg to max-w-2xl -->
+                <div class="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto shadow-sm border border-gray-200">
+                    <h1 class="text-3xl font-bold text-black-600 mb-4"><?php echo htmlspecialchars($user['student_name']); ?></h1>
+                    <div class="flex flex-col space-y-2">
+                        <div class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <p class="text-lg font-medium text-gray-700"><?php echo htmlspecialchars($user['student_id']); ?></p>
+                        </div>
+                        <div class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            <p class="text-lg font-medium text-gray-700"><?php echo htmlspecialchars($user['college_name']); ?></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card">
-                <div class="card-content">
-                    <h3>Live Tally</h3>
-                    <p>President: 45% </p>
-                    <p>Vice-President: 55%</p>
-                    <p>Secretary: 55%</p>
+
+            <!-- Update the action cards styling -->
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl p-6 
+                    border border-gray-200 
+                    shadow-[0_2px_8px_rgba(0,0,0,0.06)]
+                    hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]
+                    transform hover:scale-102 transition-all duration-300">
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Cast Your Vote</h3>
+                        <p class="text-gray-600">Make your voice heard in the SUSG Elections</p>
+                    </div>
+                    <button 
+                        onclick="navigateTo('votecasting.php')" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 <?php echo $user['has_voted'] ? 'opacity-50 cursor-not-allowed' : ''; ?>"
+                        <?php echo $user['has_voted'] ? 'disabled' : ''; ?>>
+                        Vote Now
+                    </button>
                 </div>
-                <button class="btn tally-btn" onclick="navigateTo('liveresult.php')">Live Tally</button>
+
+                <div class="bg-white rounded-xl p-6 
+                    border border-gray-200 
+                    shadow-[0_2px_8px_rgba(0,0,0,0.06)]
+                    hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]
+                    transform hover:scale-102 transition-all duration-300">
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Live Results</h3>
+                        <p class="text-gray-600">View real-time election results</p>
+                    </div>
+                    <button 
+                        onclick="navigateTo('liveresult.php')" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                        View Results
+                    </button>
+                </div>
             </div>
         </div>
     </main>
