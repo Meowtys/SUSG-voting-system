@@ -21,7 +21,6 @@ $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
 $startDatetime = $currentElection ? $currentElection['start_datetime'] : null;
 $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,175 +28,12 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Countdown</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Global styling */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body, html {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
+        @keyframes blink {
+            50% { opacity: 0; }
         }
-
-        /* Header and footer full-width styling */
-        #header, #footer {
-            width: 100%;
-        }
-
-        /* Make sure header and footer have a full-width background */
-        header, footer {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Countdown styling */
-        main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding-top: 100px;
-            padding-bottom: 60px;
-            background-color: #ffffff;
-            width: 100%;
-        }
-
-        .countdown-container {
-            text-align: center;
-            color: #333;
-        }
-
-        .countdown-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-top: 0;
-        }
-
-        .countdown-message {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .timer-box {
-            background-color: #dc3545;
-            padding: 20px;
-            border-radius: 8px;
-            color: white;
-            font-size: 36px;
-            font-weight: bold;
-            width: 80px;
-            text-align: center;
-        }
-
-        .timer-labels {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .btn {
-            width: 150px;
-            height: 45px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .vote-btn {
-            background-color: #dc3545;
-        }
-
-        .review-btn {
-            background-color: #333;
-        }
-
-        /* Button disabled state */
-        .btn.disabled {
-            background-color: gray;
-            cursor: not-allowed;
-        }
-
-        /* Responsive styling */
-        @media (max-width: 768px) {
-            .countdown-message {
-                font-size: 28px;
-            }
-
-            .countdown-title {
-                font-size: 20px;
-            }
-
-            .timer {
-                gap: 10px;
-            }
-
-            .timer-box {
-                width: 60px;
-                font-size: 28px;
-                padding: 15px;
-            }
-
-            .timer-labels {
-                font-size: 12px;
-                gap: 10px;
-            }
-
-            .actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .btn {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .countdown-message {
-                font-size: 24px;
-            }
-
-            .countdown-title {
-                font-size: 18px;
-            }
-
-            .timer-box {
-                width: 50px;
-                font-size: 24px;
-                padding: 10px;
-            }
-
-            .timer-labels {
-                font-size: 10px;
-            }
-
-            .btn {
-                width: 100%;
-                padding: 8px;
-                font-size: 12px;
-            }
-        }
+        .blink { animation: blink 1s step-start infinite; }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -281,96 +117,139 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
         });
     </script>
 </head>
-<body>
-    <!-- Include Header -->
+<body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
-    <!-- Overlay -->
-    <div class="header-overlay" id="header-overlay"></div>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 min-h-screen">
+        <!-- Countdown Container -->
+        <div class="max-w-4xl mx-auto">
+            <!-- Enhanced Countdown Box -->
+            <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
+                <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Countdown</h2>
+                
+                <!-- Countdown Status -->
+                <div class="countdown-status text-white text-xl font-semibold text-center mb-4">
+                    <span id="countdown-message" class="bg-red-500 px-4 py-1 rounded-full">
+                        ELECTION COUNTDOWN
+                    </span>
+                </div>
 
-    <!-- Popup Message -->
-    <div class="popup" id="vote-popup">
-        <p>You have already voted.</p>
-        <button onclick="closePopup()">Close</button>
-    </div>
+                <!-- Countdown Timer Boxes -->
+                <div class="countdown-box flex justify-center gap-8">
+                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="days" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="hours" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="minutes" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="seconds" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
+                    </div>
+                </div>
 
-    <div class="popup" id="review-popup">
-        <p>You have not voted yet.</p>
-        <button onclick="closePopup()">Close</button>
-    </div>
+                <!-- Election Times -->
+                <?php if ($startDatetime && $endDatetime): ?>
+                <div class="mt-6 text-center text-white">
+                    <div class="text-sm">
+                        Start: <span class="font-semibold"><?php echo (new DateTime($startDatetime))->format('F j, Y - g:i A'); ?></span>
+                    </div>
+                    <div class="text-sm">
+                        End: <span class="font-semibold"><?php echo (new DateTime($endDatetime))->format('F j, Y - g:i A'); ?></span>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
 
-    <!-- Main Section -->
-    <main class="countdown-container">
-        <h2 class="countdown-title">ELECTION COUNTDOWN</h2>
-        <div id="countdown-message" class="countdown-message">CAST YOUR VOTES NOW</div>
-
-        <div class="timer">
-            <div class="timer-box" id="days">00</div>
-            <div class="timer-box" id="hours">00</div>
-            <div class="timer-box" id="minutes">00</div>
-            <div class="timer-box" id="seconds">00</div>
-        </div>
-
-        <div class="timer-labels">
-            <span class="timer-label">DAYS</span>
-            <span class="timer-label">HOURS</span>
-            <span class="timer-label">MINUTES</span>
-            <span class="timer-label">SECONDS</span>
-        </div>
-
-        <div class="actions">
-            <button id="vote-btn" class="btn vote-btn" onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">VOTE NOW</button>
-            <button id="review-btn" class="btn review-btn" onclick="checkVotingStatus2(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)">REVIEW VOTES</button>
+            <!-- Action Buttons -->
+            <div class="flex justify-center gap-4 mt-8">
+                <button id="vote-btn" 
+                        onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    VOTE NOW
+                </button>
+                <button id="review-btn"
+                        onclick="checkVotingStatus2(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
+                        class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    REVIEW VOTES
+                </button>
+            </div>
         </div>
     </main>
 
-    <!-- Include Footer -->
+    <!-- Modal/Popup for Vote Status -->
+    <div id="vote-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full">
+                <p class="text-xl font-semibold mb-4">You have already voted.</p>
+                <button onclick="closeAllPopups()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal/Popup for Review Status -->
+    <div id="review-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="bg-white rounded-lg p-8 max-w-sm w-full">
+                <p class="text-xl font-semibold mb-4">You have not voted yet.</p>
+                <button onclick="closeAllPopups()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <?php include 'footer.php'; ?>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const overlay = document.getElementById('header-overlay');
-            const votePopup = document.getElementById('vote-popup');
-            const reviewPopup = document.getElementById('review-popup');
+        // Update popup handling for Tailwind
+        function closeAllPopups() {
+            document.getElementById('vote-popup').classList.add('hidden');
+            document.getElementById('review-popup').classList.add('hidden');
+        }
 
-            // Function to handle the "Vote Now" button
-            window.checkVotingStatus = function (event, hasVoted) {
-                if (hasVoted) {
-                    // User has already voted
-                    event.preventDefault();
-                    votePopup.classList.add('active');
-                    overlay.classList.add('active');
-                } else {
-                    // Navigate to the voting page
-                    navigateTo('votecasting.php');
-                }
-            };
-
-            // Function to handle the "Review Votes" button
-            window.checkVotingStatus2 = function (event, hasVoted) {
-                if (!hasVoted) {
-                    // User has not yet voted
-                    event.preventDefault();
-                    reviewPopup.classList.add('active');
-                    overlay.classList.add('active');
-                } else {
-                    // Navigate to the review votes page
-                    navigateTo('review_votes.php');
-                }
-            };
-
-            // Function to close popups
-            window.closePopup = function () {
-                votePopup.classList.remove('active');
-                reviewPopup.classList.remove('active');
-                overlay.classList.remove('active');
-            };
-
-            // Function to navigate to a specific page
-            window.navigateTo = function (page) {
-                window.location.href = page;
-            };
+        // Also close popups when clicking outside the modal
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('fixed')) {
+                closeAllPopups();
+            }
         });
+
+        function showVotePopup() {
+            document.getElementById('vote-popup').classList.remove('hidden');
+        }
+
+        function showReviewPopup() {
+            document.getElementById('review-popup').classList.remove('hidden');
+        }
+
+        // Update voting status checks
+        window.checkVotingStatus = function(event, hasVoted) {
+            if (hasVoted) {
+                event.preventDefault();
+                showVotePopup();
+            } else {
+                window.location.href = 'votecasting.php';
+            }
+        };
+
+        window.checkVotingStatus2 = function(event, hasVoted) {
+            if (!hasVoted) {
+                event.preventDefault();
+                showReviewPopup();
+            } else {
+                window.location.href = 'review_votes.php';
+            }
+        };
     </script>
 </body>
 </html>
