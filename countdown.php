@@ -73,7 +73,33 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             function updateCountdown() {
                 const now = new Date().getTime();
                 const distance = targetDate - now;
+                const voteBtn = document.getElementById('vote-btn');
+                const reviewBtn = document.getElementById('review-btn');
+                const messageEl = document.getElementById('countdown-message');
 
+                // Check election timing status
+                const isBeforeStart = startDatetime && now < new Date(startDatetime).getTime();
+                const isAfterEnd = endDatetime && now > new Date(endDatetime).getTime();
+                const isDuringElection = !isBeforeStart && !isAfterEnd;
+
+                if (isBeforeStart) {
+                    // Before election starts
+                    messageEl.textContent = "ELECTION STARTS IN";
+                    messageEl.className = "bg-yellow-500 px-4 py-1 rounded-full";
+                    disableVoting("Voting has not started yet");
+                } else if (isDuringElection) {
+                    // During election
+                    messageEl.textContent = "CAST YOUR VOTES NOW";
+                    messageEl.className = "bg-green-500 px-4 py-1 rounded-full";
+                    enableVoting();
+                } else {
+                    // After election ends
+                    messageEl.textContent = "VOTES ARE CLOSED";
+                    messageEl.className = "bg-gray-500 px-4 py-1 rounded-full";
+                    disableVoting("Voting period has ended");
+                }
+
+                // Update countdown display
                 if (distance > 0) {
                     // Calculate time components
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
@@ -111,6 +137,35 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 }
             }
 
+            function disableVoting(message) {
+                const voteBtn = document.getElementById('vote-btn');
+                const reviewBtn = document.getElementById('review-btn');
+
+                voteBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
+                voteBtn.setAttribute('title', message);
+                voteBtn.onclick = function(e) {
+                    e.preventDefault();
+                    alert(message);
+                };
+                
+                // Still allow review if user has voted
+                if (!<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
+                    reviewBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
+                    reviewBtn.setAttribute('title', 'No votes to review');
+                }
+            }
+
+            function enableVoting() {
+                const voteBtn = document.getElementById('vote-btn');
+                const reviewBtn = document.getElementById('review-btn');
+
+                if (!<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
+                    voteBtn.classList.remove('disabled', 'opacity-50', 'cursor-not-allowed');
+                    voteBtn.removeAttribute('title');
+                    voteBtn.onclick = null;
+                }
+            }
+
             // Start the interval to update the countdown every second
             const countdownInterval = setInterval(updateCountdown, 1000);
             updateCountdown(); // Call immediately to set initial values
@@ -137,20 +192,20 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
 
                 <!-- Countdown Timer Boxes -->
                 <div class="countdown-box flex justify-center gap-8">
-                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span id="days" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="days" class="text-7xl font-bold text-red-700 block mb-3">00</span>
                         <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span id="hours" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="hours" class="text-7xl font-bold text-red-700 block mb-3">00</span>
                         <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span id="minutes" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="minutes" class="text-7xl font-bold text-red-700 block mb-3">00</span>
                         <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-32 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span id="seconds" class="text-6xl font-bold text-red-700 block mb-3">00</span>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span id="seconds" class="text-7xl font-bold text-red-700 block mb-3">00</span>
                         <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
                     </div>
                 </div>
@@ -172,7 +227,12 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             <div class="flex justify-center gap-4">
                 <a href="votecasting.php" id="vote-btn" 
                     class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed 
-                    <?php echo ($user['has_voted'] ? 'pointer-events-none opacity-50' : ''); ?>">
+                    <?php 
+                        echo ($user['has_voted'] ? 'pointer-events-none opacity-50' : '');
+                    ?>"
+                    title="<?php 
+                        if ($user['has_voted']) echo 'You have already voted';
+                    ?>">
                     VOTE NOW
                 </a>
                 <button id="review-btn"
