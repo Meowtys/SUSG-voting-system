@@ -3,15 +3,52 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Check if the user is logged in
-if (!isset($_SESSION['user'])) {
-    header('Location: loginasvoter.php');
+// Function to redirect with error message
+function redirectWithError($message) {
+    $_SESSION['error_message'] = $message;
+    header('Location: homepage.php');
     exit();
 }
 
-$user = $_SESSION['user'];
+// Check if user is logged in
+if (!isset($_SESSION['user'])) {
+    redirectWithError("Please log in to access voting.");
+}
 
+$user = $_SESSION['user'];
 require_once 'connect.php';
+
+// Check if there's an active election
+$electionStmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    redirectWithError("No election is currently scheduled.");
+}
+
+// Check election timing
+$now = new DateTime();
+$startTime = new DateTime($currentElection['start_datetime']);
+$endTime = new DateTime($currentElection['end_datetime']);
+
+if ($now < $startTime) {
+    redirectWithError("Election has not started yet. Starts at " . $startTime->format('F j, Y - g:i A'));
+}
+
+if ($now > $endTime) {
+    redirectWithError("Election has ended.");
+}
+
+// Check if user has already voted
+$votedStmt = $pdo->prepare("SELECT has_voted FROM students WHERE student_id = ?");
+$votedStmt->execute([$user['student_id']]);
+$hasVoted = $votedStmt->fetchColumn();
+
+if ($hasVoted) {
+    redirectWithError("You have already cast your vote.");
+}
+
+// Continue with the rest of the page only if all checks pass
 
 // Fetch candidates from the database
 function fetchCandidates($pdo, $position_id) {
@@ -294,6 +331,38 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
     <script src="script/load.js" type="module" defer></script>
+    <script>
+        // Add election status monitoring
+        document.addEventListener('DOMContentLoaded', function() {
+            const electionData = <?php echo json_encode($currentElection); ?>;
+            
+            function checkElectionStatus() {
+                const now = new Date().getTime();
+                const startTime = new Date(electionData.start_datetime).getTime();
+                const endTime = new Date(electionData.end_datetime).getTime();
+
+                if (now < startTime || now > endTime) {
+                    alert("The election period has changed. You will be redirected to the homepage.");
+                    window.location.href = 'homepage.php';
+                    return false;
+                }
+                return true;
+            }
+
+            // Check status every minute
+            setInterval(checkElectionStatus, 60000);
+
+            // Add check before form submission
+            const voteForm = document.querySelector('form');
+            if (voteForm) {
+                voteForm.addEventListener('submit', function(e) {
+                    if (!checkElectionStatus()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
 </head>
 
 <body>
