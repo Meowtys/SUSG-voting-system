@@ -10,20 +10,20 @@ if (isset($_SESSION['user'])) {
     $user = null;
 }
 
-// Add election status check
-if (isset($pdo)) {
-    $electionStmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
-    $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
-    
-    $electionData = $currentElection ? [
-        'start_datetime' => $currentElection['start_datetime'],
-        'end_datetime' => $currentElection['end_datetime'],
-        'status' => $currentElection['status']
-    ] : null;
-} else {
-    $currentElection = null;
-    $electionData = null;
+// Add database connection if not already included
+if (!isset($pdo)) {
+    require_once 'connect.php';
 }
+
+// Add election status check
+$electionStmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
+
+$electionData = $currentElection ? [
+    'start_datetime' => $currentElection['start_datetime'],
+    'end_datetime' => $currentElection['end_datetime'],
+    'status' => $currentElection['status']
+] : null;
 ?>
 
 <!DOCTYPE html>
@@ -251,25 +251,25 @@ if (isset($pdo)) {
     <!-- Overlay -->
     <div class="header-overlay" id="header-overlay"></div>
 
-    <!-- Popup Messages -->
+    <!-- Update Popup Messages -->
     <div class="popup" id="vote-popup">
         <p>You have already voted.</p>
-        <button onclick="closePopup('vote-popup')">Close</button>
+        <button onclick="closeHeaderPopup('vote-popup')">Close</button>
     </div>
 
     <div class="popup" id="election-not-started">
         <p>The election has not started yet.</p>
-        <button onclick="closePopup('election-not-started')">Close</button>
+        <button onclick="closeHeaderPopup('election-not-started')">Close</button>
     </div>
 
     <div class="popup" id="election-ended">
         <p>The election has ended.</p>
-        <button onclick="closePopup('election-ended')">Close</button>
+        <button onclick="closeHeaderPopup('election-ended')">Close</button>
     </div>
 
     <div class="popup" id="no-election">
         <p>No election is currently scheduled.</p>
-        <button onclick="closePopup('no-election')">Close</button>
+        <button onclick="closeHeaderPopup('no-election')">Close</button>
     </div>
 
     <!-- Dropdown Menu -->
@@ -292,7 +292,7 @@ if (isset($pdo)) {
         </div>
         <ul>
             <li><a href="homepage.php">Home</a></li>
-            <li><a href="#" onclick="handleVoteClick(event)">Vote</a></li>
+            <li><a href="javascript:void(0);" onclick="handleVoteClickHeader()">Vote</a></li>
             <li><a href="liveresult.php">Live Tally</a></li>
             <li><a href="countdown.php">Countdown</a></li>
             <!-- <li><a href="faq.php">FAQ</a></li> -->
@@ -304,68 +304,78 @@ if (isset($pdo)) {
 
     <!-- JavaScript for toggling menu and popup message -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        // Global variables for election data
+        const headerElectionData = <?php echo json_encode($electionData); ?>;
+        const headerHasVoted = <?php echo isset($user['has_voted']) ? ($user['has_voted'] ? 'true' : 'false') : 'false'; ?>;
+
+        function handleVoteClickHeader() {
+            const now = new Date().getTime();
+            
+            if (!headerElectionData) {
+                showHeaderPopup('no-election');
+                return;
+            }
+
+            const startTime = new Date(headerElectionData.start_datetime).getTime();
+            const endTime = new Date(headerElectionData.end_datetime).getTime();
+
+            if (headerHasVoted) {
+                showHeaderPopup('vote-popup');
+            } else if (now < startTime) {
+                showHeaderPopup('election-not-started');
+            } else if (now > endTime) {
+                showHeaderPopup('election-ended');
+            } else {
+                window.location.href = 'votecasting.php';
+            }
+        }
+
+        function showHeaderPopup(popupId) {
+            const popup = document.getElementById(popupId);
+            const overlay = document.getElementById('header-overlay');
+            if (popup && overlay) {
+                popup.classList.add('active');
+                overlay.classList.add('active');
+                sideMenu.classList.remove('active'); // Close the menu when showing popup
+            }
+        }
+
+        function closeHeaderPopup(popupId) {
+            const popup = document.getElementById(popupId);
+            const overlay = document.getElementById('header-overlay');
+            if (popup && overlay) {
+                popup.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('header-menu-toggle');
             const sideMenu = document.getElementById('header-side-menu');
             const overlay = document.getElementById('header-overlay');
-            const votePopup = document.getElementById('vote-popup');
 
-            menuToggle.addEventListener('click', function () {
+            menuToggle.addEventListener('click', function() {
                 sideMenu.classList.toggle('active');
                 overlay.classList.toggle('active');
-                document.body.classList.toggle('header-overlay-active');
             });
 
-            overlay.addEventListener('click', function () {
+            // Close everything when clicking overlay
+            overlay.addEventListener('click', function() {
                 sideMenu.classList.remove('active');
                 overlay.classList.remove('active');
-                document.body.classList.remove('header-overlay-active');
+                document.querySelectorAll('.popup').forEach(popup => {
+                    popup.classList.remove('active');
+                });
             });
 
-            // Add election data to JavaScript
-            const electionData = <?php echo json_encode($electionData); ?>;
-            const hasVoted = <?php echo isset($user['has_voted']) ? ($user['has_voted'] ? 'true' : 'false') : 'false'; ?>;
-
-            function handleVoteClick(event) {
-                event.preventDefault();
-                
-                if (!electionData) {
-                    showPopup('no-election');
-                    return;
-                }
-
-                const now = new Date().getTime();
-                const startTime = new Date(electionData.start_datetime).getTime();
-                const endTime = new Date(electionData.end_datetime).getTime();
-
-                if (hasVoted) {
-                    showPopup('vote-popup');
-                } else if (now < startTime) {
-                    showPopup('election-not-started');
-                } else if (now > endTime) {
-                    showPopup('election-ended');
-                } else {
-                    window.location.href = 'votecasting.php';
-                }
-            }
-
-            function showPopup(popupId) {
-                const popup = document.getElementById(popupId);
-                popup.classList.add('active');
-                document.getElementById('header-overlay').classList.add('active');
-            }
-
-            function closePopup(popupId) {
-                const popup = document.getElementById(popupId);
-                popup.classList.remove('active');
-                document.getElementById('header-overlay').classList.remove('active');
-            }
-
-            // Update the checkVotingStatus function
-            window.checkVotingStatus = function(event, hasVoted) {
-                event.preventDefault();
-                handleVoteClick(event);
-            };
+            // Update popup close buttons
+            document.querySelectorAll('.popup button').forEach(button => {
+                button.onclick = function() {
+                    const popupId = this.closest('.popup').id;
+                    closeHeaderPopup(popupId);
+                };
+            });
         });
     </script>
 
