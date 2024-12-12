@@ -121,9 +121,9 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
     <?php include 'header.php'; ?>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8 min-h-screen">
+    <main class="container mx-auto px-4 py-8">
         <!-- Countdown Container -->
-        <div class="max-w-4xl mx-auto">
+        <div class="max-w-4xl mx-auto my-8">
             <!-- Enhanced Countdown Box -->
             <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
                 <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Countdown</h2>
@@ -169,7 +169,7 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex justify-center gap-4 mt-8">
+            <div class="flex justify-center gap-4">
                 <button id="vote-btn" 
                         onclick="checkVotingStatus(event, <?php echo $user['has_voted'] ? 'true' : 'false'; ?>)"
                         class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed">
