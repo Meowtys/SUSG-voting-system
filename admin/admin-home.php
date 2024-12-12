@@ -138,8 +138,8 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             const startDatetime = new Date("<?php echo $currentElection['start_datetime']; ?>").getTime();
             const endDatetime = new Date("<?php echo $currentElection['end_datetime']; ?>").getTime();
             <?php else: ?>
-            const startDatetime = null;
-            const endDatetime = null;
+            const startDatetimeVar = null;
+            const endDatetimeVar = null;
             <?php endif; ?>
 
             function updateCountdown() {
