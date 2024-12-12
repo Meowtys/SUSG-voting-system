@@ -50,6 +50,13 @@ $electionData = $currentElection ? [
     <?php include 'header.php'; ?>
 
     <main class="container mx-auto px-4 py-8">
+        <?php if (isset($_SESSION['error_message'])): ?>
+            <div class="max-w-6xl mx-auto mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline"><?php echo htmlspecialchars($_SESSION['error_message']); ?></span>
+            </div>
+            <?php unset($_SESSION['error_message']); ?>
+        <?php endif; ?>
+        
         <div class="max-w-6xl mx-auto bg-white rounded-xl p-8
             border border-gray-200
             shadow-[rgba(17,_17,_26,_0.1)_0px_0px_16px] 
