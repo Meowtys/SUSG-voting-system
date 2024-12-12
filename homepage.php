@@ -21,6 +21,17 @@ $hasVoted = $stmt->fetchColumn();
 // Update session data with voting status
 $_SESSION['user']['has_voted'] = $hasVoted;
 $user['has_voted'] = $hasVoted;
+
+// Add this after the existing database queries
+$electionStmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
+
+// Pass election data to JavaScript
+$electionData = $currentElection ? [
+    'start_datetime' => $currentElection['start_datetime'],
+    'end_datetime' => $currentElection['end_datetime'],
+    'status' => $currentElection['status']
+] : null;
 ?>
 
 <!DOCTYPE html>
@@ -79,12 +90,12 @@ $user['has_voted'] = $hasVoted;
                     transform hover:scale-102 transition-all duration-300">
                     <div class="mb-4">
                         <h3 class="text-xl font-semibold text-gray-800 mb-2">Cast Your Vote</h3>
-                        <p class="text-gray-600">Make your voice heard in the SUSG Elections</p>
+                        <p id="voteStatusText" class="text-gray-600">Make your voice heard in the SUSG Elections</p>
                     </div>
                     <button 
-                        onclick="navigateTo('votecasting.php')" 
-                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 <?php echo $user['has_voted'] ? 'opacity-50 cursor-not-allowed' : ''; ?>"
-                        <?php echo $user['has_voted'] ? 'disabled' : ''; ?>>
+                        id="voteButton"
+                        onclick="handleVoteAction()"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
                         Vote Now
                     </button>
                 </div>
@@ -105,6 +116,18 @@ $user['has_voted'] = $hasVoted;
                     </button>
                 </div>
             </div>
+
+            <!-- Add modals for different election states -->
+            <div id="electionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+                <div class="flex items-center justify-center min-h-screen px-4"></div>
+                    <div class="bg-white rounded-lg p-8 max-w-sm w-full"></div>
+                        <p id="modalMessage" class="text-xl font-semibold mb-4"></p>
+                        <button onclick="closeModal()" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -112,9 +135,75 @@ $user['has_voted'] = $hasVoted;
     <?php include 'footer.php'; ?>
 
     <script>
-        function navigateTo(page) {
-            window.location.href = page;
+        // Election data from PHP
+        const electionData = <?php echo json_encode($electionData); ?>;
+        const hasVoted = <?php echo $user['has_voted'] ? 'true' : 'false'; ?>;
+        
+        function updateVoteButton() {
+            const voteButton = document.getElementById('voteButton');
+            const voteStatusText = document.getElementById('voteStatusText');
+            const now = new Date().getTime();
+            
+            if (!electionData) {
+                setButtonState('No election scheduled', true, 'bg-gray-500');
+                return;
+            }
+
+            const startTime = new Date(electionData.start_datetime).getTime();
+            const endTime = new Date(electionData.end_datetime).getTime();
+
+            if (now < startTime) {
+                setButtonState('Election has not started yet', true, 'bg-gray-500');
+            } else if (now > endTime) {
+                setButtonState('Election has ended', true, 'bg-gray-500');
+            } else if (hasVoted) {
+                setButtonState('Already Voted', true, 'bg-gray-500');
+            } else {
+                setButtonState('Vote Now', false, 'bg-red-600');
+                voteStatusText.textContent = 'Election is ongoing - Cast your vote now!';
+            }
         }
+
+        function setButtonState(text, disabled, colorClass) {
+            const button = document.getElementById('voteButton');
+            button.textContent = text;
+            button.disabled = disabled;
+            button.className = `w-full ${colorClass} text-white font-bold py-3 px-6 rounded-lg transition duration-300 ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-700'}`;
+        }
+
+        function handleVoteAction() {
+            if (!electionData) {
+                showModal('No election is currently scheduled.');
+                return;
+            }
+
+            const now = new Date().getTime();
+            const startTime = new Date(electionData.start_datetime).getTime();
+            const endTime = new Date(electionData.end_datetime).getTime();
+
+            if (now < startTime) {
+                showModal('Election has not started yet.');
+            } else if (now > endTime) {
+                showModal('Election has ended.');
+            } else if (hasVoted) {
+                showModal('You have already voted.');
+            } else {
+                window.location.href = 'votecasting.php';
+            }
+        }
+
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('electionModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('electionModal').classList.add('hidden');
+        }
+
+        // Initialize button state and update every minute
+        updateVoteButton();
+        setInterval(updateVoteButton, 60000);
     </script>
 </body>
 </html>
