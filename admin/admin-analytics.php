@@ -6,6 +6,7 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 }
 
 require_once '../connect.php';
+require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
 
 try {
     // Fetch ALL feedbacks with no limit
@@ -31,9 +32,21 @@ try {
     $feedbacks = [];
 }
 
-// Encode feedback data into JSON format with error checking
+// Initialize sentiment cache
+$sentimentCache = new SentimentCache();
+
+// Process feedbacks with cache information
 try {
-    $feedbacksJSON = json_encode($feedbacks, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    $feedbacksWithCache = array_map(function($feedback) use ($sentimentCache) {
+        $cacheKey = md5($feedback['suggestion']); // Create unique key for each feedback
+        $cachedSentiment = $sentimentCache->get($cacheKey);
+        return array_merge($feedback, [
+            'cache_key' => $cacheKey,
+            'cached_sentiment' => $cachedSentiment
+        ]);
+    }, $feedbacks);
+
+    $feedbacksJSON = json_encode($feedbacksWithCache, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     if (json_last_error() !== JSON_ERROR_NONE) {
         throw new Exception(json_last_error_msg());
     }
@@ -173,9 +186,9 @@ try {
                     return;
                 }
 
-                const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // MeaningCloud API key
+                const apiKey = 'a777cea33da118e4703a82dddefab1a4'; // MeaningCloud API key
                 // backup key 'a777cea33da118e4703a82dddefab1a4'
-                
+
                 // Function to handle API errors
                 async function handleApiResponse(response) {
                     if (!response.ok) {
@@ -192,12 +205,17 @@ try {
                 const sentimentCache = new Map();
                 const RATE_LIMIT_DELAY = 1000; // 1 second delay between API calls
 
-                async function getSentiment(text) {
+                async function getSentiment(text, cacheKey, cachedSentiment) {
                     try {
-                        // Check cache first
-                        const cacheKey = text.trim();
-                        if (sentimentCache.has(cacheKey)) {
+                        // If we have cached sentiment data, use it
+                        if (cachedSentiment) {
                             console.log('Using cached sentiment for:', text.substring(0, 50) + '...');
+                            return cachedSentiment;
+                        }
+
+                        // Check memory cache first
+                        if (sentimentCache.has(cacheKey)) {
+                            console.log('Using memory-cached sentiment for:', text.substring(0, 50) + '...');
                             return sentimentCache.get(cacheKey);
                         }
 
@@ -223,13 +241,9 @@ try {
                             body: params
                         });
 
-                        if (!response.ok) {
-                            throw new Error(`API request failed: ${response.status}`);
-                        }
-
                         const data = await response.json();
+                        
                         if (data.status.code !== '0') {
-                            // If we hit rate limit, return neutral sentiment
                             if (data.status.code === '104') {
                                 console.warn('Rate limit hit, using neutral sentiment');
                                 return {
@@ -249,12 +263,24 @@ try {
                             subjectivity: data.subjectivity
                         };
 
-                        // Cache the result
+                        // Cache the result both in memory and server
                         sentimentCache.set(cacheKey, result);
+                        
+                        // Save to server cache
+                        await fetch('save_sentiment_cache.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                key: cacheKey,
+                                value: result
+                            })
+                        });
+
                         return result;
                     } catch (error) {
                         console.error('Sentiment analysis error:', error);
-                        // Return neutral sentiment on error
                         return {
                             score_tag: 'NEU',
                             confidence: 0,
@@ -271,7 +297,7 @@ try {
                         const feedback = feedbacks[i];
                         try {
                             console.log(`Processing feedback ${i + 1}/${feedbacks.length}`);
-                            const sentimentData = await getSentiment(feedback.suggestion);
+                            const sentimentData = await getSentiment(feedback.suggestion, feedback.cache_key, feedback.cached_sentiment);
                             // ... rest of the feedback processing code ...
                         } catch (error) {
                             console.error('Error processing feedback:', feedback, error);
@@ -327,7 +353,11 @@ try {
                         processedCount++;
                         console.log(`Processing feedback ${processedCount}/${totalFeedbacks}`);
                         
-                        const sentimentData = await getSentiment(feedback.suggestion);
+                        const sentimentData = await getSentiment(
+                            feedback.suggestion,
+                            feedback.cache_key,
+                            feedback.cached_sentiment
+                        );
                         const experience = parseInt(feedback.experience);
                         experienceCounts[experience]++;
 
@@ -871,6 +901,7 @@ try {
             <div id="negative-comments" class="comments-container" style="display: none;"></div>
 
             <!-- Add new section for mismatched feedback -->
+                        <h3 class="text-lg font-semibold mb-2 text-green-600">High Rating, Negative Feedback</h3>
             <div class="mt-8">
                 <h2 class="text-2xl font-bold mb-4">Rating-Sentiment Mismatches</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -887,4 +918,12 @@ try {
         </div>
     </main>
 </body>
-</html> 
+</html>
+                        <div id="negative-mismatch" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
