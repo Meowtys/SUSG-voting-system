@@ -174,6 +174,7 @@ try {
                 }
 
                 const apiKey = '8c21a308d6edef953c49c0e87b30222e'; // MeaningCloud API key
+                // backup key 'a777cea33da118e4703a82dddefab1a4'
                 
                 // Function to handle API errors
                 async function handleApiResponse(response) {
