@@ -219,6 +219,14 @@ try {
                             return sentimentCache.get(cacheKey);
                         }
 
+                        // Pre-process text for enthusiasm check
+                        const isEnthusiastic = text.includes('!') && 
+                            (text.toUpperCase() === text || 
+                             text.includes('BEST') || 
+                             text.includes('GREAT') || 
+                             text.includes('AMAZING') ||
+                             text.includes('EXCELLENT'));
+
                         if (!text || text.trim().length === 0) {
                             return {
                                 score_tag: 'NEU',
@@ -254,6 +262,13 @@ try {
                                 };
                             }
                             throw new Error(`MeaningCloud API error: ${data.status.msg}`);
+                        }
+
+                        // Override sentiment for enthusiastic feedback
+                        if (isEnthusiastic && data.score_tag === 'NEU') {
+                            console.log('Overriding neutral sentiment for enthusiastic feedback:', text);
+                            data.score_tag = 'P+';
+                            data.confidence = Math.max(data.confidence, 90);
                         }
 
                         const result = {
