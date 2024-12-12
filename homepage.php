@@ -135,6 +135,11 @@ $electionData = $currentElection ? [
     <?php include 'footer.php'; ?>
 
     <script>
+        // Preserve the original navigateTo function for the View Results button
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
         // Election data from PHP
         const electionData = <?php echo json_encode($electionData); ?>;
         const hasVoted = <?php echo $user['has_voted'] ? 'true' : 'false'; ?>;
