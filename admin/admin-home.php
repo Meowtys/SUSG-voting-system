@@ -149,27 +149,42 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 }
 
                 const now = new Date().getTime();
-                let distance = startDatetime - now;
-
-                if (now >= startDatetime && now <= endDatetime) {
+                const status = document.querySelector('.countdown-status span');
+                
+                // Determine which countdown to show
+                let distance;
+                if (now < startDatetime) {
+                    // Count down to election start
+                    distance = startDatetime - now;
+                    status.textContent = 'Election Starts In';
+                    status.className = 'bg-red-500 px-4 py-1 rounded-full';
+                } else if (now <= endDatetime) {
+                    // Count down to election end
                     distance = endDatetime - now;
+                    status.textContent = 'Election Time Remaining';
+                    status.className = 'bg-green-500 px-4 py-1 rounded-full';
+                } else {
+                    // Election has ended
+                    status.textContent = 'Election Ended';
+                    status.className = 'bg-gray-500 px-4 py-1 rounded-full';
+                    document.querySelector('.days').textContent = '00';
+                    document.querySelector('.hours').textContent = '00';
+                    document.querySelector('.minutes').textContent = '00';
+                    document.querySelector('.seconds').textContent = '00';
+                    return;
                 }
 
+                // Calculate time components
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                // Update each element separately with padded numbers
+                // Update the display with padded numbers
                 document.querySelector('.days').textContent = String(days).padStart(2, '0');
                 document.querySelector('.hours').textContent = String(hours).padStart(2, '0');
                 document.querySelector('.minutes').textContent = String(minutes).padStart(2, '0');
                 document.querySelector('.seconds').textContent = String(seconds).padStart(2, '0');
-
-                if (distance < 0) {
-                    clearInterval(countdownInterval);
-                    countdownBox.innerHTML = '<div class="text-center text-white text-3xl font-bold py-12">Election has ended.</div>';
-                }
             }
 
             const countdownInterval = setInterval(updateCountdown, 1000);
@@ -286,28 +301,50 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             <!-- Enhanced Countdown Box -->
             <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
                 <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Countdown</h2>
-                <div class="countdown-box flex justify-center gap-8">
-                    <?php if ($currentElection): ?>
-                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span class="days text-7xl font-bold text-red-700 block mb-3">00</span>
-                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
+                <?php if ($currentElection): ?>
+                    <div class="countdown-status text-white text-xl font-semibold text-center mb-4">
+                        <?php 
+                        $now = new DateTime();
+                        $start = new DateTime($currentElection['start_datetime']);
+                        $end = new DateTime($currentElection['end_datetime']);
+                        
+                        if ($now < $start): ?>
+                            <span class="bg-red-500 px-4 py-1 rounded-full">Election Starts In</span>
+                        <?php elseif ($now <= $end): ?>
+                            <span class="bg-green-500 px-4 py-1 rounded-full">Election Time Remaining</span>
+                        <?php else: ?>
+                            <span class="bg-gray-500 px-4 py-1 rounded-full">Election Ended</span>
+                        <?php endif; ?>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span class="hours text-7xl font-bold text-red-700 block mb-3">00</span>
-                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
+                    <div class="countdown-box flex justify-center gap-8">
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="days text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="hours text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="minutes text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="seconds text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
+                        </div>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span class="minutes text-7xl font-bold text-red-700 block mb-3">00</span>
-                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
+                    <div class="mt-6 text-center text-white">
+                        <div class="text-sm">
+                            Start: <span class="font-semibold"><?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A'); ?></span>
+                        </div>
+                        <div class="text-sm">
+                            End: <span class="font-semibold"><?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); ?></span>
+                        </div>
                     </div>
-                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
-                        <span class="seconds text-7xl font-bold text-red-700 block mb-3">00</span>
-                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
-                    </div>
-                    <?php else: ?>
-                    <div class="col-span-4 text-center text-white text-3xl font-bold py-12">No election scheduled.</div>
-                    <?php endif; ?>
-                </div>
+                <?php else: ?>
+                    <div class="text-center text-white text-3xl font-bold py-12">No election scheduled.</div>
+                <?php endif; ?>
             </div>
 
             <!-- Current Election Status -->
@@ -324,44 +361,55 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             <!-- Scheduled Elections -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800">Scheduled Elections</h2>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                <div class="w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-red-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Election Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Start Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">End Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Created</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Updated</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Election Name</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Start Date</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">End Date</th>
+                                <th class="w-1/12 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Status</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Created</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Updated</th>
+                                <th class="w-1/6 px-4 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php foreach ($allElections as $election): ?>
-                                <tr data-election-id="<?php echo htmlspecialchars($election['election_id']); ?>" class="hover:bg-red-50 transition-colors duration-200">
-                                    <td class="px-6 py-4 whitespace-nowrap election-name"><?php echo htmlspecialchars($election['election_name']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap start-datetime"><?php echo htmlspecialchars($election['start_datetime']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap end-datetime"><?php echo htmlspecialchars($election['end_datetime']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+                                <tr data-election-id="<?php echo htmlspecialchars($election['election_id']); ?>" 
+                                    class="hover:bg-red-50 transition-colors duration-200">
+                                    <td class="px-4 py-4 text-sm text-gray-900 truncate election-name">
+                                        <?php echo htmlspecialchars($election['election_name']); ?>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-900 truncate start-datetime">
+                                        <?php echo htmlspecialchars($election['start_datetime']); ?>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-900 truncate end-datetime">
+                                        <?php echo htmlspecialchars($election['end_datetime']); ?>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             <?php echo strtolower($election['status']) === 'ongoing' ? 'bg-green-100 text-green-800' : 
                                                 (strtolower($election['status']) === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800'); ?>">
                                             <?php echo htmlspecialchars($election['status']); ?>
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($election['created_at']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($election['updated_at']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-col space-y-2">
-                                            <button class="edit-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
-                                                <i class="fas fa-edit mr-2"></i> Edit
+                                    <td class="px-4 py-4 text-sm text-gray-500 truncate">
+                                        <?php echo htmlspecialchars($election['created_at']); ?>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-500 truncate">
+                                        <?php echo htmlspecialchars($election['updated_at']); ?>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <div class="flex flex-col space-y-1">
+                                            <button class="edit-button bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                                <i class="fas fa-edit mr-1"></i> Edit
                                             </button>
-                                            <button class="delete-button bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
-                                                <i class="fas fa-trash-alt mr-2"></i> Delete
+                                            <button class="delete-button bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                                <i class="fas fa-trash-alt mr-1"></i> Delete
                                             </button>
-                                            <button class="view-button bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
-                                                <i class="fas fa-check-circle mr-2"></i> Set as Current
+                                            <button class="view-button bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                                <i class="fas fa-check-circle mr-1"></i> Set as Current
                                             </button>
                                         </div>
                                     </td>
