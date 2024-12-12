@@ -1,13 +1,6 @@
 <?php
 
 session_start();
-
-// Clear any existing comelec session when accessing this page
-if (isset($_SESSION['comelec'])) {
-    unset($_SESSION['comelec']);
-    unset($_SESSION['is_comelec_logged_in']);
-}
-
 // Redirect to homepage if user is already logged in
 if (isset($_SESSION['user'])) {
     header('Location: homepage.php');

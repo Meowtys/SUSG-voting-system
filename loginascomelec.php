@@ -1,9 +1,10 @@
 <?php
 session_start();
 
-// Clear any existing user session when accessing this page
-if (isset($_SESSION['user'])) {
-    unset($_SESSION['user']);
+// Redirect if already logged in as comelec
+if (isset($_SESSION['is_comelec_logged_in']) && $_SESSION['is_comelec_logged_in']) {
+    header('Location: admin/admin-home.php');
+    exit();
 }
 
 if (isset($_SESSION['errors'])) {
