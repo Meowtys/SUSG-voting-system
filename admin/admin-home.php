@@ -156,16 +156,16 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 if (now < startDatetime) {
                     // Count down to election start
                     distance = startDatetime - now;
-                    status.textContent = 'Election Starts In';
+                    status.textContent = 'ELECTION STARTS IN';
                     status.className = 'bg-red-500 px-4 py-1 rounded-full';
                 } else if (now <= endDatetime) {
                     // Count down to election end
                     distance = endDatetime - now;
-                    status.textContent = 'Election Time Remaining';
+                    status.textContent = 'ELECTION TIME REMAINING';
                     status.className = 'bg-green-500 px-4 py-1 rounded-full';
                 } else {
                     // Election has ended
-                    status.textContent = 'Election Ended';
+                    status.textContent = 'ELECTION ENDED';
                     status.className = 'bg-gray-500 px-4 py-1 rounded-full';
                     document.querySelector('.days').textContent = '00';
                     document.querySelector('.hours').textContent = '00';
