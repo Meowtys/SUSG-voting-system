@@ -13,6 +13,27 @@ $user = $_SESSION['user'];
 
 require_once 'connect.php';
 
+// Get current election
+$stmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$election = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$election) {
+    header('Location: homepage.php');
+    exit();
+}
+
+// Check if user has already voted
+if ($user['has_voted']) {
+    header('Location: homepage.php');
+    exit();
+}
+
+// Pass election times to JavaScript
+$electionTimes = [
+    'start' => $election['start_datetime'],
+    'end' => $election['end_datetime']
+];
+
 // Fetch candidates from the database
 function fetchCandidates($pdo, $position_id) {
     $stmt = $pdo->prepare("
@@ -294,6 +315,17 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
     <script src="script/load.js" type="module" defer></script>
+    <script>
+        // Check if current time is within election period
+        const electionTimes = <?php echo json_encode($electionTimes); ?>;
+        const now = new Date();
+        const startTime = new Date(electionTimes.start);
+        const endTime = new Date(electionTimes.end);
+
+        if (now < startTime || now > endTime) {
+            window.location.href = 'homepage.php';
+        }
+    </script>
 </head>
 
 <body>
