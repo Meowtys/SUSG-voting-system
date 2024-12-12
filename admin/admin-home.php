@@ -144,7 +144,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
 
             function updateCountdown() {
                 if (!startDatetime || !endDatetime) {
-                    countdownBox.innerHTML = "No election scheduled.";
+                    countdownBox.innerHTML = '<div class="text-center text-white text-3xl font-bold py-12">No election scheduled.</div>';
                     return;
                 }
 
@@ -160,16 +160,15 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                countdownBox.innerHTML = `
-                    <div>${days} DAYS</div>
-                    <div>${hours} HOURS</div>
-                    <div>${minutes} MINUTES</div>
-                    <div>${seconds} SECONDS</div>
-                `;
+                // Update each element separately with padded numbers
+                document.querySelector('.days').textContent = String(days).padStart(2, '0');
+                document.querySelector('.hours').textContent = String(hours).padStart(2, '0');
+                document.querySelector('.minutes').textContent = String(minutes).padStart(2, '0');
+                document.querySelector('.seconds').textContent = String(seconds).padStart(2, '0');
 
                 if (distance < 0) {
                     clearInterval(countdownInterval);
-                    countdownBox.innerHTML = "Election has ended.";
+                    countdownBox.innerHTML = '<div class="text-center text-white text-3xl font-bold py-12">Election has ended.</div>';
                 }
             }
 
@@ -272,94 +271,99 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
         });
     </script>
 </head>
-<body class="bg-gray-100">
-    <!-- Include Sidebar -->
+<body class="bg-gray-50">
     <?php include 'sidebar.php'; ?>
 
     <!-- Main Section -->
     <main class="ml-64 p-8">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-7xl mx-auto">
             <h1 class="text-3xl font-bold mb-8 text-gray-800">Admin Home</h1>
 
-            <button id="newElectionBtn" class="mb-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
+            <button id="newElectionBtn" class="mb-8 bg-red-700 hover:bg-red-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1">
                 + Schedule New Election
             </button>
 
-            <div id="newElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
-                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold">Schedule New Election</h3>
-                        <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+            <!-- Enhanced Countdown Box -->
+            <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
+                <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Countdown</h2>
+                <div class="countdown-box flex justify-center gap-8">
+                    <?php if ($currentElection): ?>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span class="days text-7xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
                     </div>
-                    <form method="POST" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Election Name/Title</label>
-                            <input type="text" name="election_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Start Date and Time</label>
-                            <input type="datetime-local" name="start_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">End Date and Time</label>
-                            <input type="datetime-local" name="end_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Save Election
-                        </button>
-                    </form>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span class="hours text-7xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span class="minutes text-7xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                        <span class="seconds text-7xl font-bold text-red-700 block mb-3">00</span>
+                        <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
+                    </div>
+                    <?php else: ?>
+                    <div class="col-span-4 text-center text-white text-3xl font-bold py-12">No election scheduled.</div>
+                    <?php endif; ?>
                 </div>
             </div>
 
-            <div class="countdown-box grid grid-cols-4 gap-4 mb-8">
-                    <!-- Countdown will dynamically populate here -->
-            </div>
-
-            <!-- Add the Current Election Status section -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <!-- Current Election Status -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-red-600">
                 <h2 class="text-2xl font-bold mb-4 text-gray-800">Current Election Status</h2>
                 <?php if ($currentElection): ?>
                     <p class="text-lg mb-2">Name: <span class="font-semibold"><?php echo htmlspecialchars($currentElection['election_name']); ?></span></p>
-                    <p class="text-lg">Status: <span class="font-semibold <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-green-600 blink' : 'text-blue-600'; ?>"><?php echo htmlspecialchars($currentElection['status']); ?></span></p>
+                    <p class="text-lg">Status: <span class="font-semibold <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'; ?>"><?php echo htmlspecialchars($currentElection['status']); ?></span></p>
                 <?php else: ?>
                     <p class="text-lg text-gray-600">No election scheduled.</p>
                 <?php endif; ?>
             </div>
 
-            <div class="bg-white rounded-lg shadow-lg p-6">
+            <!-- Scheduled Elections -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
                 <h2 class="text-2xl font-bold mb-6 text-gray-800">Scheduled Elections</h2>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-red-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Election Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">End Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Election Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Start Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">End Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Created</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Updated</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <?php foreach ($allElections as $election): ?>
-                                <tr data-election-id="<?php echo htmlspecialchars($election['election_id']); ?>">
+                                <tr data-election-id="<?php echo htmlspecialchars($election['election_id']); ?>" class="hover:bg-red-50 transition-colors duration-200">
                                     <td class="px-6 py-4 whitespace-nowrap election-name"><?php echo htmlspecialchars($election['election_name']); ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap start-datetime"><?php echo htmlspecialchars($election['start_datetime']); ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap end-datetime"><?php echo htmlspecialchars($election['end_datetime']); ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
                                             <?php echo strtolower($election['status']) === 'ongoing' ? 'bg-green-100 text-green-800' : 
-                                                (strtolower($election['status']) === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-blue-100 text-blue-800'); ?>">
+                                                (strtolower($election['status']) === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800'); ?>">
                                             <?php echo htmlspecialchars($election['status']); ?>
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($election['created_at']); ?></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?php echo htmlspecialchars($election['updated_at']); ?></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <button class="edit-button bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">Edit</button>
-                                        <button class="delete-button bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded">Delete</button>
-                                        <button class="view-button bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">Set as Current</button>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex flex-col space-y-2">
+                                            <button class="edit-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
+                                                <i class="fas fa-edit mr-2"></i> Edit
+                                            </button>
+                                            <button class="delete-button bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
+                                                <i class="fas fa-trash-alt mr-2"></i> Delete
+                                            </button>
+                                            <button class="view-button bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-md w-full flex items-center justify-center">
+                                                <i class="fas fa-check-circle mr-2"></i> Set as Current
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -369,6 +373,33 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             </div>
         </div>
     </main>
+
+    <!-- Update modal styles to match the new color scheme -->
+    <div id="newElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-red-700">Schedule New Election</h3>
+                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+            </div>
+            <form method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Election Name/Title</label>
+                    <input type="text" name="election_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Start Date and Time</label>
+                    <input type="datetime-local" name="start_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">End Date and Time</label>
+                    <input type="datetime-local" name="end_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Save Election
+                </button>
+            </form>
+        </div>
+    </div>
 
     <!-- Edit Election Modal -->
     <div id="editElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
