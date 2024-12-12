@@ -59,22 +59,29 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 targetDate = startTime;
                 messageEl.textContent = "ELECTION STARTS IN";
                 messageEl.className = "bg-red-500 px-4 py-1 rounded-full";
+                disableVoting('not-started');
             } else if (endDatetime && now <= endTime) {
                 targetDate = endTime;
                 messageEl.textContent = "ELECTION TIME REMAINING";
                 messageEl.className = "bg-green-500 px-4 py-1 rounded-full";
+                enableVoting();
             } else {
                 messageEl.textContent = "ELECTION ENDED";
                 messageEl.className = "bg-gray-500 px-4 py-1 rounded-full";
+                // Immediately disable both buttons when election has ended
+                [voteBtn, reviewBtn].forEach(btn => {
+                    btn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    btn.disabled = true;
+                    btn.onclick = function(e) {
+                        e.preventDefault();
+                        showEndedPopup();
+                    };
+                });
                 daysEl.textContent = "00";
                 hoursEl.textContent = "00";
                 minutesEl.textContent = "00";
                 secondsEl.textContent = "00";
-                voteBtn.classList.add("disabled");
-                reviewBtn.classList.add("disabled");
-                voteBtn.disabled = true;
-                reviewBtn.disabled = true;
-                return; // Exit script since no active countdown exists
+                return;
             }
 
             function updateCountdown() {
@@ -148,32 +155,49 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 const voteBtn = document.getElementById('vote-btn');
                 const reviewBtn = document.getElementById('review-btn');
 
-                voteBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
-                
-                // Update vote button click handler based on election state
-                voteBtn.onclick = function(e) {
-                    e.preventDefault();
-                    if (state === 'not-started') {
-                        showNotStartedPopup();
-                    } else if (state === 'ended') {
-                        showEndedPopup();
-                    }
-                };
-                
-                // Still allow review if user has voted
-                if (!<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
-                    reviewBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
+                // Disable and gray out both buttons in 'not-started' and 'ended' states
+                if (state === 'not-started' || state === 'ended') {
+                    // Add disabled classes to both buttons
+                    [voteBtn, reviewBtn].forEach(btn => {
+                        btn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                        btn.disabled = true;
+                    });
+                    
+                    // Set appropriate click handlers based on state
+                    const message = state === 'not-started' ? showNotStartedPopup : showEndedPopup;
+                    voteBtn.onclick = function(e) {
+                        e.preventDefault();
+                        message();
+                    };
+                    reviewBtn.onclick = function(e) {
+                        e.preventDefault();
+                        message();
+                    };
+                    return;
                 }
+
+                // Default state handling for during election
+                // ...rest of the function for normal voting period...
             }
 
             function enableVoting() {
                 const voteBtn = document.getElementById('vote-btn');
                 const reviewBtn = document.getElementById('review-btn');
 
+                // Only enable vote button if user hasn't voted
                 if (!<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
-                    voteBtn.classList.remove('disabled', 'opacity-50', 'cursor-not-allowed');
+                    voteBtn.classList.remove('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
                     voteBtn.removeAttribute('title');
                     voteBtn.onclick = null;
+                } else {
+                    voteBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                }
+
+                // Enable review button only if user has voted
+                if (<?php echo $user['has_voted'] ? 'true' : 'false' ?>) {
+                    reviewBtn.classList.remove('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                } else {
+                    reviewBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed', 'pointer-events-none');
                 }
             }
 
@@ -237,10 +261,7 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             <!-- Action Buttons -->
             <div class="flex justify-center gap-4">
                 <a href="votecasting.php" id="vote-btn" 
-                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed 
-                    <?php 
-                        echo ($user['has_voted'] ? 'pointer-events-none opacity-50' : '');
-                    ?>"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg transition duration-300 ease-in-out transform hover:-translate-y-1 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     title="<?php 
                         if ($user['has_voted']) echo 'You have already voted';
                     ?>">
