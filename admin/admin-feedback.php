@@ -234,7 +234,7 @@ $feedbacks = $stmt->fetchAll();
                     <div id="modalDate" class="mb-4"></div>
                     
                     <div class="font-medium text-gray-900 mb-1">Comment</div>
-                    <div id="modalComment" class="whitespace-pre-wrap"></div>
+                    <div id="modalComment" class="leading-normal"></div>
                 </div>
             </div>
         </div>
