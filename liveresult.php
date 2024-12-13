@@ -97,115 +97,217 @@ foreach ($candidates as $candidate) {
             font-family: 'Poppins', sans-serif;
         }
         .vote-counter {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            padding: 0.25rem 0.75rem;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            padding: 0.5rem 1.2rem;
             border-radius: 0.75rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
             display: inline-flex;
-            flex-direction: column;
             align-items: center;
-            min-width: 80px;
+            gap: 0.5rem;
+            min-width: 100px;
         }
         .position-card {
-            background: white;
+            background: linear-gradient(135deg, #fff 0%, #fee2e2 100%);
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
+            width: 100%;
+            height: calc(100vh - 250px); /* Set fixed height */
+            display: flex;
+            flex-direction: column;
         }
-        .position-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        .candidates-container {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 0.5rem;
+            margin-right: -0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #ef4444 #fee2e2;
+        }
+        /* Webkit scrollbar styling */
+        .candidates-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .candidates-container::-webkit-scrollbar-track {
+            background: #fee2e2;
+            border-radius: 3px;
+        }
+        .candidates-container::-webkit-scrollbar-thumb {
+            background: #ef4444;
+            border-radius: 3px;
+        }
+        .candidates-container::-webkit-scrollbar-thumb:hover {
+            background: #dc2626;
+        }
+        .candidate-card {
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(239, 68, 68, 0.1);
+        }
+        .candidate-info {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.25rem;
+            align-items: center;
+            width: 100%;
+        }
+        .candidate-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .candidate-meta {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+        .meta-tag {
+            padding: 0.35rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
         }
         .progress-bar {
             height: 8px;
             border-radius: 4px;
-            background: #f3f4f6;
+            background: rgba(255, 255, 255, 0.7);
             overflow: hidden;
             margin-top: 0.5rem;
         }
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
-            transition: width 0.5s ease-out;
+            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
+            transition: width 0.6s ease;
+        }
+        .election-header {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+        }
+        .refresh-timer {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-br from-gray-50 to-red-50">
     <?php include 'header.php'; ?>
 
     <div class="container mx-auto px-4 py-8 mt-16">
-        <div class="bg-white rounded-2xl shadow-lg p-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-8 text-center">Live Election Results</h1>
-            
+        <div class="max-w-8xl mx-auto">
             <!-- Election Info -->
-            <div class="bg-red-50 rounded-xl p-6 mb-8">
-                <h2 class="text-2xl font-bold text-red-800 mb-2">
-                    <?php echo htmlspecialchars($currentElection['election_name']); ?>
-                </h2>
-                <p class="text-red-600">
-                    <?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A'); ?>
-                    to
-                    <?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); ?>
-                </p>
+            <div class="election-header">
+                <h1 class="text-3xl font-bold text-white mb-4">Live Election Results</h1>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <h2 class="text-xl font-bold text-red-100 mb-2">
+                        <?php echo htmlspecialchars($currentElection['election_name']); ?>
+                    </h2>
+                    <div class="text-red-100 font-medium text-sm">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A'); ?>
+                            to
+                            <?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); ?>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                 <?php foreach ($positions as $position): ?>
                     <div class="position-card p-6">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center border-b pb-4">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center border-b border-red-100 pb-4">
                             <?= htmlspecialchars($position['position_name']) ?>
                         </h2>
                         
-                        <div class="space-y-6">
-                            <?php if (isset($candidatesByPosition[$position['position_id']])): ?>
-                                <?php foreach ($candidatesByPosition[$position['position_id']] as $index => $candidate): ?>
-                                    <div class="transform transition-all duration-300">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center space-x-3">
+                        <div class="candidates-container">
+                            <div class="space-y-4">
+                                <?php if (isset($candidatesByPosition[$position['position_id']])): ?>
+                                    <?php foreach ($candidatesByPosition[$position['position_id']] as $index => $candidate): ?>
+                                        <div class="candidate-card">
+                                            <div class="candidate-info">
                                                 <div class="relative">
                                                     <img src="<?= htmlspecialchars($candidate['candidate_image']) ?>" 
                                                          alt="<?= htmlspecialchars($candidate['candidate_name']) ?>" 
-                                                         class="w-12 h-12 rounded-lg object-cover border-2 border-red-600">
+                                                         class="w-20 h-20 rounded-xl object-cover border-2 border-red-100">
                                                     <?php if ($index === 0 && $candidate['vote_count'] > 0): ?>
-                                                        <span class="absolute -top-2 -right-2 text-xl">👑</span>
+                                                        <span class="absolute -top-2 -right-2 text-2xl">👑</span>
                                                     <?php endif; ?>
                                                 </div>
-                                                <div>
-                                                    <p class="font-semibold text-gray-800">
+                                                <div class="candidate-details">
+                                                    <h3 class="font-bold text-gray-800 text-xl">
                                                         <?= htmlspecialchars($candidate['candidate_name']) ?>
-                                                    </p>
-                                                    <div class="flex flex-wrap gap-2 mt-1">
-                                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                                                    </h3>
+                                                    <div class="candidate-meta">
+                                                        <span class="meta-tag bg-red-50 text-red-700">
+                                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                                            </svg>
                                                             <?= htmlspecialchars($candidate['college_name']) ?>
                                                         </span>
                                                         <?php if ($candidate['candidate_party']): ?>
-                                                            <span class="px-2 py-1 <?= 
-                                                                $candidate['candidate_party'] === 'CAUSE' ? 'bg-green-100 text-green-800' :
-                                                                ($candidate['candidate_party'] === 'SURE' ? 'bg-blue-100 text-blue-800' :
-                                                                'bg-red-100 text-red-800')
-                                                            ?> text-xs font-medium rounded-full">
+                                                            <span class="meta-tag <?= 
+                                                                $candidate['candidate_party'] === 'CAUSE' ? 'bg-green-50 text-green-700' :
+                                                                ($candidate['candidate_party'] === 'SURE' ? 'bg-blue-50 text-blue-700' :
+                                                                'bg-purple-50 text-purple-700')
+                                                            ?>">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                                                </svg>
                                                                 <?= htmlspecialchars($candidate['candidate_party']) ?>
                                                             </span>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
+                                                <div class="vote-counter">
+                                                    <span class="text-2xl font-bold text-white"><?= $candidate['vote_count'] ?></span>
+                                                    <span class="text-sm text-white opacity-90">votes</span>
+                                                </div>
                                             </div>
-                                            <div class="vote-counter">
-                                                <span class="text-xl font-bold text-white"><?= $candidate['vote_count'] ?></span>
-                                                <span class="text-xs text-white opacity-90">votes</span>
+                                            <div class="mt-4">
+                                                <div class="flex justify-end mb-2">
+                                                    <span class="text-lg font-semibold text-gray-700">
+                                                        <?= $candidate['percentage'] ?>%
+                                                    </span>
+                                                </div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: <?= $candidate['percentage'] ?>%"></div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: <?= $candidate['percentage'] ?>%"></div>
-                                        </div>
-                                        <div class="text-right text-sm text-gray-500 mt-1">
-                                            <?= $candidate['percentage'] ?>%
-                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="text-center py-8">
+                                        <p class="text-gray-500">No candidates found</p>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <p class="text-gray-500 text-center py-4">No candidates found</p>
-                            <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -216,30 +318,27 @@ foreach ($candidates as $candidate) {
     <?php include 'footer.php'; ?>
 
     <script>
-        // Auto-refresh every 30 seconds
-        setInterval(function() {
-            location.reload();
-        }, 30000);
-
-        // Add a visual countdown timer
         function updateCountdown() {
             let countdown = 30;
             const timerDiv = document.createElement('div');
-            timerDiv.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg';
-            timerDiv.innerHTML = `Refreshing in: ${countdown}s`;
+            timerDiv.className = 'refresh-timer';
             document.body.appendChild(timerDiv);
 
             const timer = setInterval(() => {
                 countdown--;
-                timerDiv.innerHTML = `Refreshing in: ${countdown}s`;
-                if (countdown <= 0) {
-                    clearInterval(timer);
-                }
+                timerDiv.innerHTML = `<div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Refreshing in ${countdown}s</div>`;
+                if (countdown <= 0) clearInterval(timer);
             }, 1000);
         }
 
-        // Initialize countdown on page load
+        // Initialize countdown and auto-refresh
         document.addEventListener('DOMContentLoaded', updateCountdown);
+        setInterval(() => location.reload(), 30000);
     </script>
 </body>
 </html>
