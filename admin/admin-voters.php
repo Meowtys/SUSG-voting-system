@@ -30,193 +30,61 @@ ob_start();
     <title>Comelec - Voters Management</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .content {
-            flex-grow: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-    
-        h1 {
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-align: left;
-            color: #333;
-        }
-
-        /* Management CSS */
-        .mngment-box {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 30px 20px;
-            width: 95%;
-            max-width: 3000px;
-            margin-bottom: 40px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .mngment-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0 auto;
-            font-size: 17px;
-            text-align: left;
-        }
-
-        .mngment-table tr {
-            border-bottom: 1px solid #cfcfcf;
-        }
-
-        .mngment-table th, .mngment-table td {
-            padding: 10px;
-        }
-
-        /* Buttons */
-        .add-btn {
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            font-size: 17px;
-            border-radius: 4px;
-            background-color: #b82323; 
-            color: white;
-            width: 200px;
-            float: right;
-            margin-bottom: 12px;
-        }
-
-        .edit-btn, .delete-btn {
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            border-radius: 4px;
-        }
-
-        .edit-btn {
-            background-color: #4CAF50; 
-            color: white;
-        }
-
-        .delete-btn {
-            background-color: #f44336; 
-            color: white;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .close {
-            color: #aaa;
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: black;
-        }
-
-        .modal-form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-form label {
-            margin-top: 15px;
-            font-size: 16px;
-        }
-
-        .modal-form input, .modal-form select {
-            padding: 10px;
-            margin-top: 5px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .modal-form button {
-            margin-top: 20px;
-            padding: 12px 20px;
-            font-size: 17px;
-            background-color: #b82323;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        @media screen and (max-width: 768px) {
-            .modal-content {
-                width: 90%;
-                padding: 20px;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="../script/adminload.js" type="module" defer></script>
 </head>
-<body>
-
+<body class="bg-gray-50">
     <!-- Include Sidebar -->
     <?php include 'sidebar.php'; ?>
 
     <!-- Main Section -->
-    <main>
-        <div class="content">
-            <h1>Voters</h1>
-            <button class="add-btn" id="openModalBtn">Add New Student</button>
-            <div class="mngment-box">
-                <table class="mngment-table">
-                    <thead>
+    <main class="ml-64 p-8">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-4xl font-bold mb-8 text-gray-800">Voters Management</h1>
+            
+            <!-- Add margin-bottom to create space between button and table container -->
+            <div class="mb-8 text-right">
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:-translate-y-1" id="openModalBtn">
+                    <i class="fas fa-plus-circle mr-2"></i> Add New Student
+                </button>
+            </div>
+
+            <!-- Increased padding and added more shadow -->
+            <div class="bg-white rounded-xl shadow-xl p-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-red-50">
                         <tr>
-                            <th>Student ID</th>
-                            <th>Student Name</th>
-                            <th>College</th>
-                            <th>Has Voted</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Student ID</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Student Name</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">College</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Has Voted</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white divide-y divide-gray-200">
                         <?php foreach ($students as $student): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($student['student_id']); ?></td>
-                            <td><?php echo htmlspecialchars($student['student_name']); ?></td>
-                            <td><?php echo htmlspecialchars($student['college_name']); ?></td>
-                            <td><?php echo $student['has_voted'] ? 'Yes' : 'No'; ?></td>
-                            <td><button class="edit-btn" data-student='<?php echo json_encode($student); ?>'>Edit</button></td>
-                            <td><button class="delete-btn" data-student-id="<?php echo $student['student_id']; ?>">Delete</button></td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($student['student_id']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($student['student_name']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($student['college_name']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <?php echo $student['has_voted'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                    <?php echo $student['has_voted'] ? 'Yes' : 'No'; ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button class="edit-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
+                                        data-student='<?php echo json_encode($student); ?>'>
+                                    <i class="fas fa-edit mr-2"></i> Edit
+                                </button>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <button class="delete-btn bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
+                                        data-student-id="<?php echo $student['student_id']; ?>">
+                                    <i class="fas fa-trash-alt mr-2"></i> Delete
+                                </button>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -226,35 +94,53 @@ ob_start();
     </main>
 
     <!-- Modal Structure -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2 id="modalTitle">Add New Student</h2>
-            <form class="modal-form" id="studentForm" method="POST" action="create_student.php">
+    <div id="myModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Add New Student</h3>
+                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+            </div>
+            <form class="space-y-4" id="studentForm" method="POST" action="create_student.php">
                 <input type="hidden" id="studentFormId" name="studentFormId">
-                <label for="studentId">Student ID:</label>
-                <input type="text" id="studentId" name="studentId" required>
+                
+                <div>
+                    <label for="studentId" class="block text-sm font-medium text-gray-700">Student ID:</label>
+                    <input type="text" id="studentId" name="studentId" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
 
-                <label for="studentName">Student Name:</label>
-                <input type="text" id="studentName" name="studentName" required>
+                <div>
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name:</label>
+                    <input type="text" id="studentName" name="studentName" required
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                </div>
 
-                <label for="college">College/Department:</label>
-                <select id="college" name="college" required>
-                    <option value="">Select College</option>
-                    <?php foreach ($colleges as $college): ?>
-                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
-                            <?php echo htmlspecialchars($college['college_name']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+                <div>
+                    <label for="college" class="block text-sm font-medium text-gray-700">College/Department:</label>
+                    <select id="college" name="college" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="">Select College</option>
+                        <?php foreach ($colleges as $college): ?>
+                            <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                                <?php echo htmlspecialchars($college['college_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-                <label for="hasVoted">Has Voted:</label>
-                <select id="hasVoted" name="hasVoted" required>
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
+                <div>
+                    <label for="hasVoted" class="block text-sm font-medium text-gray-700">Has Voted:</label>
+                    <select id="hasVoted" name="hasVoted" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                </div>
 
-                <button type="submit">Submit</button>
+                <button type="submit" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Submit
+                </button>
             </form>
         </div>
     </div>
