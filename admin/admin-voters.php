@@ -5,6 +5,19 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
     exit();
 }
 
+if (isset($_SESSION['success'])) {
+    $success_message = $_SESSION['success'];
+    unset($_SESSION['success']);
+}
+if (isset($_SESSION['error'])) {
+    $error_message = $_SESSION['error'];
+    unset($_SESSION['error']);
+}
+if (isset($_SESSION['upload_errors'])) {
+    $upload_errors = $_SESSION['upload_errors'];
+    unset($_SESSION['upload_errors']);
+}
+
 require_once '../connect.php';
 
 // Get current election
@@ -168,9 +181,35 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                     <p class="text-2xl font-bold text-blue-600"><?php echo $votingPercentage; ?>%</p>
                 </div>
             </div>
+
+            <?php if (isset($success_message)): ?>
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-8" role="alert">
+                    <p><?php echo htmlspecialchars($success_message); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($error_message)): ?>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8" role="alert">
+                    <p><?php echo htmlspecialchars($error_message); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($upload_errors) && count($upload_errors) > 0): ?>
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8" role="alert">
+                    <p class="font-bold">Warnings:</p>
+                    <ul class="list-disc list-inside">
+                        <?php foreach ($upload_errors as $error): ?>
+                            <li><?php echo htmlspecialchars($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
             
             <!-- Add margin-bottom to create space between button and table container -->
-            <div class="mb-8 text-right">
+            <div class="mb-8 text-right space-x-4">
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:-translate-y-1" id="bulkUploadBtn">
+                    <i class="fas fa-file-upload mr-2"></i> Add Bulk Students
+                </button>
                 <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:-translate-y-1" id="openModalBtn">
                     <i class="fas fa-plus-circle mr-2"></i> Add New Student
                 </button>
@@ -326,6 +365,57 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
         </div>
     </div>
 
+    <div id="bulkUploadModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-2xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white">Bulk Upload Voters</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <form class="space-y-6 pt-20" id="bulkUploadForm" method="POST" action="process_bulk_upload.php" enctype="multipart/form-data">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                CSV file must contain these columns in order:<br>
+                                <code class="bg-yellow-100 px-1 rounded">student_id, student_name, college_id, password</code>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 bg-gray-50 p-6 rounded-xl">
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 transition-all">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <i class="fas fa-file-csv text-4xl text-gray-400 mb-2"></i>
+                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                                <p class="text-xs text-gray-500">CSV file only</p>
+                            </div>
+                            <input type="file" name="csvFile" id="csvFile" accept=".csv" class="hidden" required>
+                        </label>
+                    </div>
+                    <div id="fileNameDisplay" class="text-sm text-gray-600 text-center hidden">
+                        Selected file: <span class="font-medium"></span>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Upload and Process
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Modal functionality
         const modal = document.getElementById("myModal");
@@ -475,6 +565,36 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                         row.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s`;
                     });
                 });
+            });
+        });
+
+        // Bulk upload modal functionality
+        const bulkUploadModal = document.getElementById("bulkUploadModal");
+        const bulkUploadBtn = document.getElementById("bulkUploadBtn");
+        const csvFileInput = document.getElementById("csvFile");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+        bulkUploadBtn.addEventListener("click", () => {
+            bulkUploadModal.style.display = "block";
+        });
+
+        // File input change handler
+        csvFileInput.addEventListener("change", (e) => {
+            const fileName = e.target.files[0]?.name;
+            if (fileName) {
+                fileNameDisplay.classList.remove("hidden");
+                fileNameDisplay.querySelector("span").textContent = fileName;
+            } else {
+                fileNameDisplay.classList.add("hidden");
+            }
+        });
+
+        // Add bulk upload modal to the existing close buttons handler
+        document.querySelectorAll(".close").forEach(btn => {
+            btn.addEventListener("click", () => {
+                bulkUploadModal.style.display = "none";
+                csvFileInput.value = "";
+                fileNameDisplay.classList.add("hidden");
             });
         });
     </script>
