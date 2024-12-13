@@ -99,7 +99,11 @@ $electionData = $currentElection ? [
         <span class="text-white text-lg md:text-2xl font-bold ml-4">SUSG Election System</span>
         <?php if ($user): ?>
         <div class="ml-auto">
-            <img src="asset/menu.png" alt="Menu" class="w-6 h-6 cursor-pointer" id="header-menu-toggle">
+            <button class="w-10 h-10 flex flex-col justify-center items-center rounded-lg hover:bg-red-700 transition-colors duration-200" id="header-menu-toggle">
+                <span class="w-6 h-0.5 bg-white rounded-full transition-all duration-200"></span>
+                <span class="w-6 h-0.5 bg-white rounded-full my-1.5 transition-all duration-200"></span>
+                <span class="w-6 h-0.5 bg-white rounded-full transition-all duration-200"></span>
+            </button>
         </div>
         <?php endif; ?>
     </header>
