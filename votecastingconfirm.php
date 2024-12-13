@@ -36,6 +36,21 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         * {
             font-family: 'Poppins', sans-serif;
         }
+        .abstain-icon {
+            background: #FEF3C7;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .abstain-icon i {
+            font-size: 32px;
+            color: #D97706;
+        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -73,8 +88,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
                                     <!-- Abstain Card -->
                                     <div class="flex items-center bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                                        <div class="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-ban text-yellow-600 text-xl"></i>
+                                        <div class="abstain-icon">
+                                            <i class="fas fa-ban"></i>
                                         </div>
                                         <div class="ml-4">
                                             <h4 class="text-lg font-medium text-yellow-800">Abstain</h4>

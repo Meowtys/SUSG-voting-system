@@ -234,7 +234,13 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
             });
             
-            selectedVotes[position] = { candidate_id: 0 };
+            // Create abstain object with custom display properties
+            selectedVotes[position] = { 
+                candidate_id: 0,
+                candidate_name: 'Abstain',
+                college_name: 'Abstain',
+                candidate_image: 'abstain-icon' // This will be handled specially in the confirmation page
+            };
             goNext();
         }
 

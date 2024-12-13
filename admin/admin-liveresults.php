@@ -31,8 +31,10 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 function getLiveResults($pdo, $positionId, $electionId) {
     $stmt = $pdo->prepare("
         SELECT 
+            c.candidate_id,
             c.candidate_name,
             c.candidate_image,
+            c.college_id,
             co.college_name,
             pa.party_name,
             COUNT(v.vote_id) as vote_count,
@@ -40,13 +42,19 @@ function getLiveResults($pdo, $positionId, $electionId) {
              WHERE position_id = :position_id 
              AND election_id = :election_id) as total_position_votes
         FROM candidates c
-        LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
-            AND v.election_id = :election_id
         LEFT JOIN colleges co ON c.college_id = co.college_id
         LEFT JOIN parties pa ON c.party_id = pa.party_id
+        LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
+            AND v.election_id = :election_id
         WHERE c.position_id = :position_id 
         AND c.election_id = :election_id
-        GROUP BY c.candidate_id
+        GROUP BY 
+            c.candidate_id, 
+            c.candidate_name, 
+            c.candidate_image, 
+            c.college_id,
+            co.college_name,
+            pa.party_name
         ORDER BY vote_count DESC
     ");
     
@@ -60,13 +68,17 @@ function getLiveResults($pdo, $positionId, $electionId) {
 
 // Create API endpoint for fetching results
 if (isset($_GET['fetch_results'])) {
+    header('Content-Type: application/json');
     $positionId = $_GET['position_id'] ?? null;
-    if ($positionId) {
-        $results = getLiveResults($pdo, $positionId, $currentElection['election_id']);
-        header('Content-Type: application/json');
+    $electionId = $_GET['election_id'] ?? null;
+    
+    if ($positionId && $electionId) {
+        $results = getLiveResults($pdo, $positionId, $electionId);
         echo json_encode($results);
-        exit;
+    } else {
+        echo json_encode(['error' => 'Missing parameters']);
     }
+    exit;
 }
 
 // Start output buffering if needed
@@ -101,38 +113,54 @@ ob_start();
                 fetch(`fetch_results.php?position_id=${positionId}&election_id=<?php echo $currentElection['election_id']; ?>`)
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Fetched data:', data); // Debug log
                         updateResults(data, positionName);
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        resultsContainer.innerHTML = '<div class="text-red-600">Error loading results</div>';
+                    });
             }
 
             function updateResults(candidates, positionName) {
                 resultsContainer.innerHTML = "";
                 currentPositionElement.textContent = positionName;
 
+                if (!candidates || candidates.length === 0) {
+                    resultsContainer.innerHTML = '<div class="text-gray-600">No candidates found for this position</div>';
+                    return;
+                }
+
                 candidates.forEach((candidate, index) => {
                     const resultElement = document.createElement("div");
                     resultElement.className = "transform transition-all duration-300 hover:scale-105 bg-white rounded-xl shadow-md mb-4 p-6 border-l-4 border-red-600";
                     
-                    const totalVotes = candidates.reduce((sum, c) => sum + parseInt(c.votes), 0);
-                    const percentage = totalVotes > 0 ? ((candidate.votes / totalVotes) * 100).toFixed(1) : 0;
-                    
+                    const voteCount = parseInt(candidate.vote_count) || 0;
+                    const percentage = candidate.percentage || 0;
+
                     resultElement.innerHTML = `
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
                                 <div class="relative">
-                                    <img class="h-16 w-16 rounded-full object-cover border-2 border-red-600" 
+                                    <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
                                          src="../${candidate.candidate_image}" 
                                          alt="${candidate.candidate_name}">
-                                    ${index === 0 ? '<span class="absolute -top-2 -right-2 text-2xl">👑</span>' : ''}
+                                    ${index === 0 && voteCount > 0 ? '<span class="absolute -top-2 -right-2 text-2xl">👑</span>' : ''}
                                 </div>
                                 <div>
                                     <h3 class="text-lg font-bold text-gray-800">${candidate.candidate_name}</h3>
-                                    <p class="text-sm text-gray-600">${candidate.candidate_party}</p>
+                                    <div class="flex flex-col space-y-1">
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
+                                            ${candidate.college_name}
+                                        </span>
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
+                                            ${candidate.party_name}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold text-red-600">${candidate.votes}</div>
+                                <div class="text-2xl font-bold text-red-600">${voteCount}</div>
                                 <div class="text-sm text-gray-500">votes (${percentage}%)</div>
                             </div>
                         </div>
