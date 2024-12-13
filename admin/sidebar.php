@@ -10,6 +10,15 @@ if (isset($_SESSION['user'])) {
     $user = null;
 }
 
+// Get current election
+try {
+    require_once '../connect.php';
+    $stmt = $pdo->query("SELECT election_name FROM elections WHERE is_current = 1 LIMIT 1");
+    $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $currentElection = null;
+}
+
 // Determine the current page for dynamic highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -34,6 +43,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="space-y-8">
             <div class="space-y-6">
                 <h2 class="text-xl font-bold tracking-wider">SUSG COMELEC</h2>
+                <!-- Add current election display -->
+                <div class="px-4 py-2 bg-red-600 rounded-lg">
+                    <p class="text-sm text-red-200">Current Election:</p>
+                    <p class="font-semibold truncate">
+                        <?php echo $currentElection ? htmlspecialchars($currentElection['election_name']) : 'No active election'; ?>
+                    </p>
+                </div>
                 <nav class="space-y-2">
                     <a href="admin-home.php" 
                        class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-home.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
