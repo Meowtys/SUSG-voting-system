@@ -6,6 +6,7 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 }
 
 require_once '../connect.php';
+require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
 
 // Function to update election statuses based on current time
 function updateElectionStatuses($pdo) {
@@ -95,6 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("SELECT * FROM elections WHERE election_id = ?");
                 $stmt->execute([$electionId]);
                 $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Clear sentiment cache
+                $sentimentCache = new SentimentCache();
+                $sentimentCache->clear();
 
                 // Return JSON response
                 echo json_encode([
