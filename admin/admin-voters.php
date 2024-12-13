@@ -61,6 +61,38 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
         .blur-text:hover {
             filter: blur(0);
         }
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-10%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+
+        .modal input:focus, .modal select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Update blur-text style */
+        .blur-text {
+            filter: blur(4px);
+            transition: filter 0.3s ease;
+        }
+        .blur-text:hover {
+            filter: blur(0);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -154,66 +186,82 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
         </div>
     </main>
 
-    <!-- Modal Structure -->
+    <!-- Update both modals with enhanced styling -->
     <div id="myModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900" id="modalTitle">Add New Student</h3>
-                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-4xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white" id="modalTitle">Add New Student</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
             </div>
-            <form class="space-y-4" id="studentForm" method="POST" action="create_student.php">
+
+            <!-- Form Section with added top padding for header -->
+            <form class="space-y-6 pt-20" id="studentForm" method="POST" action="create_student.php">
                 <input type="hidden" id="studentFormId" name="studentFormId">
                 
-                <div>
-                    <label for="studentId" class="block text-sm font-medium text-gray-700">Student ID:</label>
-                    <input type="text" id="studentId" name="studentId" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Student ID</label>
+                            <input type="text" id="studentId" name="studentId" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
 
-                <div>
-                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name:</label>
-                    <input type="text" id="studentName" name="studentName" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Student Name</label>
+                            <input type="text" id="studentName" name="studentName" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
+                    </div>
 
-                <div>
-                    <label for="college" class="block text-sm font-medium text-gray-700">College/Department:</label>
-                    <select id="college" name="college" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <option value="">Select College</option>
-                        <?php foreach ($colleges as $college): ?>
-                            <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
-                                <?php echo htmlspecialchars($college['college_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                    <!-- Right Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">College/Department</label>
+                            <select id="college" name="college" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                                <option value="">Select College</option>
+                                <?php foreach ($colleges as $college): ?>
+                                    <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                                        <?php echo htmlspecialchars($college['college_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="hasVoted" class="block text-sm font-medium text-gray-700">Has Voted:</label>
-                    <select id="hasVoted" name="hasVoted" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <option value="0">No</option>
-                        <option value="1">Yes</option>
-                    </select>
-                </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Has Voted</label>
+                            <select id="hasVoted" name="hasVoted" required
+                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
 
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Password:</label>
-                    <div class="relative">
-                        <input type="password" id="password" name="password" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                                onclick="togglePasswordVisibility()">
-                            <i class="fas fa-eye" id="togglePassword"></i>
-                        </button>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Password</label>
+                            <div class="relative">
+                                <input type="password" id="password" name="password" required
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                                <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                        onclick="togglePasswordVisibility()">
+                                    <i class="fas fa-eye" id="togglePassword"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <button type="submit" 
-                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                    Submit
-                </button>
+                <!-- Submit Button Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Submit
+                    </button>
+                </div>
             </form>
         </div>
     </div>
