@@ -13,6 +13,14 @@ $user = $_SESSION['user'];
 // Include database connection
 require_once 'connect.php';
 
+// Get current election
+$stmt = $pdo->query("SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    die("No active election found");
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
@@ -21,12 +29,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Debugging: Check received data
     error_log("Received experience: $experience, suggestion: $suggestion");
 
-    // Insert feedback into the database
-    $stmt = $pdo->prepare("INSERT INTO feedbacks (student_id, experience, suggestion, feedback_timestamp) VALUES (:student_id, :experience, :suggestion, NOW())");
+    // Insert feedback into the database with election_id
+    $stmt = $pdo->prepare("
+        INSERT INTO feedbacks (
+            student_id, 
+            experience, 
+            suggestion, 
+            feedback_timestamp, 
+            election_id
+        ) VALUES (
+            :student_id, 
+            :experience, 
+            :suggestion, 
+            NOW(),
+            :election_id
+        )
+    ");
+
     $stmt->execute([
         'student_id' => $user['student_id'],
         'experience' => $experience,
-        'suggestion' => $suggestion
+        'suggestion' => $suggestion,
+        'election_id' => $currentElection['election_id']
     ]);
 
     // Debugging: Check if insertion was successful
