@@ -106,13 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-4 pt-4">
-                        <button type="button" 
-                                onclick="window.history.back()"
-                                class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition duration-300 flex items-center">
-                            <i class="fas fa-arrow-left mr-2"></i>
-                            Back
-                        </button>
+                    <div class="flex justify-end pt-4">
                         <button type="submit"
                                 class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-300 flex items-center">
                             <i class="fas fa-paper-plane mr-2"></i>
