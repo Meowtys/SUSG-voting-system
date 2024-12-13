@@ -9,6 +9,9 @@ if (isset($_SESSION['user'])) {
 } else {
     $user = null;
 }
+
+// Determine the current page for dynamic highlighting
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
@@ -19,128 +22,77 @@ if (isset($_SESSION['user'])) {
     <title>SUSG Election System - Side Bar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-            height: 100%;
-            width: 100%;
-        }
-
-        body {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            height: 100vh;
-            width: 250px;
-            background-color: #b82323;
-            color: white;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        .sidebar h2 {
-            margin-bottom: 40px;
-            font-size: 20px;
-        }
-
-        .sidebar a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .sidebar a:hover {
-            background-color: #d9534f;
-        }
-
-        .sidebar .active {
-            background-color: white;
-            color: #b82323;
-        }
-
-        .sidebar .section {
-            margin-bottom: 20px;
-        }
-
-        .sidebar .sections .section:not(:first-child) {
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            padding-top: 20px;
-            margin-top: 20px;
-        }
-
-        .sidebar .sections .section h3 {
-            margin-bottom: 15px;
-        }
-
-        .icon {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar a .fas {
-            width: 20px;
-        }
-        
-        main {
-            margin-left: 250px; /* Space for the sidebar */
-            padding: 20px;
-            width: 100%;
-            overflow-y: auto;
-        }
+        body { font-family: 'Poppins', sans-serif; }
     </style>
 </head>
-<body>
-    <?php
-    // Determine the current page for dynamic highlighting
-    $current_page = basename($_SERVER['PHP_SELF']);
-    ?>
+<body class="bg-gray-50">
     <!-- Side Bar Content -->
-    <div class="sidebar">
-        <div class="sections">
-            <div class="section">
-                <h2>SUSG COMELEC</h2>
-                <a href="admin-home.php" class="nav-link <?php echo $current_page == 'admin-home.php' ? 'active' : ''; ?>"><i class="fas fa-home icon"></i>Home</a>
-                <a href="admin-liveresults.php" class="nav-link <?php echo $current_page == 'admin-liveresults.php' ? 'active' : ''; ?>"><i class="fas fa-chart-bar icon"></i>Live Results</a>
+    <div class="fixed top-0 left-0 h-full w-64 bg-red-700 text-white p-6 flex flex-col justify-between shadow-lg">
+        <div class="space-y-8">
+            <div class="space-y-6">
+                <h2 class="text-xl font-bold tracking-wider">SUSG COMELEC</h2>
+                <nav class="space-y-2">
+                    <a href="admin-home.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-home.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-home w-6"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="admin-liveresults.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-liveresults.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-chart-bar w-6"></i>
+                        <span>Live Results</span>
+                    </a>
+                </nav>
             </div>
-            <div class="section">
-                <h3>Management</h3>
-                <a href="admin-voters.php" class="nav-link <?php echo $current_page == 'admin-voters.php' ? 'active' : ''; ?>"><i class="fas fa-user-friends icon"></i>Voters</a>
-                <a href="admin-candidates.php" class="nav-link <?php echo $current_page == 'admin-candidates.php' ? 'active' : ''; ?>"><i class="fas fa-user-tie icon"></i>Candidates</a>
+
+            <div class="space-y-6">
+                <h3 class="text-sm uppercase tracking-wider text-red-200">Management</h3>
+                <nav class="space-y-2">
+                    <a href="admin-voters.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-voters.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-user-friends w-6"></i>
+                        <span>Voters</span>
+                    </a>
+                    <a href="admin-candidates.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-candidates.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-user-tie w-6"></i>
+                        <span>Candidates</span>
+                    </a>
+                </nav>
             </div>
-            <div class="section">
-                <h3>Feedback</h3>
-                <a href="admin-feedback.php" class="nav-link <?php echo $current_page == 'admin-feedback.php' ? 'active' : ''; ?>"><i class="fas fa-comments icon"></i>View Feedback</a>  
+
+            <div class="space-y-6">
+                <h3 class="text-sm uppercase tracking-wider text-red-200">Feedback</h3>
+                <nav class="space-y-2">
+                    <a href="admin-feedback.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-feedback.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-comments w-6"></i>
+                        <span>View Feedback</span>
+                    </a>
+                </nav>
             </div>
-            <div class="section">
-                <h3>Sentiment Analysis</h3>
-                <a href="admin-analytics.php" class="nav-link <?php echo $current_page == 'admin-analytics.php' ? 'active' : ''; ?>"><i class="fas fa-chart-pie icon"></i>Analytics</a>
+
+            <div class="space-y-6">
+                <h3 class="text-sm uppercase tracking-wider text-red-200">Sentiment Analysis</h3>
+                <nav class="space-y-2">
+                    <a href="admin-analytics.php" 
+                       class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-analytics.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
+                        <i class="fas fa-chart-pie w-6"></i>
+                        <span>Analytics</span>
+                    </a>
+                </nav>
             </div>
-            <div class="section">
-                <a href="../logout.php?type=comelec" class="nav-link"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
-            </div>
+        </div>
+
+        <div class="pt-6 border-t border-red-600">
+            <a href="../logout.php?type=comelec" 
+               class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 hover:bg-red-600">
+                <i class="fas fa-sign-out-alt w-6"></i>
+                <span>Logout</span>
+            </a>
         </div>
     </div>
 </body>
