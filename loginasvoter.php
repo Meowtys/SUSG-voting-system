@@ -1,7 +1,7 @@
 <?php
-
 session_start();
-// Redirect to homepage if user is already logged in
+
+// Only check for voter login status
 if (isset($_SESSION['user'])) {
     header('Location: homepage.php');
     exit();
