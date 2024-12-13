@@ -79,12 +79,42 @@ ob_start();
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-red-50">
                             <tr>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6">Candidate Name</th>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Party</th>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Position</th>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">College</th>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Qualified</th>
-                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6">Remarks</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6 cursor-pointer hover:bg-red-100 transition-colors" data-sort="candidate_name">
+                                    <div class="flex items-center">
+                                        Candidate Name
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8 cursor-pointer hover:bg-red-100 transition-colors" data-sort="party_name">
+                                    <div class="flex items-center">
+                                        Party
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8 cursor-pointer hover:bg-red-100 transition-colors" data-sort="position_name">
+                                    <div class="flex items-center">
+                                        Position
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8 cursor-pointer hover:bg-red-100 transition-colors" data-sort="college_name">
+                                    <div class="flex items-center">
+                                        College
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8 cursor-pointer hover:bg-red-100 transition-colors" data-sort="qualified">
+                                    <div class="flex items-center">
+                                        Qualified
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6 cursor-pointer hover:bg-red-100 transition-colors" data-sort="remarks">
+                                    <div class="flex items-center">
+                                        Remarks
+                                        <span class="sort-icon ml-1">↕</span>
+                                    </div>
+                                </th>
                                 <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8"></th>
                                 <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8"></th>
                             </tr>
@@ -419,6 +449,46 @@ ob_start();
         #imagePreview, #editImagePreview {
             transition: all 0.3s ease;
         }
+
+        .sort-icon {
+            opacity: 0.5;
+            font-size: 0.8em;
+        }
+
+        th[data-sort] {
+            position: relative;
+        }
+
+        th[data-sort].asc .sort-icon::after {
+            content: '↑';
+        }
+
+        th[data-sort].desc .sort-icon::after {
+            content: '↓';
+        }
+
+        th[data-sort].active {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        th[data-sort].active .sort-icon {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        tbody tr {
+            animation: none;
+        }
     </style>
 
     <script>
@@ -530,6 +600,71 @@ ob_start();
         document.addEventListener('DOMContentLoaded', function() {
             setupImagePreview('candidateImage', 'imagePreview', 'placeholderIcon');
             setupImagePreview('editCandidateImage', 'editImagePreview', 'editPlaceholderIcon');
+        });
+
+        // Table sorting functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('table');
+            const headers = table.querySelectorAll('th[data-sort]');
+            let currentSort = {
+                column: null,
+                direction: 'asc'
+            };
+
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    
+                    // Reset all headers
+                    headers.forEach(h => {
+                        h.classList.remove('asc', 'desc', 'active');
+                    });
+
+                    // Determine sort direction
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'asc';
+                    }
+
+                    // Add appropriate classes
+                    header.classList.add(currentSort.direction, 'active');
+
+                    // Get table body and rows
+                    const tbody = table.querySelector('tbody');
+                    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                    // Sort rows
+                    const sortedRows = rows.sort((a, b) => {
+                        let aValue = a.querySelector(`td:nth-child(${Array.from(headers).indexOf(header) + 1})`).textContent.trim();
+                        let bValue = b.querySelector(`td:nth-child(${Array.from(headers).indexOf(header) + 1})`).textContent.trim();
+
+                        // Handle numeric values for 'qualified' column
+                        if (column === 'qualified') {
+                            aValue = aValue === 'Yes' ? 1 : 0;
+                            bValue = bValue === 'Yes' ? 1 : 0;
+                        }
+
+                        if (currentSort.direction === 'asc') {
+                            return aValue > bValue ? 1 : -1;
+                        } else {
+                            return aValue < bValue ? 1 : -1;
+                        }
+                    });
+
+                    // Clear and append sorted rows
+                    while (tbody.firstChild) {
+                        tbody.removeChild(tbody.firstChild);
+                    }
+                    sortedRows.forEach(row => tbody.appendChild(row));
+
+                    // Add animation to sorted rows
+                    sortedRows.forEach((row, index) => {
+                        row.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s`;
+                    });
+                });
+            });
         });
     </script>
 </body>
