@@ -10,13 +10,33 @@ require_once '../connect.php';
 // Function to update election statuses based on current time
 function updateElectionStatuses($pdo) {
     $now = date('Y-m-d H:i:s');
-
-    // Set elections to 'Ongoing' if the current time is between start and end times
-    $stmt = $pdo->prepare("UPDATE elections SET status = 'Ongoing' WHERE start_datetime <= ? AND end_datetime >= ? AND status = 'Scheduled'");
+    
+    // Update to Ongoing
+    $stmt = $pdo->prepare("
+        UPDATE elections 
+        SET status = 'Ongoing', updated_at = NOW() 
+        WHERE start_datetime <= ? 
+        AND end_datetime >= ? 
+        AND status != 'Ongoing'
+    ");
     $stmt->execute([$now, $now]);
 
-    // Set elections to 'Completed' if the current time is past the end time
-    $stmt = $pdo->prepare("UPDATE elections SET status = 'Completed' WHERE end_datetime < ? AND status = 'Ongoing'");
+    // Update to Completed
+    $stmt = $pdo->prepare("
+        UPDATE elections 
+        SET status = 'Completed', updated_at = NOW() 
+        WHERE end_datetime < ? 
+        AND status != 'Completed'
+    ");
+    $stmt->execute([$now]);
+
+    // Ensure future elections are marked as Scheduled
+    $stmt = $pdo->prepare("
+        UPDATE elections 
+        SET status = 'Scheduled', updated_at = NOW() 
+        WHERE start_datetime > ? 
+        AND status != 'Scheduled'
+    ");
     $stmt->execute([$now]);
 }
 
@@ -283,6 +303,54 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     event.target.style.display = 'none';
                 }
             }
+
+            // Function to update election status in the UI
+            function updateElectionStatusUI(row) {
+                const startDateTime = new Date(row.querySelector('.start-datetime').textContent);
+                const endDateTime = new Date(row.querySelector('.end-datetime').textContent);
+                const now = new Date();
+                
+                let newStatus;
+                if (now < startDateTime) {
+                    newStatus = 'Scheduled';
+                } else if (now >= startDateTime && now <= endDateTime) {
+                    newStatus = 'Ongoing';
+                } else {
+                    newStatus = 'Completed';
+                }
+
+                const statusCell = row.querySelector('td:nth-child(4) span');
+                const currentStatus = statusCell.textContent.trim();
+
+                if (currentStatus !== newStatus) {
+                    // Update UI
+                    statusCell.textContent = newStatus;
+                    statusCell.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + 
+                        (newStatus === 'Ongoing' ? 'bg-green-100 text-green-800' : 
+                         newStatus === 'Completed' ? 'bg-gray-100 text-gray-800' : 
+                         'bg-red-100 text-red-800');
+
+                    // Update database via AJAX
+                    const electionId = row.dataset.electionId;
+                    fetch('update_election_status.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `election_id=${electionId}&status=${newStatus}`
+                    });
+                }
+            }
+
+            // Function to update all election statuses
+            function updateAllElectionStatuses() {
+                const rows = document.querySelectorAll('tbody tr');
+                rows.forEach(updateElectionStatusUI);
+            }
+
+            // Update statuses immediately and then every minute
+            updateAllElectionStatuses();
+            setInterval(updateAllElectionStatuses, 60000);
         });
     </script>
 </head>
