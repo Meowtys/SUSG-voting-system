@@ -119,11 +119,13 @@ ob_start();
         }
         .vote-counter {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            padding: 0.5rem 1.25rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            min-width: 100px;
-            text-align: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 80px;
         }
         .position-card {
             background: white;
@@ -148,17 +150,19 @@ ob_start();
             transition: width 0.5s ease-out;
         }
         .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
         .candidate-card {
             border-left: 4px solid #ef4444;
             transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
         }
-        .candidate-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+        .progress-container {
+            margin-top: 0.5rem;
+            width: 100%;
         }
     </style>
     <script>
@@ -206,42 +210,46 @@ ob_start();
 
                     let candidateContent = `
                         <div class="relative ${isLeading ? 'pb-4' : ''}">
-                            ${isLeading ? '<div class="absolute -top-3 -right-3 bg-yellow-400 text-white p-2 rounded-full shadow-lg"><i class="fas fa-crown"></i></div>' : ''}
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center space-x-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-grow">
                                     ${candidate.candidate_name === 'Abstain' ? `
                                         <div class="abstain-icon">
                                             <i class="fas fa-ban"></i>
                                         </div>
                                     ` : `
-                                        <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
-                                             src="../${candidate.candidate_image}" 
-                                             alt="${candidate.candidate_name}">
+                                        <div class="relative">
+                                            <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
+                                                 src="../${candidate.candidate_image}" 
+                                                 alt="${candidate.candidate_name}">
+                                            ${isLeading ? '<div class="absolute -top-2 -right-2 bg-yellow-400 text-white p-1.5 rounded-full shadow-lg transform -translate-y-1/4 translate-x-1/4"><i class="fas fa-crown text-sm"></i></div>' : ''}
+                                        </div>
                                     `}
-                                    <div>
+                                    <div class="flex-grow">
                                         <h3 class="text-lg font-bold ${candidate.candidate_name === 'Abstain' ? 'text-yellow-800' : 'text-gray-800'}">${candidate.candidate_name}</h3>
                                         ${candidate.candidate_name !== 'Abstain' ? `
-                                            <div class="flex flex-col space-y-1">
-                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
+                                            <div class="flex flex-wrap gap-2 mt-1">
+                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                                                     ${candidate.college_name || 'N/A'}
                                                 </span>
-                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
+                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
                                                     ${candidate.party_name || 'Independent'}
                                                 </span>
                                             </div>
                                         ` : ''}
                                     </div>
                                 </div>
+                                <div class="vote-counter">
+                                    <span class="text-xl font-bold text-white">${voteCount}</span>
+                                    <span class="text-xs text-white opacity-90">votes</span>
+                                </div>
                             </div>
-                            <div class="vote-counter mb-3">
-                                <span class="text-2xl font-bold text-white">${voteCount}</span>
-                                <span class="text-sm text-white opacity-90">votes</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percentage}%"></div>
-                            </div>
-                            <div class="text-right text-sm text-gray-500 mt-1">
-                                ${percentage}% of total votes
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                                </div>
+                                <div class="text-right text-sm text-gray-500 mt-1">
+                                    ${percentage}%
+                                </div>
                             </div>
                         </div>
                     `;
