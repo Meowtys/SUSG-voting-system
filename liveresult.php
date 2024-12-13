@@ -403,6 +403,7 @@ foreach ($candidates as $candidate) {
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
             position: relative;
+            padding-bottom: 3rem; /* Add space for the refresh timer */
         }
 
         .election-header h1 {
@@ -415,20 +416,17 @@ foreach ($candidates as $candidate) {
         }
 
         .refresh-timer {
-            position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-            color: white;
+            position: absolute;
+            top: 4rem; /* Position it below live indicator */
+            right: 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 0.75rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
+            backdrop-filter: blur(4px);
+            color: white;
         }
 
         .live-indicator {
@@ -486,47 +484,53 @@ foreach ($candidates as $candidate) {
 <body class="bg-gradient-to-br from-gray-50 to-red-50">
     <?php include 'header.php'; ?>
 
-    <div class="container mx-auto px-4 py-8 mt-16">
+    <div class="container mx-auto px-4 py-4 mt-4">
         <div class="max-w-8xl mx-auto">
             <!-- Election Info -->
             <div class="election-header">
+                <div class="flex justify-between items-start mb-4">
+                    <h1 class="text-3xl font-bold text-white">Live Election Results</h1>
+                </div>
+                
                 <span class="live-indicator">
                     <span class="live-dot"></span>
                     <span class="text-sm font-medium text-white">LIVE</span>
                 </span>
+
+                <div id="refreshTimer" class="refresh-timer">
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Refreshing in 30s</span>
+                </div>
                 
                 <div class="flex flex-col">
-                    <h1 class="text-3xl font-bold text-white mb-2">Live Election Results</h1>
+                    <h2 class="text-xl font-bold text-red-100">
+                        <?php echo htmlspecialchars($currentElection['election_name']); ?>
+                    </h2>
                     
-                    <div class="space-y-4">
-                        <div>
-                            <h2 class="text-xl font-bold text-red-100">
-                                <?php echo htmlspecialchars($currentElection['election_name']); ?>
-                            </h2>
-                            
-                            <div class="status-section">
-                                <span class="status-badge <?php echo $statusClass; ?>">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <?php echo $electionStatus; ?>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="datetime-section">
-                            <div class="flex items-center gap-2 text-red-100 font-medium text-sm">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <?php 
-                                    echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A') . 
-                                         ' to ' . 
-                                         (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); 
-                                ?>
-                            </div>
+                    <div class="status-section">
+                        <span class="status-badge <?php echo $statusClass; ?>">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <?php echo $electionStatus; ?>
+                        </span>
+                    </div>
+                    
+                    <div class="datetime-section">
+                        <div class="flex items-center gap-2 text-red-100 font-medium text-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <?php 
+                                echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A') . 
+                                     ' to ' . 
+                                     (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); 
+                            ?>
                         </div>
                     </div>
                 </div>
@@ -625,18 +629,11 @@ foreach ($candidates as $candidate) {
     <script>
         function updateCountdown() {
             let countdown = 30;
-            const timerDiv = document.createElement('div');
-            timerDiv.className = 'refresh-timer';
-            document.body.appendChild(timerDiv);
+            const timerSpan = document.querySelector('#refreshTimer span');
 
             const timer = setInterval(() => {
                 countdown--;
-                timerDiv.innerHTML = `<div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Refreshing in ${countdown}s</div>`;
+                timerSpan.textContent = `Auto-Refreshing in ${countdown}s`;
                 if (countdown <= 0) clearInterval(timer);
             }, 1000);
         }
