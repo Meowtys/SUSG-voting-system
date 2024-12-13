@@ -311,7 +311,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             setCurrentButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     const electionId = button.closest('tr').dataset.electionId;
-                    if (confirm('Are you sure you want to set this election as current?')) {
+                    if (confirm('Are you sure you want to set this election as current?\nThis will log out all current voters.')) {
                         // Send AJAX request
                         fetch('admin-home.php', {
                             method: 'POST',
@@ -320,10 +320,17 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data); // For debugging
                             if (data.success) {
-                                // Reload the page
-                                location.reload();
+                                // Send request to logout all voters
+                                fetch('../logout.php?type=voter')
+                                    .then(() => {
+                                        // Reload the page after logout request
+                                        location.reload();
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        location.reload(); // Reload anyway if there's an error
+                                    });
                             } else {
                                 alert(data.message || 'Failed to update current election.');
                             }
