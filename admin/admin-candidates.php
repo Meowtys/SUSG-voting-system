@@ -137,185 +137,259 @@ ob_start();
         </div>
     </main>
 
-    <!-- Modal Structure -->
+    <!-- Update both modals with enhanced styling -->
     <div id="myModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">File New Candidacy</h3>
-                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-4xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white">File New Candidacy</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
             </div>
-            <form class="space-y-4" id="newCandidateForm" method="POST" action="create_candidate.php" enctype="multipart/form-data">
-                <!-- Add hidden input for election_id -->
+
+            <!-- Form Section with added top padding for header -->
+            <form class="space-y-6 pt-20" id="newCandidateForm" method="POST" action="create_candidate.php" enctype="multipart/form-data">
                 <input type="hidden" name="election_id" value="<?php echo $currentElection['election_id']; ?>">
                 
-                <div>
-                    <label for="candidateName" class="block text-sm font-medium text-gray-700">Candidate Name:</label>
-                    <input type="text" id="candidateName" name="candidateName" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Candidate Name</label>
+                            <input type="text" id="candidateName" name="candidateName" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
 
-                <div>
-                    <label for="partyId" class="block text-sm font-medium text-gray-700">Party:</label>
-                    <select id="partyId" name="partyId" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <option value="">Select Party</option>
-                        <?php foreach ($parties as $party): ?>
-                            <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
-                                <?php echo htmlspecialchars($party['party_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Party:</label>
+                            <select id="partyId" name="partyId" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                <option value="">Select Party</option>
+                                <?php foreach ($parties as $party): ?>
+                                    <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
+                                        <?php echo htmlspecialchars($party['party_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="position" class="block text-sm font-medium text-gray-700">Position:</label>
-                        <select id="position" name="position" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select Position</option>
-                            <?php foreach ($positions as $position): ?>
-                                <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
-                                    <?php echo htmlspecialchars($position['position_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Position:</label>
+                                <select id="position" name="position" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select Position</option>
+                                    <?php foreach ($positions as $position): ?>
+                                        <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
+                                            <?php echo htmlspecialchars($position['position_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">College/Department:</label>
+                                <select id="college" name="college" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select College</option>
+                                    <?php foreach ($colleges as $college): ?>
+                                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                                            <?php echo htmlspecialchars($college['college_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="college" class="block text-sm font-medium text-gray-700">College/Department:</label>
-                        <select id="college" name="college" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select College</option>
-                            <?php foreach ($colleges as $college): ?>
-                                <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
-                                    <?php echo htmlspecialchars($college['college_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <!-- Right Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Candidate Image</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label class="w-full flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="mt-2 text-sm text-gray-500">Click to upload image</span>
+                                    <input type="file" id="candidateImage" name="candidateImage" accept="image/*" required class="hidden">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 text-center mt-2">JPG, JPEG, PNG only</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Qualified:</label>
+                                <select id="qualified" name="qualified" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select Qualification</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Remarks:</label>
+                                <input type="text" id="remarks" name="remarks"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label for="candidateImage" class="block text-sm font-medium text-gray-700">Candidate Image (JPG, JPEG, PNG only):</label>
-                    <input type="file" id="candidateImage" name="candidateImage" accept="image/*" required
-                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                <!-- Submit Button Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Submit Candidacy
+                    </button>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="qualified" class="block text-sm font-medium text-gray-700">Qualified:</label>
-                        <select id="qualified" name="qualified" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select Qualification</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks:</label>
-                        <input type="text" id="remarks" name="remarks"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                    </div>
-                </div>
-
-                <button type="submit" 
-                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                    Submit
-                </button>
             </form>
         </div>
     </div>
 
-    <!-- Edit Modal (Similar structure with different ID) -->
+    <!-- Apply similar styling to Edit Modal -->
     <div id="editModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Edit Candidacy</h3>
-                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-4xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white">Edit Candidacy</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
             </div>
-            <form class="space-y-4" id="editCandidateForm" method="POST" action="edit_candidate.php" enctype="multipart/form-data">
+
+            <!-- Form Section with added top padding for header -->
+            <form class="space-y-6 pt-20" id="editCandidateForm" method="POST" action="edit_candidate.php" enctype="multipart/form-data">
                 <input type="hidden" id="editCandidateId" name="candidateId">
                 <input type="hidden" name="election_id" value="<?php echo $currentElection['election_id']; ?>">
                 
-                <div>
-                    <label for="editCandidateName" class="block text-sm font-medium text-gray-700">Candidate Name:</label>
-                    <input type="text" id="editCandidateName" name="candidateName" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Candidate Name</label>
+                            <input type="text" id="editCandidateName" name="candidateName" required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
 
-                <div>
-                    <label for="editPartyId" class="block text-sm font-medium text-gray-700">Party:</label>
-                    <select id="editPartyId" name="partyId" required
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                        <option value="">Select Party</option>
-                        <?php foreach ($parties as $party): ?>
-                            <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
-                                <?php echo htmlspecialchars($party['party_name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Party:</label>
+                            <select id="editPartyId" name="partyId" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                <option value="">Select Party</option>
+                                <?php foreach ($parties as $party): ?>
+                                    <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
+                                        <?php echo htmlspecialchars($party['party_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="editPosition" class="block text-sm font-medium text-gray-700">Position:</label>
-                        <select id="editPosition" name="position" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select Position</option>
-                            <?php foreach ($positions as $position): ?>
-                                <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
-                                    <?php echo htmlspecialchars($position['position_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Position:</label>
+                                <select id="editPosition" name="position" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select Position</option>
+                                    <?php foreach ($positions as $position): ?>
+                                        <option value="<?php echo htmlspecialchars($position['position_id']); ?>">
+                                            <?php echo htmlspecialchars($position['position_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">College/Department:</label>
+                                <select id="editCollege" name="college" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select College</option>
+                                    <?php foreach ($colleges as $college): ?>
+                                        <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                                            <?php echo htmlspecialchars($college['college_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="editCollege" class="block text-sm font-medium text-gray-700">College/Department:</label>
-                        <select id="editCollege" name="college" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select College</option>
-                            <?php foreach ($colleges as $college): ?>
-                                <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
-                                    <?php echo htmlspecialchars($college['college_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <!-- Right Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Candidate Image</label>
+                            <div class="flex items-center justify-center w-full">
+                                <label class="w-full flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="mt-2 text-sm text-gray-500">Click to upload image</span>
+                                    <input type="file" id="editCandidateImage" name="candidateImage" accept="image/*" class="hidden">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 text-center mt-2">JPG, JPEG, PNG only</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Qualified:</label>
+                                <select id="editQualified" name="qualified" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                    <option value="">Select Qualification</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Remarks:</label>
+                                <input type="text" id="editRemarks" name="remarks"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label for="editCandidateImage" class="block text-sm font-medium text-gray-700">Candidate Image (JPG, JPEG, PNG only):</label>
-                    <input type="file" id="editCandidateImage" name="candidateImage" accept="image/*"
-                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100">
+                <!-- Submit Button Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Submit
+                    </button>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="editQualified" class="block text-sm font-medium text-gray-700">Qualified:</label>
-                        <select id="editQualified" name="qualified" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                            <option value="">Select Qualification</option>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="editRemarks" class="block text-sm font-medium text-gray-700">Remarks:</label>
-                        <input type="text" id="editRemarks" name="remarks"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
-                    </div>
-                </div>
-
-                <button type="submit" 
-                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                    Submit
-                </button>
             </form>
         </div>
     </div>
+
+    <!-- Add these styles to your existing styles section -->
+    <style>
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-10%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+
+        .modal input:focus, .modal select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+    </style>
 
     <script>
         // Modal functionality
