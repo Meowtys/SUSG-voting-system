@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 09:14 PM
+-- Generation Time: Dec 13, 2024 at 09:11 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,7 +48,8 @@ INSERT INTO `candidates` (`candidate_id`, `candidate_name`, `college_id`, `posit
 (31, 'George Russell', 6, 1, 1, '', 'candidate_images/c8e03540375b1029edaa12a7be22b75e.jpg', 'Mercedes'),
 (32, 'Max Verstappen', 3, 2, 1, '', 'candidate_images/b0b2275ec0af41d01d8f9992a539be03.jpg', 'Redbull'),
 (33, 'Lewis Hamilton', 7, 2, 1, '', 'candidate_images/cce6f1466f9bdf5921fa249bfba3a627.jpg', 'Mercedes'),
-(34, 'Carlos Sainz', 8, 3, 1, '', 'candidate_images/f942d3bdcd52b9fe6ab24b846e86bb14.jpg', 'Ferrari');
+(34, 'Carlos Sainz', 8, 3, 1, '', 'candidate_images/f942d3bdcd52b9fe6ab24b846e86bb14.jpg', 'Ferrari'),
+(35, 'John Vergara', 1, 3, 1, '', 'candidate_images/d6e360dd346bb2b3ae9cffebcd316f0b.jpg', 'Ambot');
 
 -- --------------------------------------------------------
 
@@ -128,8 +129,9 @@ CREATE TABLE `elections` (
 --
 
 INSERT INTO `elections` (`election_id`, `start_datetime`, `end_datetime`, `status`, `created_at`, `updated_at`, `election_name`, `is_current`) VALUES
-(17, '2024-12-01 08:00:00', '2024-12-10 20:00:00', 'Ongoing', '2024-11-30 00:29:05', '2024-11-30 00:29:05', 'Election 1', 0),
-(18, '2024-11-30 08:00:00', '2024-12-01 08:30:00', 'Scheduled', '2024-11-30 00:30:45', '2024-11-30 00:30:45', 'Election 2', 1);
+(17, '2024-11-12 21:25:00', '2024-11-30 21:25:00', 'Completed', '2024-11-30 00:29:05', '2024-11-30 00:29:05', 'Election 1', 1),
+(19, '2024-12-17 11:09:00', '2024-12-18 11:10:00', 'Scheduled', '2024-12-12 20:38:08', '2024-12-13 03:49:38', '                                        Election 2                                    ', 0),
+(20, '2024-12-13 10:00:00', '2024-12-14 10:00:00', 'Ongoing', '2024-12-12 20:53:54', '2024-12-13 08:07:37', 'Election 3', 0);
 
 -- --------------------------------------------------------
 
@@ -150,7 +152,18 @@ CREATE TABLE `feedbacks` (
 --
 
 INSERT INTO `feedbacks` (`feedback_id`, `student_id`, `experience`, `suggestion`, `feedback_timestamp`) VALUES
-(14, '21-1-01417', 5, 'HUHUHUHUHUH LAMIA KO', '2024-11-26 01:26:04');
+(25, '21-1-01417', 5, 'The system is fine, it works good!', '2024-12-09 22:25:13'),
+(26, '21-1-01417', 1, 'System is down hell bad!', '2024-12-09 22:25:27'),
+(27, '21-1-01417', 4, 'System is nice, you can easily access the important section of the site.', '2024-12-09 22:25:52'),
+(28, '21-1-01417', 3, 'HELLO', '2024-12-09 22:33:36'),
+(29, '21-1-01417', 5, 'System is very good!', '2024-12-09 22:38:32'),
+(30, '21-1-01417', 1, 'The system is very fast, responsive and very good. I recommend this to my classmates. the development team really did a good job', '2024-12-09 22:58:52'),
+(31, '21-1-01417', 5, 'The system is slow! who even created this thing it is atrocious!', '2024-12-09 23:07:42'),
+(34, '21-1-01417', 5, 'The system is just so good, it serves really well to the point that I think this beats the national elections system.', '2024-12-12 20:23:46'),
+(35, '21-1-01417', 5, 'SO GOOD! THIS IS THE BEST EVER', '2024-12-12 20:24:20'),
+(37, '21-1-01417', 2, 'Nearly bad, unusable at first.', '2024-12-13 02:26:20'),
+(38, '21-1-01417', 4, 'The system looks so nice, it\'s very modern and stylish.', '2024-12-13 05:51:55'),
+(40, '21-1-01417', 1, 'The system is very good, it works so nice, the best!', '2024-12-13 07:00:23');
 
 -- --------------------------------------------------------
 
@@ -191,7 +204,8 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`student_id`, `student_name`, `college_id`, `password`, `has_voted`) VALUES
-('21-1-01417', 'John Westen Rey Dasig', 1, 'westengwapo', 0);
+('21-0-01223', 'Jojo', 3, '$2y$10$JXYKhtT9sAiIIIh7VHw2du/cWZO/Zxp5ZJuT6bxwd4Y', 0),
+('21-1-01417', 'John Westen Rey Dasig', 1, 'westengwapo', 1);
 
 -- --------------------------------------------------------
 
@@ -206,6 +220,30 @@ CREATE TABLE `votes` (
   `position_id` int(3) NOT NULL,
   `vote_timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `votes`
+--
+
+INSERT INTO `votes` (`vote_id`, `student_id`, `candidate_id`, `position_id`, `vote_timestamp`) VALUES
+(79, '21-1-01417', 31, 1, '2024-12-13 04:48:07'),
+(80, '21-1-01417', 33, 2, '2024-12-13 04:48:07'),
+(81, '21-1-01417', 34, 3, '2024-12-13 04:48:07'),
+(82, '21-1-01417', 31, 1, '2024-12-13 05:29:44'),
+(83, '21-1-01417', 32, 2, '2024-12-13 05:29:44'),
+(84, '21-1-01417', 34, 3, '2024-12-13 05:29:44'),
+(85, '21-1-01417', 30, 1, '2024-12-13 05:34:51'),
+(86, '21-1-01417', 33, 2, '2024-12-13 05:34:51'),
+(87, '21-1-01417', 35, 3, '2024-12-13 05:34:51'),
+(88, '21-1-01417', 31, 1, '2024-12-13 05:39:09'),
+(89, '21-1-01417', 33, 2, '2024-12-13 05:39:09'),
+(90, '21-1-01417', 35, 3, '2024-12-13 05:39:09'),
+(91, '21-1-01417', 31, 1, '2024-12-13 05:41:51'),
+(92, '21-1-01417', 33, 2, '2024-12-13 05:41:51'),
+(93, '21-1-01417', 35, 3, '2024-12-13 05:41:51'),
+(94, '21-1-01417', 31, 1, '2024-12-13 05:45:54'),
+(95, '21-1-01417', 33, 2, '2024-12-13 05:45:54'),
+(96, '21-1-01417', 35, 3, '2024-12-13 05:45:54');
 
 --
 -- Indexes for dumped tables
@@ -274,7 +312,7 @@ ALTER TABLE `votes`
 -- AUTO_INCREMENT for table `candidates`
 --
 ALTER TABLE `candidates`
-  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `candidate_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `colleges`
@@ -292,13 +330,13 @@ ALTER TABLE `comelec`
 -- AUTO_INCREMENT for table `elections`
 --
 ALTER TABLE `elections`
-  MODIFY `election_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `election_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `positions`
@@ -310,7 +348,7 @@ ALTER TABLE `positions`
 -- AUTO_INCREMENT for table `votes`
 --
 ALTER TABLE `votes`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- Constraints for dumped tables
