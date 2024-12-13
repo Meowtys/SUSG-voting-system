@@ -57,9 +57,9 @@ ob_start();
     <!-- Include Sidebar -->
     <?php include 'sidebar.php'; ?>
 
-    <!-- Main Section -->
-    <main class="ml-64 p-8">
-        <div class="max-w-7xl mx-auto">
+    <!-- Main Section - Adjust width and padding -->
+    <main class="ml-64 p-8"> <!-- Changed p-4 to p-8 for more space from edges -->
+        <div class="max-w-[90%] mx-auto"> <!-- Changed from 95% to 90% -->
             <h1 class="text-4xl font-bold mb-8 text-gray-800">Candidates Management</h1>
 
             <div class="mb-8 text-right">
@@ -68,7 +68,8 @@ ob_start();
                 </button>
             </div>
 
-            <div class="bg-white rounded-xl shadow-xl p-8">
+            <!-- Add more padding to container -->
+            <div class="bg-white rounded-xl shadow-xl p-8"> <!-- Changed p-6 to p-8 -->
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-red-50">
                         <tr>
