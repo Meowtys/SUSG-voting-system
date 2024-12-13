@@ -18,9 +18,67 @@ $feedbacks = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comelec - Voter's Feedback</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.tailwind.min.js"></script>
+    <style>
+        /* Custom DataTables Styling */
+        .dataTables_wrapper {
+            padding: 1rem;
+        }
+        
+        table.dataTable thead .sorting,
+        table.dataTable thead .sorting_asc,
+        table.dataTable thead .sorting_desc {
+            position: relative;
+            background-image: none !important;
+        }
+
+        table.dataTable thead .sorting:after,
+        table.dataTable thead .sorting_asc:after,
+        table.dataTable thead .sorting_desc:after {
+            position: absolute;
+            right: 8px;
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            font-size: 0.8em;
+        }
+
+        table.dataTable thead .sorting:after {
+            content: "\f0dc";
+            color: #ddd;
+        }
+
+        table.dataTable thead .sorting_asc:after {
+            content: "\f0de";
+            color: #666;
+        }
+
+        table.dataTable thead .sorting_desc:after {
+            content: "\f0dd";
+            color: #666;
+        }
+
+        .dataTables_info {
+            margin-top: 1rem;
+            padding-top: 0.5rem !important;
+            color: #6b7280;
+        }
+
+        .dataTables_paginate {
+            margin-top: 1rem !important;
+            padding-top: 0.5rem !important;
+        }
+
+        .dataTables_wrapper .dataTables_length, 
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Include Sidebar -->
@@ -64,9 +122,9 @@ $feedbacks = $stmt->fetchAll();
             </div>
 
             <!-- Feedback Table -->
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden p-4">
                 <div class="overflow-x-auto">
-                    <table class="w-full whitespace-nowrap">
+                    <table id="feedbackTable" class="w-full whitespace-nowrap">
                         <thead>
                             <tr class="bg-gray-50 border-b border-gray-200">
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
@@ -82,7 +140,7 @@ $feedbacks = $stmt->fetchAll();
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-medium text-gray-900"><?php echo htmlspecialchars($feedback['student_name']); ?></div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4" data-order="<?php echo $feedback['experience']; ?>">
                                     <?php 
                                     $ratingClass = '';
                                     if ($feedback['experience'] >= 4) {
@@ -98,9 +156,9 @@ $feedbacks = $stmt->fetchAll();
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900 max-w-md truncate"><?php echo htmlspecialchars($feedback['suggestion']); ?></div>
+                                    <div class="text-sm text-gray-900"><?php echo htmlspecialchars($feedback['suggestion']); ?></div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4" data-order="<?php echo strtotime($feedback['feedback_timestamp']); ?>">
                                     <div class="text-sm text-gray-500"><?php echo date('M d, Y \a\t h:i A', strtotime($feedback['feedback_timestamp'])); ?></div>
                                 </td>
                                 <td class="px-6 py-4 text-right">
@@ -118,6 +176,41 @@ $feedbacks = $stmt->fetchAll();
         </div>
     </main>
     <script>
+        // Initialize DataTable
+        $(document).ready(function() {
+            $('#feedbackTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                order: [[3, 'desc']], // Sort by date by default
+                columnDefs: [
+                    { orderable: false, targets: 4 }, // Disable sorting for action column
+                    { 
+                        targets: 2,
+                        render: function(data, type, row) {
+                            if (type === 'display' && data.length > 100) {
+                                return data.substr(0, 100) + '...';
+                            }
+                            return data;
+                        }
+                    }
+                ],
+                dom: '<"flex flex-col sm:flex-row justify-between items-center"lf><"overflow-x-auto"rt><"flex flex-col sm:flex-row justify-between items-center"ip>',
+                language: {
+                    search: "Search feedback:",
+                    lengthMenu: "Show _MENU_ entries per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ feedback entries",
+                },
+                drawCallback: function() {
+                    // Re-apply Tailwind classes to DataTables elements
+                    $('.dataTables_length select').addClass('rounded-lg border-gray-300 mx-2');
+                    $('.dataTables_filter input').addClass('rounded-lg border-gray-300 ml-2');
+                    $('.dataTables_paginate .paginate_button').addClass('px-3 py-1 mx-1 rounded-lg hover:bg-gray-100');
+                    $('.dataTables_paginate .paginate_button.current').addClass('bg-blue-500 text-white hover:bg-blue-600');
+                    $('.dataTables_info').addClass('text-sm text-gray-600');
+                }
+            });
+        });
+
         // JavaScript for removing rows
         document.addEventListener('DOMContentLoaded', function () {
             const removeButtons = document.querySelectorAll('.remove-btn');
