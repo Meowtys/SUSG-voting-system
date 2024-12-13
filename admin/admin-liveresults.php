@@ -7,29 +7,38 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
+// Get current election
+$stmt = $pdo->query("SELECT election_id, election_name FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    die("Please set a current election first before viewing results.");
+}
+
 // Fetch positions from the database
 $positionsStmt = $pdo->query("SELECT * FROM positions");
 $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch the current election from the database
-$electionStmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
-$currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
-
-// Set default values if no current election exists
-$startDatetime = $currentElection ? $currentElection['start_datetime'] : null;
-$endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
-
-// Fetch live results from the database
-function getLiveResults($pdo, $positionId) {
+// Function to get live results for current election
+function getLiveResults($pdo, $positionId, $electionId) {
     $stmt = $pdo->prepare("
-        SELECT candidates.candidate_name, candidates.candidate_party, candidates.candidate_image, COUNT(votes.vote_id) AS votes
-        FROM votes
-        JOIN candidates ON votes.candidate_id = candidates.candidate_id
-        WHERE votes.position_id = ?
-        GROUP BY candidates.candidate_id
+        SELECT 
+            c.candidate_name, 
+            pa.party_name, 
+            c.candidate_image, 
+            COUNT(v.vote_id) AS votes
+        FROM candidates c
+        LEFT JOIN votes v ON v.candidate_id = c.candidate_id AND v.election_id = :election_id
+        LEFT JOIN parties pa ON c.party_id = pa.party_id
+        WHERE c.position_id = :position_id 
+        AND c.election_id = :election_id
+        GROUP BY c.candidate_id
         ORDER BY votes DESC
     ");
-    $stmt->execute([$positionId]);
+    $stmt->execute([
+        'position_id' => $positionId,
+        'election_id' => $electionId
+    ]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -62,7 +71,7 @@ ob_start();
             const countdownBox = document.querySelector('.countdown-box');
 
             function fetchResults(positionId, positionName) {
-                fetch(`fetch_results.php?position_id=${positionId}`)
+                fetch(`fetch_results.php?position_id=${positionId}&election_id=<?php echo $currentElection['election_id']; ?>`)
                     .then(response => response.json())
                     .then(data => {
                         updateResults(data, positionName);
@@ -196,7 +205,12 @@ ob_start();
 
     <main class="ml-64 p-8">
         <div class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold mb-8 text-gray-800">Live Election Results</h1>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Live Election Results</h1>
+                <div class="text-sm text-gray-600">
+                    Current Election: <span class="font-semibold text-red-600"><?php echo htmlspecialchars($currentElection['election_name']); ?></span>
+                </div>
+            </div>
 
             <!-- Countdown Section -->
             <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
