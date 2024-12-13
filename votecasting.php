@@ -436,8 +436,53 @@ foreach ($candidates as $candidate) {
 
         function goBack() {
             if (currentPositionIndex > 0) {
+                // Reset the current position's selections if it's Representatives
+                const currentPosition = positions[currentPositionIndex].position_name;
+                if (currentPosition === 'Representative') {
+                    selectedVotes['Representative'] = [];
+                    const indicator = document.querySelector('.max-reps-indicator');
+                    if (indicator) {
+                        indicator.querySelector('span:last-child').textContent = `0/${maxRepresentatives} selected`;
+                        indicator.querySelector('.bg-red-600').style.width = '0%';
+                    }
+                }
+                
+                // Go back to previous position
                 currentPositionIndex--;
                 displayPosition();
+                
+                // Clear any selections on the previous page
+                const allCards = document.querySelectorAll('.candidate-card');
+                allCards.forEach(card => {
+                    card.querySelector('.selected-overlay').classList.add('hidden');
+                    card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
+                });
+                
+                // Show previous selections if they exist
+                const prevPosition = positions[currentPositionIndex].position_name;
+                if (selectedVotes[prevPosition]) {
+                    if (Array.isArray(selectedVotes[prevPosition])) {
+                        // Handle representative selections
+                        selectedVotes[prevPosition].forEach(candidate => {
+                            const candidateCard = Array.from(allCards).find(
+                                card => card.querySelector('h3').textContent.trim() === candidate.candidate_name
+                            );
+                            if (candidateCard) {
+                                candidateCard.querySelector('.selected-overlay').classList.remove('hidden');
+                                candidateCard.classList.add('ring-4', 'ring-red-600', 'ring-opacity-50');
+                            }
+                        });
+                    } else {
+                        // Handle single candidate selection
+                        const candidateCard = Array.from(allCards).find(
+                            card => card.querySelector('h3').textContent.trim() === selectedVotes[prevPosition].candidate_name
+                        );
+                        if (candidateCard) {
+                            candidateCard.querySelector('.selected-overlay').classList.remove('hidden');
+                            candidateCard.classList.add('ring-4', 'ring-red-600', 'ring-opacity-50');
+                        }
+                    }
+                }
             }
         }
 
