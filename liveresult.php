@@ -151,6 +151,26 @@ foreach ($candidates as $candidate) {
         setInterval(function() {
             location.reload();
         }, 30000);
+
+        // Add a visual countdown timer
+        function updateCountdown() {
+            let countdown = 30;
+            const timerDiv = document.createElement('div');
+            timerDiv.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg';
+            timerDiv.innerHTML = `Refreshing in: ${countdown}s`;
+            document.body.appendChild(timerDiv);
+
+            const timer = setInterval(() => {
+                countdown--;
+                timerDiv.innerHTML = `Refreshing in: ${countdown}s`;
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                }
+            }, 1000);
+        }
+
+        // Initialize countdown on page load
+        document.addEventListener('DOMContentLoaded', updateCountdown);
     </script>
 </body>
 </html>
