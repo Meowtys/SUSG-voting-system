@@ -8,7 +8,7 @@ if (isset($_GET['type'])) {
             if (isset($_SESSION['user'])) {
                 unset($_SESSION['user']);
             }
-            header("Location: loginasvoter.php");
+            header("Location: start.php");
             break;
             
         case 'comelec':
@@ -17,7 +17,7 @@ if (isset($_GET['type'])) {
                 unset($_SESSION['is_comelec_logged_in']);
                 unset($_SESSION['comelec_name']);
             }
-            header("Location: loginascomelec.php");
+            header("Location: start.php");
             break;
             
         default:
