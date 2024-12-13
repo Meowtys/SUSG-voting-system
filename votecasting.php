@@ -84,7 +84,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
-    <main class="min-h-screen p-8">
+    <main class="h-full p-8 mb-16">
         <div class="max-w-7xl mx-auto">
             <!-- Vote Casting Header -->
             <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border-l-4 border-red-600">
@@ -153,6 +153,18 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 const candidatesContainer = document.getElementById("candidatesContainer");
                 candidatesContainer.innerHTML = "";
 
+                // Check if there are no candidates
+                if (!candidates || candidates.length === 0) {
+                    candidatesContainer.innerHTML = `
+                        <div class="col-span-3 text-center p-8 bg-yellow-50 rounded-xl border-2 border-yellow-200">
+                            <i class="fas fa-exclamation-triangle text-yellow-500 text-5xl mb-4"></i>
+                            <h3 class="text-xl font-semibold text-yellow-800 mb-2">No Candidates Available</h3>
+                            <p class="text-yellow-700 mb-4">There are no candidates for this position. 
+                            <br> Press Abstain to Continue <br></p>
+                        </div>`;
+                    return;
+                }
+
                 candidates.forEach((candidate, index) => {
                     const candidateCard = document.createElement("div");
                     candidateCard.classList.add(
@@ -186,7 +198,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                             <p class="text-gray-600">${candidate.party_name}</p>
                         </div>
                         <div class="selected-overlay hidden absolute inset-0 bg-red-600/20 rounded-xl">
-                            <div class="absolute top-4 right-4 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                            <div class="absolute bottom-4 right-4 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
                                 <i class="fas fa-check text-lg"></i>
                             </div>
                         </div>
