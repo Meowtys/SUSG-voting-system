@@ -378,7 +378,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     const currentStatus = currentStatusSpan.textContent.trim();
                     if (currentStatus !== newStatus) {
                         currentStatusSpan.textContent = newStatus;
-                        currentStatusSpan.className = `font-semibold ${
+                        currentStatusSpan.className = `text-2xl font-semibold ${
                             newStatus === 'Ongoing' ? 'text-green-600 blink' : 
                             newStatus === 'Scheduled' ? 'text-blue-600' : 
                             'text-gray-600'
