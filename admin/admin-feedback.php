@@ -7,9 +7,23 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
-// Fetch feedbacks from the database
-$stmt = $pdo->prepare("SELECT f.*, s.student_name FROM feedbacks f JOIN students s ON f.student_id = s.student_id ORDER BY f.feedback_timestamp DESC");
-$stmt->execute();
+// Get current election
+$stmt = $pdo->query("SELECT election_id, election_name FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    die("Please set a current election first before viewing feedback.");
+}
+
+// Fetch feedbacks from the database for current election only
+$stmt = $pdo->prepare("
+    SELECT f.*, s.student_name 
+    FROM feedbacks f 
+    JOIN students s ON f.student_id = s.student_id 
+    WHERE f.election_id = :election_id 
+    ORDER BY f.feedback_timestamp DESC
+");
+$stmt->execute(['election_id' => $currentElection['election_id']]);
 $feedbacks = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
@@ -87,9 +101,14 @@ $feedbacks = $stmt->fetchAll();
     <!-- Main Section -->
     <main class="ml-64 p-8 bg-gray-50 min-h-screen">
         <div class="max-w-7xl mx-auto">
-            <!-- Header Section -->
+            <!-- Header Section with Current Election -->
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold text-gray-900">Voter's Feedback</h1>
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-900">Voter's Feedback</h1>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Current Election: <span class="font-semibold text-red-600"><?php echo htmlspecialchars($currentElection['election_name']); ?></span>
+                    </p>
+                </div>
                 <div class="text-sm text-gray-600">
                     Total Feedbacks: <?php echo count($feedbacks); ?>
                 </div>
