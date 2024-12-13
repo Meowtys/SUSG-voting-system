@@ -123,19 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = 'Scheduled';
 
             $stmt = $pdo->prepare("INSERT INTO elections (election_name, start_datetime, end_datetime, status) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$electionName, $startDatetime, $endDatetime, $status]);
-
-            header('Location: admin-home.php');
-            exit();
-        } elseif (isset($_POST['toggle_election'])) {
-            $electionId = $_POST['election_id'];
-            $newStatus = $_POST['new_status'];
-
-            $stmt = $pdo->prepare("UPDATE elections SET status = ? WHERE election_id = ?");
-            $stmt->execute([$newStatus, $electionId]);
-
-            header('Location: admin-home.php');
-            exit();
+            if ($stmt->execute([$electionName, $startDatetime, $endDatetime, $status])) {
+                // Clear any cached data
+                $stmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+                $stmt->execute();
+                $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                header('Location: admin-home.php');
+                exit();
+            }
         } elseif (isset($_POST['edit_election'])) {
             $electionId = $_POST['election_id'];
             $electionName = $_POST['election_name'];
@@ -143,7 +139,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $endDatetime = $_POST['end_datetime'];
 
             $stmt = $pdo->prepare("UPDATE elections SET election_name = ?, start_datetime = ?, end_datetime = ? WHERE election_id = ?");
-            $stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId]);
+            if ($stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId])) {
+                // Clear any cached data
+                $stmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+                $stmt->execute();
+                $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                header('Location: admin-home.php');
+                exit();
+            }
+        } elseif (isset($_POST['toggle_election'])) {
+            $electionId = $_POST['election_id'];
+            $newStatus = $_POST['new_status'];
+
+            $stmt = $pdo->prepare("UPDATE elections SET status = ? WHERE election_id = ?");
+            $stmt->execute([$newStatus, $electionId]);
 
             header('Location: admin-home.php');
             exit();
@@ -434,6 +444,37 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 updateCurrentElectionStatus();
                 setInterval(updateCurrentElectionStatus, 60000); // Check every minute
             }
+
+            // Modal form submissions
+            const newElectionForm = document.querySelector('#newElectionModal form');
+            if (newElectionForm) {
+                newElectionForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    this.submit();
+                });
+            }
+
+            const editElectionForm = document.querySelector('#editElectionModal form');
+            if (editElectionForm) {
+                editElectionForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    this.submit();
+                });
+            }
+
+            // Close modals after form submission
+            const closeModals = () => {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            };
+
+            // Add event listeners for form submissions
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    closeModals();
+                });
+            });
         });
     </script>
 </head>
@@ -666,8 +707,8 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- Update modal styles to match the new color scheme -->
-    <div id="newElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <!-- Update modal styles -->
+    <div id="newElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-red-700">Schedule New Election</h3>
@@ -694,7 +735,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Edit Election Modal -->
-    <div id="editElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div id="editElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
         <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold">Edit Election</h3>
