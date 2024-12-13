@@ -45,75 +45,115 @@ try {
             throw new Exception("Invalid position: " . htmlspecialchars($position));
         }
 
-        // Handle abstain vote
-        if ($candidate['candidate_id'] === 0) {
-            // Find abstain candidate or create one if it doesn't exist
-            $abstainStmt = $pdo->prepare("
-                SELECT candidate_id FROM candidates 
-                WHERE position_id = :position_id 
-                AND election_id = :election_id 
-                AND candidate_name = 'Abstain'
-            ");
-            $abstainStmt->execute([
-                ':position_id' => $position_id,
-                ':election_id' => $election_id
-            ]);
-            $abstain_id = $abstainStmt->fetchColumn();
+        // Handle representatives differently
+        if ($position === 'Representative' && is_array($candidate)) {
+            // Insert vote for each representative
+            foreach ($candidate as $rep) {
+                // Verify candidate exists and belongs to current election
+                $checkCandidateStmt = $pdo->prepare("
+                    SELECT candidate_id FROM candidates 
+                    WHERE candidate_id = :candidate_id 
+                    AND election_id = :election_id
+                ");
+                $checkCandidateStmt->execute([
+                    ':candidate_id' => $rep['candidate_id'],
+                    ':election_id' => $election_id
+                ]);
+                $candidate_id = $checkCandidateStmt->fetchColumn();
 
-            if (!$abstain_id) {
-                // Create abstain candidate
-                $createAbstainStmt = $pdo->prepare("
-                    INSERT INTO candidates (
-                        candidate_name, college_id, position_id, 
-                        qualified, election_id, party_id
+                if (!$candidate_id) {
+                    throw new Exception("Invalid representative selection");
+                }
+
+                // Insert representative vote
+                $stmt = $pdo->prepare("
+                    INSERT INTO votes (
+                        student_id, position_id, candidate_id, 
+                        election_id, vote_timestamp
                     ) VALUES (
-                        'Abstain', 0, :position_id, 
-                        1, :election_id, 3
+                        :student_id, :position_id, :candidate_id, 
+                        :election_id, NOW()
                     )
                 ");
-                $createAbstainStmt->execute([
+                
+                $stmt->execute([
+                    ':student_id' => $user_id,
+                    ':position_id' => $position_id,
+                    ':candidate_id' => $candidate_id,
+                    ':election_id' => $election_id
+                ]);
+            }
+        } else {
+            // Handle abstain vote
+            if ($candidate['candidate_id'] === 0) {
+                // Find abstain candidate or create one if it doesn't exist
+                $abstainStmt = $pdo->prepare("
+                    SELECT candidate_id FROM candidates 
+                    WHERE position_id = :position_id 
+                    AND election_id = :election_id 
+                    AND candidate_name = 'Abstain'
+                ");
+                $abstainStmt->execute([
                     ':position_id' => $position_id,
                     ':election_id' => $election_id
                 ]);
-                $abstain_id = $pdo->lastInsertId();
+                $abstain_id = $abstainStmt->fetchColumn();
+
+                if (!$abstain_id) {
+                    // Create abstain candidate
+                    $createAbstainStmt = $pdo->prepare("
+                        INSERT INTO candidates (
+                            candidate_name, college_id, position_id, 
+                            qualified, election_id, party_id
+                        ) VALUES (
+                            'Abstain', 0, :position_id, 
+                            1, :election_id, 3
+                        )
+                    ");
+                    $createAbstainStmt->execute([
+                        ':position_id' => $position_id,
+                        ':election_id' => $election_id
+                    ]);
+                    $abstain_id = $pdo->lastInsertId();
+                }
+                
+                $candidate_id = $abstain_id;
+            } else {
+                // Verify candidate exists and belongs to current election
+                $checkCandidateStmt = $pdo->prepare("
+                    SELECT candidate_id FROM candidates 
+                    WHERE candidate_id = :candidate_id 
+                    AND election_id = :election_id
+                ");
+                $checkCandidateStmt->execute([
+                    ':candidate_id' => $candidate['candidate_id'],
+                    ':election_id' => $election_id
+                ]);
+                $candidate_id = $checkCandidateStmt->fetchColumn();
+
+                if (!$candidate_id) {
+                    throw new Exception("Invalid candidate selection");
+                }
             }
-            
-            $candidate_id = $abstain_id;
-        } else {
-            // Verify candidate exists and belongs to current election
-            $checkCandidateStmt = $pdo->prepare("
-                SELECT candidate_id FROM candidates 
-                WHERE candidate_id = :candidate_id 
-                AND election_id = :election_id
+
+            // Insert vote
+            $stmt = $pdo->prepare("
+                INSERT INTO votes (
+                    student_id, position_id, candidate_id, 
+                    election_id, vote_timestamp
+                ) VALUES (
+                    :student_id, :position_id, :candidate_id, 
+                    :election_id, NOW()
+                )
             ");
-            $checkCandidateStmt->execute([
-                ':candidate_id' => $candidate['candidate_id'],
+            
+            $stmt->execute([
+                ':student_id' => $user_id,
+                ':position_id' => $position_id,
+                ':candidate_id' => $candidate_id,
                 ':election_id' => $election_id
             ]);
-            $candidate_id = $checkCandidateStmt->fetchColumn();
-
-            if (!$candidate_id) {
-                throw new Exception("Invalid candidate selection");
-            }
         }
-
-        // Insert vote
-        $stmt = $pdo->prepare("
-            INSERT INTO votes (
-                student_id, position_id, candidate_id, 
-                election_id, vote_timestamp
-            ) VALUES (
-                :student_id, :position_id, :candidate_id, 
-                :election_id, NOW()
-            )
-        ");
-        
-        $stmt->execute([
-            ':student_id' => $user_id,
-            ':position_id' => $position_id,
-            ':candidate_id' => $candidate_id,
-            ':election_id' => $election_id
-        ]);
     }
 
     // Update has_voted status

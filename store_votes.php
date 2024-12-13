@@ -11,8 +11,13 @@ try {
         throw new Exception("No vote data received");
     }
 
-    // Store votes in session
-    $_SESSION['selectedVotes'] = $data['votes'];
+    // Process representatives array if it exists
+    if (isset($data['votes']['Representative']) && is_array($data['votes']['Representative'])) {
+        $_SESSION['selectedVotes'] = $data['votes'];
+    } else {
+        // Handle regular votes
+        $_SESSION['selectedVotes'] = $data['votes'];
+    }
     
     echo json_encode([
         'success' => true,
