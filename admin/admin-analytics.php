@@ -221,13 +221,13 @@ try {
 
                 async function getSentiment(text, cacheKey, cachedSentiment) {
                     try {
-                        // If we have cached sentiment data, use it
+                        // If we have cached sentiment data from PHP, use it
                         if (cachedSentiment) {
-                            console.log('Using cached sentiment for:', text.substring(0, 50) + '...');
+                            console.log('Using PHP cached sentiment for:', text.substring(0, 50) + '...');
                             return cachedSentiment;
                         }
 
-                        // Check memory cache first
+                        // Check memory cache
                         if (sentimentCache.has(cacheKey)) {
                             console.log('Using memory-cached sentiment for:', text.substring(0, 50) + '...');
                             return sentimentCache.get(cacheKey);
@@ -295,15 +295,17 @@ try {
                         // Cache the result both in memory and server
                         sentimentCache.set(cacheKey, result);
                         
-                        // Save to server cache
-                        await fetch('save_sentiment_cache.php', {
+                        // Save to server cache using the SentimentCache PHP class
+                        const currentElectionId = <?php echo $currentElection['election_id']; ?>;
+                        await fetch('../cache/save_sentiment.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
                                 key: cacheKey,
-                                value: result
+                                value: result,
+                                election_id: currentElectionId
                             })
                         });
 
