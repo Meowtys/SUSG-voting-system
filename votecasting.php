@@ -54,267 +54,20 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Vote Casting</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="script/load.js" type="module" defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        main {
-            background-color: #f5e8e7;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 90vh; /* Reduced min-height */
-        }
-
-        body {
             font-family: 'Poppins', sans-serif;
         }
-
-        .vote-casting-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px; /* Increased padding */
-        }
-
-        .title {
-            font-size: 36px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .voting-box {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-        }
-
-        .position-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .divider {
-            border: 1px solid #e0e0e0;
-            width: 90%;
-            margin: 10px auto 20px auto;
-        }
-
-        .candidates {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .candidate-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f8d0d0;
-            border-radius: 10px;
-            padding: 20px; /* Increased padding */
-            width: 250px; /* Increased width */
-            transition: transform 0.3s ease, background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .candidate-card.selected {
-            background-color: #d3a5a5;
-        }
-
-        .candidate-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .candidate-photo {
-            width: 100%;
-            height: 200px; /* Increased height */
-            background-color: #d3a5a5;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .candidate-name {
-            font-size: 20px; /* Increased font size */
-            font-weight: 600; /* Increased font weight */
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .candidate-party {
-            font-size: 16px; /* Increased font size */
-            color: #666;
-            margin-bottom: 10px;
-        }
-
-        .vote-btn {
-            background-color: #333;
-            color: white;
-            padding: 8px 16px; /* Adjusted padding */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .vote-btn:hover {
-            background-color: #000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
-        }
-
-        .nav-btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            color: white;
-        }
-
-        .back-btn,
-        .next-btn {
-            background-color: #333;
-        }
-
-        .abstain-btn {
-            background-color: #dc3545;
-        }
-
-        .nav-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .summary-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .summary-title {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .summary-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            max-width: 800px;
-        }
-
-        .summary-item {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .summary-item span {
-            font-size: 18px;
-            color: #333;
-        }
-
-        .submit-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background-color: #218838;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .candidates {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .candidate-card {
-                width: 100%;
-            }
-
-            .navigation-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .nav-btn {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .title {
-                font-size: 28px;
-            }
-
-            .position-title {
-                font-size: 20px;
-            }
-
-            .candidate-photo {
-                height: 100px;
-            }
-
-            .candidate-name {
-                font-size: 14px;
-            }
-
-            .candidate-party {
-                font-size: 10px;
-            }
-
-            .vote-btn {
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-        }
     </style>
-    <script src="script/load.js" type="module" defer></script>
     <script>
         // Check if current time is within election period
         const electionTimes = <?php echo json_encode($electionTimes); ?>;
@@ -328,35 +81,54 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 </head>
 
-<body>
-    
-    <!-- Header Section -->
+<body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
-    <main class="vote-casting-container">
-        <h1 class="title" id="mainTitle">Vote Casting</h1>
-        <div class="voting-box">
-            <div class="candidates" id="candidatesContainer">
-                <!-- Candidates will be loaded here dynamically -->
+    <main class="min-h-screen p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Vote Casting Header -->
+            <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border-l-4 border-red-600">
+                <h1 id="mainTitle" class="text-3xl font-bold text-gray-800 mb-4"></h1>
+                <div class="text-gray-600">
+                    Please select your candidate for each position carefully.
+                </div>
             </div>
-        </div>
 
-        <div class="navigation-buttons">
-            <button class="nav-btn back-btn" onclick="goBack()">Back</button>
-            <button class="nav-btn abstain-btn" onclick="abstainVote()">Abstain</button>
-            <button class="nav-btn next-btn" onclick="goNext()">Next</button>
-        </div>
+            <!-- Voting Area -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <div id="candidatesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Candidates will be loaded here dynamically -->
+                </div>
+            </div>
 
-        <div class="summary-container" id="summaryContainer">
-            <h2 class="summary-title">Summary of Your Votes</h2>
-            <ul class="summary-list" id="summaryList">
-                <!-- Summary items will be loaded here dynamically -->
-            </ul>
-            <button class="submit-btn" onclick="submitVotes()">Submit Votes</button>
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center space-x-4">
+                <button class="nav-btn back-btn bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-300 transform hover:-translate-y-1" onclick="goBack()">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </button>
+                <button class="nav-btn abstain-btn bg-yellow-600 hover:bg-yellow-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-300 transform hover:-translate-y-1" onclick="abstainVote()">
+                    <i class="fas fa-ban mr-2"></i> Abstain
+                </button>
+                <button class="nav-btn next-btn bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center transition duration-300 transform hover:-translate-y-1" onclick="goNext()">
+                    Next <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+
+            <!-- Vote Summary -->
+            <div id="summaryContainer" class="hidden bg-white rounded-xl shadow-xl p-8 mt-8">
+                <h2 class="text-2xl font-bold mb-6 text-gray-800">Summary of Your Votes</h2>
+                <ul id="summaryList" class="space-y-4">
+                    <!-- Summary items will be loaded here dynamically -->
+                </ul>
+                <div class="mt-8 flex justify-center">
+                    <button onclick="submitVotes()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 transform hover:-translate-y-1 flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i> Submit Votes
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- Footer Section -->
     <?php include 'footer.php'; ?>
 
     <script>
@@ -383,49 +155,85 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 candidates.forEach((candidate, index) => {
                     const candidateCard = document.createElement("div");
-                    candidateCard.classList.add("candidate-card");
+                    candidateCard.classList.add(
+                        "candidate-card",
+                        "bg-white",
+                        "rounded-xl",
+                        "shadow-lg",
+                        "overflow-hidden",
+                        "transition-all",
+                        "duration-300",
+                        "hover:shadow-2xl",
+                        "transform",
+                        "hover:-translate-y-2",
+                        "cursor-pointer",
+                        "relative"
+                    );
                     candidateCard.dataset.index = index;
 
                     candidateCard.innerHTML = `
-                        <img class="candidate-photo" src="${candidate.candidate_image}" alt="${candidate.candidate_name}">
-                        <h3 class="candidate-name">${candidate.candidate_name}</h3>
-                        <p class="candidate-party">${candidate.candidate_party}</p>
+                        <div class="relative aspect-w-4 aspect-h-3">
+                            <img class="w-full h-64 object-cover object-center" src="${candidate.candidate_image}" alt="${candidate.candidate_name}">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="absolute top-0 right-0 m-2">
+                                <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded-full shadow-md">
+                                    ${candidate.college_name}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">${candidate.candidate_name}</h3>
+                            <p class="text-gray-600">${candidate.candidate_party}</p>
+                        </div>
+                        <div class="selected-overlay hidden absolute inset-0 bg-red-600/20 rounded-xl">
+                            <div class="absolute top-4 right-4 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-check text-lg"></i>
+                            </div>
+                        </div>
                     `;
 
                     candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
                     candidatesContainer.appendChild(candidateCard);
 
-                    // Highlight previously selected candidate
-                    if (selectedVotes[position.position_name] && selectedVotes[position.position_name].candidate_id === candidate.candidate_id) {
-                        candidateCard.classList.add("selected");
+                    // Show selection if previously selected
+                    if (selectedVotes[position.position_name] && 
+                        selectedVotes[position.position_name].candidate_id === candidate.candidate_id) {
+                        const overlay = candidateCard.querySelector('.selected-overlay');
+                        overlay.classList.remove('hidden');
+                        candidateCard.classList.add('ring-4', 'ring-red-600', 'ring-opacity-50');
                     }
                 });
-
-                // Update the selection state of the candidate cards
-                updateSelectionState();
             });
         }
 
         function selectCandidate(candidateCard, candidate, positionName) {
             const candidatesContainer = document.getElementById("candidatesContainer");
-            const selectedCard = candidatesContainer.querySelector(".candidate-card.selected");
+            const allCards = candidatesContainer.querySelectorAll('.candidate-card');
+            
+            // Remove selection from all cards
+            allCards.forEach(card => {
+                card.querySelector('.selected-overlay').classList.add('hidden');
+            });
 
-            if (selectedCard) {
-                selectedCard.classList.remove("selected");
-            }
-
-            if (selectedCard !== candidateCard) {
-                candidateCard.classList.add("selected");
-                selectedVotes[positionName] = candidate;
-            } else {
-                delete selectedVotes[positionName];
-            }
-
+            // Add selection to clicked card
+            const overlay = candidateCard.querySelector('.selected-overlay');
+            overlay.classList.remove('hidden');
+            
+            selectedVotes[positionName] = candidate;
             updateSelectionState();
         }
 
         function abstainVote() {
             const position = positions[currentPositionIndex].position_name;
+            const candidatesContainer = document.getElementById("candidatesContainer");
+            const allCards = candidatesContainer.querySelectorAll('.candidate-card');
+            
+            // Remove selection from all cards
+            allCards.forEach(card => {
+                card.querySelector('.selected-overlay').classList.add('hidden');
+                card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
+            });
+            
             selectedVotes[position] = { candidate_id: 0 };
             goNext();
         }
@@ -494,11 +302,25 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
             for (const [position, candidate] of Object.entries(selectedVotes)) {
                 const summaryItem = document.createElement("li");
-                summaryItem.classList.add("summary-item");
+                summaryItem.classList.add(
+                    "flex",
+                    "justify-between",
+                    "items-center",
+                    "p-4",
+                    "bg-gray-50",
+                    "rounded-lg",
+                    "border",
+                    "border-gray-200"
+                );
 
                 summaryItem.innerHTML = `
-                    <span>${position}</span>
-                    <span>${candidate === "Abstain" ? "Abstain" : candidate.candidate_name}</span>
+                    <div>
+                        <h4 class="font-semibold text-gray-800">${position}</h4>
+                        <p class="text-gray-600">${candidate === "Abstain" ? "Abstain" : candidate.candidate_name}</p>
+                    </div>
+                    <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+                        ${candidate === "Abstain" ? "Abstained" : "Selected"}
+                    </span>
                 `;
 
                 summaryList.appendChild(summaryItem);
