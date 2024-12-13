@@ -613,7 +613,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     <label class="block text-sm font-medium text-gray-700">End Date and Time</label>
                     <input type="datetime-local" id="edit_end_datetime" name="end_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
-                <button type="submit" name="edit_election" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button type="submit" name="edit_election" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                     Save Changes
                 </button>
             </form>
