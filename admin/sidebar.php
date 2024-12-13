@@ -135,10 +135,6 @@ if (isset($_SESSION['user'])) {
                 <a href="admin-feedback.php" class="nav-link <?php echo $current_page == 'admin-feedback.php' ? 'active' : ''; ?>"><i class="fas fa-comments icon"></i>View Feedback</a>  
             </div>
             <div class="section">
-                <h3>Notifications</h3>
-                <a href="admin-notify.php" class="nav-link <?php echo $current_page == 'admin-notify.php' ? 'active' : ''; ?>"><i class="fas fa-bell icon"></i>View Notifications</a>  
-            </div>
-            <div class="section">
                 <h3>Sentiment Analysis</h3>
                 <a href="admin-analytics.php" class="nav-link <?php echo $current_page == 'admin-analytics.php' ? 'active' : ''; ?>"><i class="fas fa-chart-pie icon"></i>Analytics</a>
             </div>
