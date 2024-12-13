@@ -916,7 +916,6 @@ try {
             <div id="negative-comments" class="comments-container" style="display: none;"></div>
 
             <!-- Add new section for mismatched feedback -->
-                        <h3 class="text-lg font-semibold mb-2 text-green-600">High Rating, Negative Feedback</h3>
             <div class="mt-8">
                 <h2 class="text-2xl font-bold mb-4">Rating-Sentiment Mismatches</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
