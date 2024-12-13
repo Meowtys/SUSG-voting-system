@@ -48,7 +48,7 @@ $electionData = $currentElection ? [
         }
         
         .header-menu.active {
-            display: block;
+            display: flex;
         }
 
         @keyframes slideIn {
@@ -58,7 +58,13 @@ $electionData = $currentElection ? [
 
         .menu-item-hover {
             position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
+            overflow-x: hidden; /* Add this line */
+        }
+
+        .menu-item-hover:hover {
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1));
+            padding-left: 4px; /* Replace transform with padding change */
         }
 
         .menu-item-hover::after {
@@ -74,6 +80,15 @@ $electionData = $currentElection ? [
 
         .menu-item-hover:hover::after {
             width: 100%;
+        }
+
+        .header-menu [class*="bg-"].shadow-lg {
+            transition: all 0.3s ease;
+        }
+
+        .header-menu [class*="bg-"].shadow-lg:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -115,78 +130,116 @@ $electionData = $currentElection ? [
 
     <!-- Dropdown Menu -->
     <?php if ($user): ?>
-    <nav class="header-menu fixed top-0 right-0 w-72 h-full bg-gradient-to-b from-[#811111] to-[#621111] z-50" id="header-side-menu">
-        <!-- Student Info Section with enhanced design -->
-        <div class="p-6 border-b border-red-700/30 backdrop-blur-sm bg-white/5">
+    <nav class="header-menu fixed top-0 right-0 w-72 h-full bg-gradient-to-b from-[#811111] to-[#621111] z-50 flex flex-col" id="header-side-menu">
+        <!-- Enhanced Menu Header -->
+        <div class="p-6 bg-[#811111]/50 backdrop-blur-sm">
+            <div class="flex items-center justify-between mb-6">
+                <img src="asset/susglogo.png" alt="SUSG Logo" class="w-12 h-12 rounded-lg">
+                <button onclick="closeMenu()" class="text-white/80 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
             <?php if ($user): ?>
                 <div class="text-white">
-                    <div class="mb-4">
-                        <h3 class="text-xl font-bold"><?php echo htmlspecialchars($user['student_name']); ?></h3>
-                    </div>
-                    <div class="space-y-2">
-                        <p class="text-sm text-white/90"><?php echo htmlspecialchars($user['student_id']); ?></p>
-                        <p class="text-sm text-white/90"><?php echo htmlspecialchars($user['college_name']); ?></p>
+                    <h3 class="text-xl font-bold truncate"><?php echo htmlspecialchars($user['student_name']); ?></h3>
+                    <div class="mt-2 space-y-1">
+                        <p class="text-sm text-white/90 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <?php echo htmlspecialchars($user['student_id']); ?>
+                        </p>
+                        <p class="text-sm text-white/90 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            <?php echo htmlspecialchars($user['college_name']); ?>
+                        </p>
                     </div>
                     <div class="mt-4">
-                        <div class="<?php echo $user['has_voted'] ? 'bg-green-600' : 'bg-red-600'; ?> text-white text-sm font-semibold py-2 px-4 rounded-md text-center shadow-sm">
-                            <?php echo $user['has_voted'] ? '✓ Voted' : '○ Not Voted'; ?>
+                        <div class="<?php echo $user['has_voted'] ? 'bg-green-600' : 'bg-red-600'; ?> 
+                                 text-white text-sm font-semibold py-2 px-4 rounded-md 
+                                 flex items-center justify-center space-x-2 
+                                 shadow-lg shadow-black/10">
+                            <?php if ($user['has_voted']): ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            <?php else: ?>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            <?php endif; ?>
+                            <span><?php echo $user['has_voted'] ? 'Vote Recorded' : 'Not Voted Yet'; ?></span>
                         </div>
                     </div>
                 </div>
             <?php endif; ?>
         </div>
 
-        <!-- Navigation Links with icons -->
-        <ul class="py-2">
-            <li class="menu-item-hover">
-                <a href="homepage.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    <span>Home</span>
-                </a>
-            </li>
-            <li class="menu-item-hover">
-                <a href="javascript:void(0);" onclick="handleVoteClickHeader()" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Vote</span>
-                </a>
-            </li>
-            <li class="menu-item-hover">
-                <a href="liveresult.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span>Live Results</span>
-                </a>
-            </li>
-            <li class="menu-item-hover">
-                <a href="countdown.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Countdown</span>
-                </a>
-            </li>
-            <li class="menu-item-hover">
-                <a href="feedback.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                    <span>Leave a Feedback</span>
-                </a>
-            </li>
-            <li class="menu-item-hover mt-4">
-                <a href="logout.php" class="flex items-center space-x-3 px-6 py-3 text-red-300 hover:text-red-200 hover:bg-white/5 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Logout</span>
-                </a>
-            </li>
-        </ul>
+        <!-- Main Navigation -->
+        <div class="flex-1 overflow-y-auto py-2">
+            <ul class="space-y-1">
+                <li class="menu-item-hover">
+                    <a href="homepage.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="menu-item-hover">
+                    <a href="javascript:void(0);" onclick="handleVoteClickHeader()" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Vote</span>
+                    </a>
+                </li>
+                <li class="menu-item-hover">
+                    <a href="liveresult.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <span>Live Results</span>
+                    </a>
+                </li>
+                <li class="menu-item-hover">
+                    <a href="countdown.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Countdown</span>
+                    </a>
+                </li>
+                <li class="menu-item-hover">
+                    <a href="feedback.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                        </svg>
+                        <span>Leave a Feedback</span>
+                    </a>
+                </li>
+                <li class="menu-item-hover mt-4">
+                    <a href="logout.php" class="flex items-center space-x-3 px-6 py-3 text-red-300 hover:text-red-200 hover:bg-white/5 transition-colors duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Menu Footer -->
+        <div class="p-4 bg-[#811111]/30 backdrop-blur-sm">
+            <div class="text-white/60 text-xs text-center">
+                <p>SUSG Election System</p>
+                <p class="mt-1">© <?php echo date('Y'); ?> All rights reserved</p>
+            </div>
+        </div>
     </nav>
     <?php endif; ?>
 
@@ -235,6 +288,14 @@ $electionData = $currentElection ? [
                 popup.classList.add('hidden');
                 overlay.classList.add('hidden');
             }
+        }
+
+        function closeMenu() {
+            const sideMenu = document.getElementById('header-side-menu');
+            const overlay = document.getElementById('header-overlay');
+            sideMenu.classList.add('hidden');
+            sideMenu.classList.remove('active');
+            overlay.classList.add('hidden');
         }
 
         // Event Listeners
