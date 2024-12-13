@@ -140,39 +140,113 @@ foreach ($candidates as $candidate) {
             background: #dc2626;
         }
         .candidate-card {
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.95);
             transition: all 0.3s ease;
             margin-bottom: 1rem;
             border: 1px solid rgba(239, 68, 68, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
+
+        .candidate-card:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(239, 68, 68, 0.1);
+        }
+
         .candidate-info {
             display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 1.25rem;
-            align-items: center;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 1.5rem;
+            align-items: start;
             width: 100%;
         }
+
+        .candidate-image-wrapper {
+            position: relative;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .candidate-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 1rem;
+            object-fit: cover;
+            border: 3px solid #fecaca;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+        }
+
+        .crown-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            padding: 0.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.3);
+            transform: rotate(15deg);
+        }
+
         .candidate-details {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            width: 100%;
         }
+
+        .candidate-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.2;
+        }
+
         .candidate-meta {
             display: flex;
             gap: 0.75rem;
             flex-wrap: wrap;
-            margin-top: 0.5rem;
         }
+
         .meta-tag {
-            padding: 0.35rem 1rem;
-            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.375rem;
+            gap: 0.5rem;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .votes-section {
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(239, 68, 68, 0.1);
+        }
+
+        .vote-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .vote-counter {
+            background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .vote-percentage {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .progress-bar {
             height: 8px;
@@ -250,18 +324,24 @@ foreach ($candidates as $candidate) {
                                     <?php foreach ($candidatesByPosition[$position['position_id']] as $index => $candidate): ?>
                                         <div class="candidate-card">
                                             <div class="candidate-info">
-                                                <div class="relative">
+                                                <div class="candidate-image-wrapper">
                                                     <img src="<?= htmlspecialchars($candidate['candidate_image']) ?>" 
                                                          alt="<?= htmlspecialchars($candidate['candidate_name']) ?>" 
-                                                         class="w-20 h-20 rounded-xl object-cover border-2 border-red-100">
+                                                         class="candidate-image">
                                                     <?php if ($index === 0 && $candidate['vote_count'] > 0): ?>
-                                                        <span class="absolute -top-2 -right-2 text-2xl">👑</span>
+                                                        <div class="crown-badge">
+                                                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M10 2l1.85 3.75 4.15.6-3 2.925.7 4.175L10 11.75 6.3 13.45l.7-4.175-3-2.925 4.15-.6L10 2z"/>
+                                                            </svg>
+                                                        </div>
                                                     <?php endif; ?>
                                                 </div>
+                                                
                                                 <div class="candidate-details">
-                                                    <h3 class="font-bold text-gray-800 text-xl">
+                                                    <h3 class="candidate-name">
                                                         <?= htmlspecialchars($candidate['candidate_name']) ?>
                                                     </h3>
+                                                    
                                                     <div class="candidate-meta">
                                                         <span class="meta-tag bg-red-50 text-red-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,20 +364,24 @@ foreach ($candidates as $candidate) {
                                                             </span>
                                                         <?php endif; ?>
                                                     </div>
-                                                </div>
-                                                <div class="vote-counter">
-                                                    <span class="text-2xl font-bold text-white"><?= $candidate['vote_count'] ?></span>
-                                                    <span class="text-sm text-white opacity-90">votes</span>
-                                                </div>
-                                            </div>
-                                            <div class="mt-4">
-                                                <div class="flex justify-end mb-2">
-                                                    <span class="text-lg font-semibold text-gray-700">
-                                                        <?= $candidate['percentage'] ?>%
-                                                    </span>
-                                                </div>
-                                                <div class="progress-bar">
-                                                    <div class="progress-fill" style="width: <?= $candidate['percentage'] ?>%"></div>
+                                                    
+                                                    <div class="votes-section">
+                                                        <div class="vote-stats">
+                                                            <div class="vote-counter">
+                                                                <span class="text-2xl font-bold text-white"><?= $candidate['vote_count'] ?></span>
+                                                                <span class="text-sm text-white opacity-90">votes</span>
+                                                            </div>
+                                                            <div class="vote-percentage">
+                                                                <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                                                                </svg>
+                                                                <?= $candidate['percentage'] ?>%
+                                                            </div>
+                                                        </div>
+                                                        <div class="progress-bar">
+                                                            <div class="progress-fill" style="width: <?= $candidate['percentage'] ?>%"></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
