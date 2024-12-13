@@ -133,16 +133,23 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include 'footer.php'; ?>
     <script>
         function returnToVoting() {
-            // Navigate back to the vote casting page
             window.location.href = "votecasting.php";
         }
 
         function submitVotes() {
             if (confirm("Are you sure you want to submit your final votes? This action cannot be undone.")) {
+                // Disable both buttons immediately to prevent further interaction
                 const submitButton = document.querySelector('button:last-child');
+                const returnButton = document.querySelector('button:first-child');
                 submitButton.disabled = true;
-                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+                returnButton.disabled = true;
                 
+                // Add visual feedback that buttons are disabled
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                returnButton.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
                 fetch("submit_votes.php", {
                     method: "POST",
                     headers: {
@@ -153,15 +160,26 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById("successMessage").classList.remove("hidden");
-                        setTimeout(() => {
-                            window.location.href = "homepage.php";
-                        }, 2000);
+                        // Redirect immediately on success
+                        window.location.href = "homepage.php";
                     } else {
+                        // Only re-enable buttons if submission fails
                         alert("Failed to submit votes. Please try again.");
                         submitButton.disabled = false;
+                        returnButton.disabled = false;
+                        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        returnButton.classList.remove('opacity-50', 'cursor-not-allowed');
                         submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Final Vote';
                     }
+                })
+                .catch(error => {
+                    // Handle any errors and re-enable buttons
+                    alert("An error occurred: " + error.message);
+                    submitButton.disabled = false;
+                    returnButton.disabled = false;
+                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    returnButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Final Vote';
                 });
             }
         }
