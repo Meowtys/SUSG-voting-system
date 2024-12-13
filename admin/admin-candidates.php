@@ -59,8 +59,13 @@ ob_start();
 
     <!-- Main Section - Adjust width and padding -->
     <main class="ml-64 p-8"> <!-- Changed p-4 to p-8 for more space from edges -->
-        <div class="max-w-[90%] mx-auto"> <!-- Changed from 95% to 90% -->
-            <h1 class="text-4xl font-bold mb-8 text-gray-800">Candidates Management</h1>
+        <div class="max-w-7xl mx-auto"> <!-- Changed from max-w-[90%] to max-w-7xl -->
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Candidates Management</h1>
+                <div class="text-sm text-gray-600">
+                    Current Election: <span class="font-semibold text-red-600"><?php echo htmlspecialchars($currentElection['election_name']); ?></span>
+                </div>
+            </div>
 
             <div class="mb-8 text-right">
                 <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:-translate-y-1" id="openModalBtn">
@@ -70,48 +75,64 @@ ob_start();
 
             <!-- Add more padding to container -->
             <div class="bg-white rounded-xl shadow-xl p-8"> <!-- Changed p-6 to p-8 -->
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-red-50">
-                        <tr>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Candidate Name</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Party</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Position</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">College</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Qualified</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Remarks</th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
-                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <?php foreach ($candidates as $candidate): ?>
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($candidate['candidate_name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['party_name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['position_name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['college_name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full <?php echo $candidate['qualified'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
-                                    <?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?>
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['remarks']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <button class="edit-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
-                                        data-candidate='<?php echo json_encode($candidate); ?>'>
-                                    <i class="fas fa-edit mr-2"></i> Edit
-                                </button>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <button class="delete-btn bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
-                                        data-candidate-id="<?php echo $candidate['candidate_id']; ?>">
-                                    <i class="fas fa-trash-alt mr-2"></i> Delete
-                                </button>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto"> <!-- Add this wrapper div -->
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-red-50">
+                            <tr>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6">Candidate Name</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Party</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Position</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">College</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8">Qualified</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/6">Remarks</th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8"></th>
+                                <th class="px-4 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider w-1/8"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <?php foreach ($candidates as $candidate): ?>
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-4 text-sm font-medium text-gray-900">
+                                    <div class="truncate max-w-[150px]"><?php echo htmlspecialchars($candidate['candidate_name']); ?></div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-900">
+                                    <div class="truncate max-w-[100px]"><?php echo htmlspecialchars($candidate['party_name']); ?></div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-900">
+                                    <div class="truncate max-w-[120px]"><?php echo htmlspecialchars($candidate['position_name']); ?></div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-900">
+                                    <div class="truncate max-w-[120px]" title="<?php echo htmlspecialchars($candidate['college_name']); ?>">
+                                        <?php echo htmlspecialchars($candidate['college_name']); ?>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?php echo $candidate['qualified'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                        <?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-gray-900">
+                                    <div class="truncate max-w-[150px]" title="<?php echo htmlspecialchars($candidate['remarks']); ?>">
+                                        <?php echo htmlspecialchars($candidate['remarks']); ?>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <button class="edit-btn bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
+                                            data-candidate='<?php echo json_encode($candidate); ?>'>
+                                        <i class="fas fa-edit mr-1"></i> Edit
+                                    </button>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <button class="delete-btn bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-lg text-sm transition duration-300 transform hover:-translate-y-1" 
+                                            data-candidate-id="<?php echo $candidate['candidate_id']; ?>">
+                                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
