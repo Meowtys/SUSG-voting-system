@@ -694,13 +694,13 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                     </td>
                                     <td class="px-4 py-4">
                                         <div class="flex flex-col space-y-1">
-                                            <button class="edit-button bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                            <button class="edit-button bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
                                                 <i class="fas fa-edit mr-1"></i> Edit
                                             </button>
-                                            <button class="delete-button bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                            <button class="delete-button bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
                                                 <i class="fas fa-trash-alt mr-1"></i> Delete
                                             </button>
-                                            <button class="view-button bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
+                                            <button class="view-button bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm flex items-center justify-center">
                                                 <i class="fas fa-check-circle mr-1"></i> Set as Current
                                             </button>
                                         </div>
