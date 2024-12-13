@@ -75,41 +75,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <form id="feedback-form" class="p-8 space-y-8">
                     <!-- Rating Section -->
-                    <div class="text-center">
-                        <label class="block text-xl font-semibold text-gray-800 mb-6">
+                    <div class="text-center space-y-6">
+                        <label class="block text-2xl font-semibold text-gray-800">
                             How would you rate your experience?
                         </label>
-                        <div class="flex justify-center space-x-6">
+                        <div class="flex justify-center space-x-8">
                             <?php for($i = 1; $i <= 5; $i++): ?>
                                 <button type="button" 
-                                        class="rating-option w-14 h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-xl font-bold transition-all duration-200 hover:scale-110 transform"
+                                        class="rating-option w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center text-2xl font-bold transition-all duration-200 hover:scale-110 transform hover:border-red-500"
                                         data-value="<?php echo $i; ?>">
                                     <?php echo $i; ?>
                                 </button>
                             <?php endfor; ?>
                         </div>
                         <input type="hidden" name="experience" id="experience" value="0">
-                        <div class="flex justify-between text-sm text-gray-600 mt-4 px-8">
-                            <span class="flex items-center"><i class="fas fa-frown text-red-500 mr-2"></i>Poor</span>
-                            <span class="flex items-center">Excellent<i class="fas fa-smile text-green-500 ml-2"></i></span>
+                        <div class="flex justify-between text-sm text-gray-600 px-12">
+                            <span class="flex items-center">
+                                <i class="fas fa-frown text-red-500 text-xl mr-2"></i>
+                                <span class="font-medium">Poor</span>
+                            </span>
+                            <span class="flex items-center">
+                                <span class="font-medium">Excellent</span>
+                                <i class="fas fa-smile text-green-500 text-xl ml-2"></i>
+                            </span>
                         </div>
                     </div>
 
                     <!-- Suggestion Section -->
                     <div class="space-y-4">
-                        <label class="block text-xl font-semibold text-gray-800 text-center">
+                        <label class="block text-2xl font-semibold text-gray-800 text-center">
                             Any suggestions for improvement?
                         </label>
                         <textarea name="suggestion" 
-                                class="w-full h-40 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700"
+                                class="w-full h-48 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700 text-lg"
                                 placeholder="Share your ideas with us..."></textarea>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="flex justify-end pt-4">
+                    <!-- Submit Button -->
+                    <div class="pt-6">
                         <button type="submit"
-                                class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-300 flex items-center">
-                            <i class="fas fa-paper-plane mr-2"></i>
+                                class="w-full bg-red-600 hover:bg-red-700 text-white text-lg font-semibold rounded-xl py-4 transition duration-300 flex items-center justify-center group">
+                            <i class="fas fa-paper-plane mr-2 group-hover:translate-x-1 transition-transform"></i>
                             Submit Feedback
                         </button>
                     </div>
