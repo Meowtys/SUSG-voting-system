@@ -235,9 +235,15 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 button.addEventListener('click', function () {
                     const row = button.closest('tr');
                     const electionId = row.dataset.electionId;
-                    const electionName = row.querySelector('.election-name').textContent;
-                    const startDatetime = row.querySelector('.start-datetime').textContent;
-                    const endDatetime = row.querySelector('.end-datetime').textContent;
+                    const electionName = row.querySelector('.election-name').textContent.trim();
+                    
+                    // Format datetime strings for input
+                    let startDatetime = row.querySelector('.start-datetime').textContent.trim();
+                    let endDatetime = row.querySelector('.end-datetime').textContent.trim();
+                    
+                    // Convert to ISO format for datetime-local input
+                    startDatetime = new Date(startDatetime).toISOString().slice(0, 16);
+                    endDatetime = new Date(endDatetime).toISOString().slice(0, 16);
 
                     document.getElementById('edit_election_id').value = electionId;
                     document.getElementById('edit_election_name').value = electionName;
