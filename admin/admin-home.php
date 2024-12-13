@@ -177,7 +177,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     // Count down to election start
                     distance = startDatetime - now;
                     status.textContent = 'ELECTION STARTS IN';
-                    status.className = 'bg-red-500 px-4 py-1 rounded-full';
+                    status.className = 'bg-blue-500 px-4 py-1 rounded-full';
                 } else if (now <= endDatetime) {
                     // Count down to election end
                     distance = endDatetime - now;
@@ -424,7 +424,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         $end = new DateTime($currentElection['end_datetime']);
                         
                         if ($now < $start): ?>
-                            <span class="bg-red-500 px-4 py-1 rounded-full">Election Starts In</span>
+                            <span class="bg-blue-500 px-4 py-1 rounded-full">Election Starts In</span>
                         <?php elseif ($now <= $end): ?>
                             <span class="bg-green-500 px-4 py-1 rounded-full">Election Time Remaining</span>
                         <?php else: ?>
