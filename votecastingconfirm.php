@@ -106,10 +106,53 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <h4 class="text-lg font-medium text-gray-800">
                                                 <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>
                                             </h4>
-                                            <div class="flex items-center mt-1">
-                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                                                    <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
-                                                </span>
+                                            <div class="flex flex-row items-center space-x-3 mt-1">
+                                                <!-- College Name -->
+                                                <div class="flex-1">
+                                                    <div class="flex items-center p-2 bg-red-100 rounded-lg">
+                                                        <i class="fas fa-university text-red-800 text-lg mr-2"></i>
+                                                        <span class="text-red-800 text-base font-medium truncate">
+                                                            <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Party Name -->
+                                                <?php if (!empty($selectedVotes[$position['position_name']]['party_name'])): ?>
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center p-2 <?php 
+                                                            $partyName = $selectedVotes[$position['position_name']]['party_name'];
+                                                            if ($partyName === 'CAUSE') {
+                                                                echo 'bg-green-100';
+                                                            } elseif ($partyName === 'SURE') {
+                                                                echo 'bg-blue-100';
+                                                            } else {
+                                                                echo 'bg-red-100';
+                                                            }
+                                                        ?> rounded-lg">
+                                                            <i class="fas fa-users text-<?php 
+                                                                if ($partyName === 'CAUSE') {
+                                                                    echo 'green';
+                                                                } elseif ($partyName === 'SURE') {
+                                                                    echo 'blue';
+                                                                } else {
+                                                                    echo 'red';
+                                                                }
+                                                            ?>-800 text-lg mr-2"></i>
+                                                            <span class="text-<?php 
+                                                                if ($partyName === 'CAUSE') {
+                                                                    echo 'green';
+                                                                } elseif ($partyName === 'SURE') {
+                                                                    echo 'blue';
+                                                                } else {
+                                                                    echo 'red';
+                                                                }
+                                                            ?>-800 text-base font-medium truncate">
+                                                                <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['party_name']); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
