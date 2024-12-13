@@ -129,6 +129,29 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </main>
 
+    <!-- Success Modal with Redirect -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center">
+            <div class="mb-6">
+                <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-check-circle text-4xl text-green-500"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Vote Submitted Successfully!</h2>
+                <p class="text-gray-600">Thank you for participating in the SUSG Election.</p>
+            </div>
+            <div class="text-center mb-6">
+                <p class="text-gray-600">Redirecting to homepage in <span id="redirectTimer" class="font-bold text-red-600">5</span> seconds...</p>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div id="redirectProgress" class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+            <button onclick="redirectNow()" 
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                Go to Homepage Now
+            </button>
+        </div>
+    </div>
+
     <!-- Footer Section -->
     <?php include 'footer.php'; ?>
     <script>
@@ -160,8 +183,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Redirect immediately on success
-                        window.location.href = "homepage.php";
+                        showSuccessAndRedirect();
                     } else {
                         // Only re-enable buttons if submission fails
                         alert("Failed to submit votes. Please try again.");
@@ -182,6 +204,31 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                     submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Final Vote';
                 });
             }
+        }
+
+        function showSuccessAndRedirect() {
+            const modal = document.getElementById('successModal');
+            const timerDisplay = document.getElementById('redirectTimer');
+            const progressBar = document.getElementById('redirectProgress');
+            let timeLeft = 5;
+            
+            modal.classList.remove('hidden');
+            
+            // Start countdown
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                progressBar.style.width = `${(5 - timeLeft) * 20}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    redirectNow();
+                }
+            }, 1000);
+        }
+
+        function redirectNow() {
+            window.location.href = 'homepage.php';
         }
     </script>
 </body>
