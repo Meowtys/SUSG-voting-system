@@ -143,7 +143,7 @@ if (isset($_SESSION['user'])) {
                 <a href="admin-analytics.php" class="nav-link <?php echo $current_page == 'admin-analytics.php' ? 'active' : ''; ?>"><i class="fas fa-chart-pie icon"></i>Analytics</a>
             </div>
             <div class="section">
-                <a href="../logout.php" class="nav-link"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
+                <a href="../logout.php?type=comelec" class="nav-link"><i class="fas fa-sign-out-alt icon"></i>Logout</a>
             </div>
         </div>
     </div>

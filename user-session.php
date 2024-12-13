@@ -3,6 +3,15 @@ require_once 'connect.php';
 
 session_start();
 
+// Store the previous page URL in session for proper redirection after logout
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['current_page'])) {
+    if (strpos($_GET['current_page'], 'admin') !== false) {
+        $_SESSION['logout_type'] = 'comelec';
+    } else {
+        $_SESSION['logout_type'] = 'voter';
+    }
+}
+
 // Only redirect if accessing this page directly (not through a login form)
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     if (isset($_SESSION['is_comelec_logged_in'])) {

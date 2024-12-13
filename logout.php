@@ -1,25 +1,33 @@
 <?php
 session_start();
 
-// Check which type of logout was requested
 if (isset($_GET['type'])) {
-    if ($_GET['type'] === 'voter') {
-        // Only clear voter session data
-        unset($_SESSION['user']);
-        header("Location: loginasvoter.php");
-    } elseif ($_GET['type'] === 'comelec') {
-        // Only clear comelec session data
-        unset($_SESSION['comelec_name']);
-        unset($_SESSION['is_comelec_logged_in']);
-        header("Location: loginascomelec.php");
-    } else {
-        // Invalid logout type - logout completely
-        session_unset();
-        session_destroy();
-        header("Location: start.php");
+    switch ($_GET['type']) {
+        case 'voter':
+            // Only unset voter session
+            if (isset($_SESSION['user'])) {
+                unset($_SESSION['user']);
+            }
+            header("Location: loginasvoter.php");
+            break;
+            
+        case 'comelec':
+            // Only unset comelec session
+            if (isset($_SESSION['is_comelec_logged_in'])) {
+                unset($_SESSION['is_comelec_logged_in']);
+                unset($_SESSION['comelec_name']);
+            }
+            header("Location: loginascomelec.php");
+            break;
+            
+        default:
+            // Full logout
+            session_unset();
+            session_destroy();
+            header("Location: start.php");
     }
 } else {
-    // No type specified - logout completely
+    // Default to full logout if no type specified
     session_unset();
     session_destroy();
     header("Location: start.php");
