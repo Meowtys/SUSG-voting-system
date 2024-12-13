@@ -236,8 +236,8 @@ ob_start();
     const startDatetime = new Date("<?php echo $startDatetime; ?>").getTime();
     const endDatetime = new Date("<?php echo $endDatetime; ?>").getTime();
     <?php else: ?>
-    const startDatetime = null;
-    const endDatetime = null;
+    const startDatetimeVar = null;
+    const endDatetimeVar = null;
     <?php endif; ?>
 
     function updateCountdown() {
