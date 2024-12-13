@@ -1,14 +1,16 @@
 <?php
-
 session_start();
-// Redirect if already logged in as comelec
-if (isset($_SESSION['is_comelec_logged_in']) && $_SESSION['is_comelec_logged_in']) {
+
+// Only redirect if already logged in as Comelec
+if (isset($_SESSION['is_comelec_logged_in'])) {
     header('Location: admin/admin-home.php');
     exit();
 }
 
+// Don't redirect if user is logged in - allow comelec login
+
 if (isset($_SESSION['errors'])) {
-  $errors = $_SESSION['errors'];
+    $errors = $_SESSION['errors'];
 }
 ?>
 

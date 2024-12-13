@@ -3,15 +3,70 @@ require_once 'connect.php';
 
 session_start();
 
-// Redirect to homepage if user is already logged in
-if (isset($_SESSION['user'])) {
-    header('Location: homepage.php');
-    exit();
+// Only redirect if accessing this page directly (not through a login form)
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if (isset($_SESSION['is_comelec_logged_in'])) {
+        header('Location: Admin/admin-home.php');
+        exit();
+    } elseif (isset($_SESSION['user'])) {
+        header('Location: homepage.php');
+        exit();
+    }
 }
 
 $errors = [];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
+// Handle Comelec login
+if (isset($_POST['signin_comelec'])) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+    $password = $_POST['password'];
+
+    // Debugging: Log the received username and password
+    error_log("Received Username: $username");
+    error_log("Received Password: $password");
+
+    if (empty($username)) {
+        $errors['username'] = 'Username cannot be empty';
+    }
+
+    if (empty($password)) {
+        $errors['password'] = 'Password cannot be empty';
+    }
+
+    if (!empty($errors)) {
+        $_SESSION['errors'] = $errors;
+        header('Location: loginascomelec.php');
+        exit();
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM comelec WHERE comelec_name = :username");
+    $stmt->execute(['username' => $username]);
+    $user = $stmt->fetch();
+
+    // Debugging: Log the fetched user data
+    if ($user) {
+        error_log("Comelec user found: " . print_r($user, true));
+    } else {
+        error_log("Comelec user not found");
+    }
+
+    // Compare plain text passwords
+    if ($user && $password === $user['password']) {
+        $_SESSION['comelec_name'] = $user['comelec_name'];
+        $_SESSION['is_comelec_logged_in'] = true; // Add session variable to track Comelec login
+
+        header('Location: Admin/admin-home.php');
+        exit();
+    } else {
+        $errors['login'] = 'Invalid Username or Password';
+        $_SESSION['errors'] = $errors;
+        header('Location: loginascomelec.php');
+        exit();
+    }
+}
+
+// Handle Voter login
+if (isset($_POST['signin'])) {
     $student_id = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING);
     $password = $_POST['password'];
 
@@ -64,55 +119,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin'])) {
         $errors['login'] = 'Invalid student ID or password';
         $_SESSION['errors'] = $errors;
         header('Location: loginasvoter.php');
-        exit();
-    }
-}
-
-// New code for Comelec login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['signin_comelec'])) {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = $_POST['password'];
-
-    // Debugging: Log the received username and password
-    error_log("Received Username: $username");
-    error_log("Received Password: $password");
-
-    if (empty($username)) {
-        $errors['username'] = 'Username cannot be empty';
-    }
-
-    if (empty($password)) {
-        $errors['password'] = 'Password cannot be empty';
-    }
-
-    if (!empty($errors)) {
-        $_SESSION['errors'] = $errors;
-        header('Location: loginascomelec.php');
-        exit();
-    }
-
-    $stmt = $pdo->prepare("SELECT * FROM comelec WHERE comelec_name = :username");
-    $stmt->execute(['username' => $username]);
-    $user = $stmt->fetch();
-
-    // Debugging: Log the fetched user data
-    if ($user) {
-        error_log("Comelec user found: " . print_r($user, true));
-    } else {
-        error_log("Comelec user not found");
-    }
-
-    // Compare plain text passwords
-    if ($user && $password === $user['password']) {
-        $_SESSION['comelec_name'] = $user['comelec_name'];
-        $_SESSION['is_comelec_logged_in'] = true; // Add session variable to track Comelec login
-
-        header('Location: Admin/admin-home.php');
-        exit();
-    } else {
-        $errors['login'] = 'Invalid Username or Password';
-        $_SESSION['errors'] = $errors;
-        header('Location: loginascomelec.php');
         exit();
     }
 }
