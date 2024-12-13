@@ -99,7 +99,7 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 if (isBeforeStart) {
                     // Before election starts
                     messageEl.textContent = "ELECTION STARTS IN";
-                    messageEl.className = "bg-red-500 px-4 py-1 rounded-full";
+                    messageEl.className = "bg-blue-500 px-4 py-1 rounded-full";
                     disableVoting('not-started');
                 } else if (isDuringElection) {
                     // During election
@@ -220,7 +220,7 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                 
                 <!-- Countdown Status -->
                 <div class="countdown-status text-white text-xl font-semibold text-center mb-4">
-                    <span id="countdown-message" class="bg-red-500 px-4 py-1 rounded-full">
+                    <span id="countdown-message" class="bg-blue-500 px-4 py-1 rounded-full">
                         ELECTION COUNTDOWN
                     </span>
                 </div>

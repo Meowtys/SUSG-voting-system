@@ -123,51 +123,47 @@ ob_start();
 
             function updateCountdown() {
                 if (!startDatetime || !endDatetime) {
-                    countdownBox.innerHTML = '<div class="text-2xl font-bold text-gray-600">No election scheduled.</div>';
+                    countdownBox.innerHTML = '<div class="text-center text-white text-3xl font-bold py-12">No election scheduled.</div>';
                     return;
                 }
 
                 const now = new Date().getTime();
+                const status = document.querySelector('.countdown-status span');
+                
+                // Determine which countdown to show
                 let distance;
-                let status;
-
                 if (now < startDatetime) {
+                    // Count down to election start
                     distance = startDatetime - now;
-                    status = 'ELECTION STARTS IN';
-                } else if (now >= startDatetime && now <= endDatetime) {
+                    status.textContent = 'ELECTION STARTS IN';
+                    status.className = 'bg-blue-500 px-4 py-1 rounded-full';
+                } else if (now <= endDatetime) {
+                    // Count down to election end
                     distance = endDatetime - now;
-                    status = 'ELECTION ENDS IN';
+                    status.textContent = 'ELECTION TIME REMAINING';
+                    status.className = 'bg-green-500 px-4 py-1 rounded-full';
                 } else {
-                    countdownBox.innerHTML = '<div class="text-2xl font-bold text-gray-600">Election has ended.</div>';
+                    // Election has ended
+                    status.textContent = 'ELECTION ENDED';
+                    status.className = 'bg-gray-500 px-4 py-1 rounded-full';
+                    document.querySelector('.days').textContent = '00';
+                    document.querySelector('.hours').textContent = '00';
+                    document.querySelector('.minutes').textContent = '00';
+                    document.querySelector('.seconds').textContent = '00';
                     return;
                 }
 
+                // Calculate time components
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                countdownBox.innerHTML = `
-                    <div class="text-xl font-bold text-red-600 mb-4">${status}</div>
-                    <div class="grid grid-cols-4 gap-4">
-                        <div class="bg-white rounded-xl p-4 text-center shadow-lg float-animation">
-                            <span class="text-4xl font-bold text-red-600 block">${String(days).padStart(2, '0')}</span>
-                            <span class="text-sm text-gray-600">DAYS</span>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 text-center shadow-lg float-animation" style="animation-delay: 0.2s">
-                            <span class="text-4xl font-bold text-red-600 block">${String(hours).padStart(2, '0')}</span>
-                            <span class="text-sm text-gray-600">HOURS</span>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 text-center shadow-lg float-animation" style="animation-delay: 0.4s">
-                            <span class="text-4xl font-bold text-red-600 block">${String(minutes).padStart(2, '0')}</span>
-                            <span class="text-sm text-gray-600">MINUTES</span>
-                        </div>
-                        <div class="bg-white rounded-xl p-4 text-center shadow-lg float-animation" style="animation-delay: 0.6s">
-                            <span class="text-4xl font-bold text-red-600 block">${String(seconds).padStart(2, '0')}</span>
-                            <span class="text-sm text-gray-600">SECONDS</span>
-                        </div>
-                    </div>
-                `;
+                // Update the display with padded numbers
+                document.querySelector('.days').textContent = String(days).padStart(2, '0');
+                document.querySelector('.hours').textContent = String(hours).padStart(2, '0');
+                document.querySelector('.minutes').textContent = String(minutes).padStart(2, '0');
+                document.querySelector('.seconds').textContent = String(seconds).padStart(2, '0');
             }
 
             const countdownInterval = setInterval(updateCountdown, 1000);
@@ -204,8 +200,51 @@ ob_start();
 
             <!-- Countdown Section -->
             <div class="bg-gradient-to-r from-red-600 to-red-800 rounded-xl shadow-2xl p-8 mb-8">
-                <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Timer</h2>
-                <div class="countdown-box"></div>
+                <h2 class="text-4xl font-bold mb-8 text-white text-center tracking-wide">Election Countdown</h2>
+                <?php if ($currentElection): ?>
+                    <div class="countdown-status text-white text-xl font-semibold text-center mb-4">
+                        <?php 
+                        $now = new DateTime();
+                        $start = new DateTime($currentElection['start_datetime']);
+                        $end = new DateTime($currentElection['end_datetime']);
+                        
+                        if ($now < $start): ?>
+                            <span class="bg-blue-500 px-4 py-1 rounded-full">Election Starts In</span>
+                        <?php elseif ($now <= $end): ?>
+                            <span class="bg-green-500 px-4 py-1 rounded-full">Election Time Remaining</span>
+                        <?php else: ?>
+                            <span class="bg-gray-500 px-4 py-1 rounded-full">Election Ended</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="countdown-box flex justify-center gap-8">
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="days text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Days</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="hours text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Hours</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="minutes text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Minutes</span>
+                        </div>
+                        <div class="bg-white rounded-xl p-8 text-center w-44 transform hover:scale-105 transition-transform duration-300 shadow-lg">
+                            <span class="seconds text-7xl font-bold text-red-700 block mb-3">00</span>
+                            <span class="text-base font-semibold text-gray-600 block uppercase tracking-wider">Seconds</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center text-white">
+                        <div class="text-sm">
+                            Start: <span class="font-semibold"><?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A'); ?></span>
+                        </div>
+                        <div class="text-sm">
+                            End: <span class="font-semibold"><?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); ?></span>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="text-center text-white text-3xl font-bold py-12">No election scheduled.</div>
+                <?php endif; ?>
             </div>
 
             <!-- Results Section -->
