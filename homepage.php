@@ -7,16 +7,24 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-// Retrieve user details from the session
-$user = $_SESSION['user'];
-
 // Include database connection
 require_once 'connect.php';
 
+// Update the user query to include college information
+$stmt = $pdo->prepare("
+    SELECT students.*, colleges.college_name 
+    FROM students 
+    LEFT JOIN colleges ON students.college_id = colleges.college_id 
+    WHERE students.student_id = :student_id
+");
+$stmt->execute(['student_id' => $_SESSION['user']['student_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Update session with complete user data including college name
+$_SESSION['user'] = $user;
+
 // Check if the user has voted
-$stmt = $pdo->prepare("SELECT has_voted FROM students WHERE student_id = :student_id");
-$stmt->execute(['student_id' => $user['student_id']]);
-$hasVoted = $stmt->fetchColumn();
+$hasVoted = $user['has_voted'];
 
 // Update session data with voting status
 $_SESSION['user']['has_voted'] = $hasVoted;

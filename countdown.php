@@ -7,11 +7,29 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-// Retrieve user details from the session
-$user = $_SESSION['user'];
-
 // Database connection
 require_once 'connect.php';
+
+// Get fresh user data from database to ensure current voting status
+$stmt = $pdo->prepare("SELECT * FROM students WHERE student_id = ?");
+$stmt->execute([$_SESSION['user']['student_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Update session with fresh user data
+$_SESSION['user'] = $user;
+
+// Update the user query to include college information
+$stmt = $pdo->prepare("
+    SELECT students.*, colleges.college_name 
+    FROM students 
+    LEFT JOIN colleges ON students.college_id = colleges.college_id 
+    WHERE students.student_id = :student_id
+");
+$stmt->execute(['student_id' => $_SESSION['user']['student_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Update session with complete user data including college name
+$_SESSION['user'] = $user;
 
 // Fetch the current election's start and end times
 $stmt = $pdo->query("SELECT start_datetime, end_datetime FROM elections WHERE is_current = 1 LIMIT 1");
@@ -20,6 +38,12 @@ $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
 // Set default values if no current election exists
 $startDatetime = $currentElection ? $currentElection['start_datetime'] : null;
 $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
+
+// Pass user voting status to JavaScript
+$userStatus = [
+    'has_voted' => (bool)$user['has_voted'],
+    'student_id' => $user['student_id']
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +60,9 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
         .blink { animation: blink 1s step-start infinite; }
     </style>
     <script>
+        // Add user status to window object
+        window.userStatus = <?php echo json_encode($userStatus); ?>;
+        
         document.addEventListener('DOMContentLoaded', function () {
             const startDatetime = "<?php echo $startDatetime; ?>";
             const endDatetime = "<?php echo $endDatetime; ?>";
@@ -149,6 +176,9 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
                     voteBtn.disabled = true;
                     reviewBtn.disabled = true;
                 }
+
+                // Also update button states in case they changed
+                updateButtonStates();
             }
 
             function disableVoting(state) {
@@ -204,6 +234,34 @@ $endDatetime = $currentElection ? $currentElection['end_datetime'] : null;
             // Start the interval to update the countdown every second
             const countdownInterval = setInterval(updateCountdown, 1000);
             updateCountdown(); // Call immediately to set initial values
+
+            // Update button states based on user voting status
+            function updateButtonStates() {
+                const voteBtn = document.getElementById('vote-btn');
+                const reviewBtn = document.getElementById('review-btn');
+                
+                if (window.userStatus.has_voted) {
+                    // User has voted - disable vote button, enable review button
+                    voteBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    voteBtn.disabled = true;
+                    voteBtn.title = 'You have already voted';
+                    
+                    reviewBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    reviewBtn.disabled = false;
+                } else {
+                    // User hasn't voted - enable vote button, disable review button
+                    voteBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    voteBtn.disabled = false;
+                    voteBtn.removeAttribute('title');
+                    
+                    reviewBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                    reviewBtn.disabled = true;
+                    reviewBtn.title = 'You have not voted yet';
+                }
+            }
+
+            // Initial button state update
+            updateButtonStates();
         });
     </script>
 </head>
