@@ -72,6 +72,7 @@ try {
             background: #f8f9fa;
             min-height: 100vh;
             padding: 2rem;
+            margin-left: 250px; /* Add this line to match sidebar width */
         }
         .chart-grid {
             display: grid;
