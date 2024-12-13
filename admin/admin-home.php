@@ -327,8 +327,8 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     statusCell.textContent = newStatus;
                     statusCell.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + 
                         (newStatus === 'Ongoing' ? 'bg-green-100 text-green-800' : 
-                         newStatus === 'Completed' ? 'bg-gray-100 text-gray-800' : 
-                         'bg-red-100 text-red-800');
+                         newStatus === 'Scheduled' ? 'bg-blue-100 text-blue-800' : 
+                         'bg-gray-100 text-gray-800');
 
                     // Update database via AJAX
                     const electionId = row.dataset.electionId;
@@ -372,7 +372,11 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                     const currentStatus = currentStatusSpan.textContent.trim();
                     if (currentStatus !== newStatus) {
                         currentStatusSpan.textContent = newStatus;
-                        currentStatusSpan.className = `font-semibold ${newStatus.toLowerCase() === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'} current-election-status`;
+                        currentStatusSpan.className = `font-semibold ${
+                            newStatus === 'Ongoing' ? 'text-green-600 blink' : 
+                            newStatus === 'Scheduled' ? 'text-blue-600' : 
+                            'text-gray-600'
+                        } current-election-status`;
                         
                         // Update database via AJAX
                         const electionId = currentStatusSpan.dataset.electionId;
@@ -464,10 +468,12 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 <?php if ($currentElection): ?>
                     <p class="text-lg mb-2">Name: <span class="font-semibold"><?php echo htmlspecialchars($currentElection['election_name']); ?></span></p>
                     <p class="text-lg">Status: 
-                        <span class="current-election-status font-semibold <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'; ?>"
-                              data-election-id="<?php echo htmlspecialchars($currentElection['election_id']); ?>"
-                              data-start="<?php echo htmlspecialchars($currentElection['start_datetime']); ?>"
-                              data-end="<?php echo htmlspecialchars($currentElection['end_datetime']); ?>">
+                        <span class="current-election-status font-semibold 
+                            <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-green-600 blink' : 
+                                (strtolower($currentElection['status']) === 'scheduled' ? 'text-blue-600' : 'text-gray-600'); ?>"
+                            data-election-id="<?php echo htmlspecialchars($currentElection['election_id']); ?>"
+                            data-start="<?php echo htmlspecialchars($currentElection['start_datetime']); ?>"
+                            data-end="<?php echo htmlspecialchars($currentElection['end_datetime']); ?>">
                             <?php echo htmlspecialchars($currentElection['status']); ?>
                         </span>
                     </p>
@@ -508,7 +514,8 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                     <td class="px-4 py-4">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             <?php echo strtolower($election['status']) === 'ongoing' ? 'bg-green-100 text-green-800' : 
-                                                (strtolower($election['status']) === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800'); ?>">
+                                                (strtolower($election['status']) === 'scheduled' ? 'bg-blue-100 text-blue-800' : 
+                                                'bg-gray-100 text-gray-800'); ?>">
                                             <?php echo htmlspecialchars($election['status']); ?>
                                         </span>
                                     </td>
