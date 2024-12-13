@@ -469,23 +469,94 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             </div>
 
             <!-- Current Election Status -->
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-red-600">
-                <h2 class="text-2xl font-bold mb-4 text-gray-800">Current Election Status</h2>
-                <?php if ($currentElection): ?>
-                    <p class="text-lg mb-2">Name: <span class="font-semibold"><?php echo htmlspecialchars($currentElection['election_name']); ?></span></p>
-                    <p class="text-lg">Status: 
-                        <span class="current-election-status font-semibold 
-                            <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-green-600 blink' : 
-                                (strtolower($currentElection['status']) === 'scheduled' ? 'text-blue-600' : 'text-gray-600'); ?>"
-                            data-election-id="<?php echo htmlspecialchars($currentElection['election_id']); ?>"
-                            data-start="<?php echo htmlspecialchars($currentElection['start_datetime']); ?>"
-                            data-end="<?php echo htmlspecialchars($currentElection['end_datetime']); ?>">
-                            <?php echo htmlspecialchars($currentElection['status']); ?>
-                        </span>
-                    </p>
-                <?php else: ?>
-                    <p class="text-lg text-gray-600">No election scheduled.</p>
-                <?php endif; ?>
+            <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border-l-4 border-red-600 relative overflow-hidden">
+                <!-- Background Pattern -->
+                <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 bg-red-600 transform -skew-y-12"></div>
+                </div>
+                
+                <!-- Content -->
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800">Current Election Status</h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-semibold">Active Election</span>
+                        </div>
+                    </div>
+
+                    <?php if ($currentElection): ?>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Election Details -->
+                            <div class="space-y-6">
+                                <div class="bg-red-50 rounded-lg p-4">
+                                    <p class="text-sm text-red-600 uppercase tracking-wider mb-1">Election Title</p>
+                                    <h3 class="text-2xl font-bold text-red-700"><?php echo htmlspecialchars($currentElection['election_name']); ?></h3>
+                                </div>
+                                <div class="bg-gradient-to-r from-gray-50 to-white rounded-lg p-4">
+                                    <p class="text-sm text-gray-600 uppercase tracking-wider mb-1">Current Status</p>
+                                    <span class="current-election-status text-2xl font-bold inline-flex items-center
+                                        <?php 
+                                        $statusClass = strtolower($currentElection['status']) === 'ongoing' 
+                                            ? 'text-green-600 blink' 
+                                            : (strtolower($currentElection['status']) === 'scheduled' 
+                                                ? 'text-blue-600' 
+                                                : 'text-gray-600'); 
+                                        echo $statusClass;
+                                        ?>"
+                                        data-election-id="<?php echo htmlspecialchars($currentElection['election_id']); ?>"
+                                        data-start="<?php echo htmlspecialchars($currentElection['start_datetime']); ?>"
+                                        data-end="<?php echo htmlspecialchars($currentElection['end_datetime']); ?>">
+                                        <?php echo htmlspecialchars($currentElection['status']); ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Time Details -->
+                            <div class="bg-gray-50 rounded-lg p-6 space-y-6">
+                                <div>
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <i class="fas fa-calendar-day text-red-600"></i>
+                                        <p class="text-sm text-gray-600 uppercase tracking-wider">Schedule</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-xs text-gray-500 uppercase">Starts</p>
+                                            <p class="font-bold text-gray-800">
+                                                <?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y'); ?>
+                                            </p>
+                                            <p class="text-sm font-medium text-red-600">
+                                                <?php echo (new DateTime($currentElection['start_datetime']))->format('g:i A'); ?>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500 uppercase">Ends</p>
+                                            <p class="font-bold text-gray-800">
+                                                <?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y'); ?>
+                                            </p>
+                                            <p class="text-sm font-medium text-red-600">
+                                                <?php echo (new DateTime($currentElection['end_datetime']))->format('g:i A'); ?>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center py-12 bg-gray-50 rounded-lg">
+                            <i class="fas fa-calendar-times text-gray-400 text-5xl mb-4"></i>
+                            <p class="text-xl text-gray-600 mb-4">No election currently scheduled</p>
+                            <button onclick="document.getElementById('newElectionBtn').click()" 
+                                    class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-300">
+                                <i class="fas fa-plus-circle mr-2"></i>
+                                <span>Schedule New Election</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <!-- Scheduled Elections -->
