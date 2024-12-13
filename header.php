@@ -32,272 +32,101 @@ $electionData = $currentElection ? [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Header</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
+        
         body, html {
-            margin: 0;
-            padding: 0;
             font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
         }
-
-        .header {
-            display: flex;
-            align-items: center;
-            background-color: #c41f1f; 
-            padding: 10px 20px;
-            padding-left: 250px; 
-        }
-
-        .header-icons {
-            margin-right: 55px;
-            display: flex;
-            align-items: center;
-            margin-left: auto;
-        }
-
-        .header-icons img {
-            width: 24px;
-            height: 24px;
-            margin-right: 220px;
-            cursor: pointer;
-        }
-
-        .header-menu-icon {
-            display: block;
-        }
-
+        
+        /* Remove the transform styles from CSS */
         .header-menu {
             display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: #811111;
-            width: 250px;
-            height: 100%;
-            z-index: 1001;
-            padding-top: 20px;
-            transition: transform 0.3s ease;
-            transform: translateX(100%);
-            overflow-y: auto; /* Enable vertical scroll */
         }
-
+        
         .header-menu.active {
-            transform: translateX(0);
             display: block;
-        }
-
-        .header-menu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            text-align: center;
-        }
-
-        .header-student-info {
-            background-color: #811111;
-            padding: 15px;
-            color: white;
-            text-align: left;
-            border-bottom: 1px solid #c41f1f;
-        }
-
-        .header-student-info .header-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .header-student-info .header-id,
-        .header-student-info .header-department {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .header-voting-status {
-            border: none;
-            padding: 8px 16px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-
-        .voted {
-            background-color: #28a745; /* Use the same green color as the homepage */
-            color: white;
-        }
-
-        .not-voted {
-            background-color: #dc3545; /* Use the same red color as the homepage */
-            color: white;
-        }
-
-        .header-menu ul li {
-            padding: 15px 0;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            border-bottom: 1px solid #c41f1f;
-        }
-
-        .header-menu ul li a {
-            text-decoration: none;
-            color: white;
-            display: block;
-            width: 100%;
-            padding: 10px 0;
-        }
-
-        .header-menu ul li a:hover {
-            background-color: #c41f1f;
-        }
-
-        .header-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .header-overlay.active {
-            display: block;
-        }
-
-        .header-hidden {
-            display: none;
-        }
-
-        .header-logo {
-            width: 120px;
-            height: 120px;
-        }
-
-        .header-title {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding-left: 20px; 
-                justify-content: flex-start; 
-            }
-
-            .header-logo {
-                width: 80px;
-                height: auto;
-            }
-
-            .header-title {
-                font-size: 18px;
-            }
-        }
-
-        .header-main {
-            padding-top: 150px;
-            height: auto;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1002;
-            border-radius: 10px;
-            text-align: center;
         }
 
         .popup.active {
             display: block;
         }
-
-        .popup button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #c41f1f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <img src="asset/susglogo.png" alt="Logo" class="header-logo">
-        <span class="header-title">SUSG Election System</span>
+    <header class="flex items-center bg-[#c41f1f] px-4 md:px-20 py-2">
+        <img src="asset/susglogo.png" alt="Logo" class="w-20 md:w-32">
+        <span class="text-white text-lg md:text-2xl font-bold ml-4">SUSG Election System</span>
         <?php if ($user): ?>
-        <div class="header-icons">
-            <img src="asset/menu.png" alt="Menu" class="header-menu-icon" id="header-menu-toggle">
+        <div class="ml-auto">
+            <img src="asset/menu.png" alt="Menu" class="w-6 h-6 cursor-pointer" id="header-menu-toggle">
         </div>
         <?php endif; ?>
     </header>
 
     <!-- Overlay -->
-    <div class="header-overlay" id="header-overlay"></div>
+    <div class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" id="header-overlay"></div>
 
     <!-- Update Popup Messages -->
-    <div class="popup" id="vote-popup">
-        <p>You have already voted.</p>
-        <button onclick="closeHeaderPopup('vote-popup')">Close</button>
+    <div class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-80" id="vote-popup">
+        <p class="text-gray-800 mb-4">You have already voted.</p>
+        <button onclick="closeHeaderPopup('vote-popup')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
     </div>
 
-    <div class="popup" id="election-not-started">
-        <p>The election has not started yet.</p>
-        <button onclick="closeHeaderPopup('election-not-started')">Close</button>
+    <div class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-80" id="election-not-started">
+        <p class="text-gray-800 mb-4">The election has not started yet.</p>
+        <button onclick="closeHeaderPopup('election-not-started')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
     </div>
 
-    <div class="popup" id="election-ended">
-        <p>The election has ended.</p>
-        <button onclick="closeHeaderPopup('election-ended')">Close</button>
+    <div class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-80" id="election-ended">
+        <p class="text-gray-800 mb-4">The election has ended.</p>
+        <button onclick="closeHeaderPopup('election-ended')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
     </div>
 
-    <div class="popup" id="no-election">
-        <p>No election is currently scheduled.</p>
-        <button onclick="closeHeaderPopup('no-election')">Close</button>
+    <div class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-80" id="no-election">
+        <p class="text-gray-800 mb-4">No election is currently scheduled.</p>
+        <button onclick="closeHeaderPopup('no-election')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
     </div>
 
     <!-- Dropdown Menu -->
     <?php if ($user): ?>
-    <nav class="header-menu" id="header-side-menu">
-        <div class="header-student-info">
+    <nav class="header-menu fixed top-0 right-0 w-64 h-full bg-[#811111] z-50" id="header-side-menu">
+        <!-- Student Info Section -->
+        <div class="p-6 border-b border-red-700">
             <?php if ($user): ?>
-                <div class="header-name"><?php echo htmlspecialchars($user['student_name']); ?></div>
-                <div class="header-id"><?php echo htmlspecialchars($user['student_id']); ?></div>
-                <div class="header-department"><?php echo htmlspecialchars($user['college_name']); ?></div>
-                <button class="header-voting-status <?php echo $user['has_voted'] ? 'voted' : 'not-voted'; ?>">
-                    <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
-                </button>
-            <?php else: ?>
-                <div class="header-name">Guest</div>
-                <div class="header-id">N/A</div>
-                <div class="header-department">N/A</div>
-                <button class="header-voting-status not-voted">N/A</button>
+                <div class="text-white">
+                    <h3 class="text-xl font-bold mb-2"><?php echo htmlspecialchars($user['student_name']); ?></h3>
+                    <p class="text-sm opacity-90 mb-1"><?php echo htmlspecialchars($user['student_id']); ?></p>
+                    <p class="text-sm opacity-90 mb-3"><?php echo htmlspecialchars($user['college_name']); ?></p>
+                    <div class="<?php echo $user['has_voted'] ? 'bg-green-600' : 'bg-red-600'; ?> text-white text-sm font-semibold py-2 px-4 rounded-full text-center">
+                        <?php echo $user['has_voted'] ? 'Voted' : 'Not Voted'; ?>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
-        <ul>
-            <li><a href="homepage.php">Home</a></li>
-            <li><a href="javascript:void(0);" onclick="handleVoteClickHeader()">Vote</a></li>
-            <li><a href="liveresult.php">Live Tally</a></li>
-            <li><a href="countdown.php">Countdown</a></li>
-            <!-- <li><a href="faq.php">FAQ</a></li> -->
-            <li><a href="feedback.php">Leave a Feedback</a></li>
-            <li><a href="logout.php">Logout</a></li>
+
+        <!-- Navigation Links -->
+        <ul class="py-2">
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="homepage.php" class="block px-6 py-3 text-white font-medium">Home</a>
+            </li>
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="javascript:void(0);" onclick="handleVoteClickHeader()" class="block px-6 py-3 text-white font-medium">Vote</a>
+            </li>
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="liveresult.php" class="block px-6 py-3 text-white font-medium">Live Tally</a>
+            </li>
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="countdown.php" class="block px-6 py-3 text-white font-medium">Countdown</a>
+            </li>
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="feedback.php" class="block px-6 py-3 text-white font-medium">Leave a Feedback</a>
+            </li>
+            <li class="hover:bg-[#c41f1f] transition-colors duration-200">
+                <a href="logout.php" class="block px-6 py-3 text-white font-medium">Logout</a>
+            </li>
         </ul>
     </nav>
     <?php endif; ?>
@@ -334,9 +163,9 @@ $electionData = $currentElection ? [
             const popup = document.getElementById(popupId);
             const overlay = document.getElementById('header-overlay');
             if (popup && overlay) {
-                popup.classList.add('active');
-                overlay.classList.add('active');
-                sideMenu.classList.remove('active'); // Close the menu when showing popup
+                popup.classList.remove('hidden');
+                overlay.classList.remove('hidden');
+                sideMenu.classList.add('hidden'); // Close the menu when showing popup
             }
         }
 
@@ -344,8 +173,8 @@ $electionData = $currentElection ? [
             const popup = document.getElementById(popupId);
             const overlay = document.getElementById('header-overlay');
             if (popup && overlay) {
-                popup.classList.remove('active');
-                overlay.classList.remove('active');
+                popup.classList.add('hidden');
+                overlay.classList.add('hidden');
             }
         }
 
@@ -356,16 +185,18 @@ $electionData = $currentElection ? [
             const overlay = document.getElementById('header-overlay');
 
             menuToggle.addEventListener('click', function() {
+                sideMenu.classList.toggle('hidden');
                 sideMenu.classList.toggle('active');
-                overlay.classList.toggle('active');
+                overlay.classList.toggle('hidden');
             });
 
             // Close everything when clicking overlay
             overlay.addEventListener('click', function() {
+                sideMenu.classList.add('hidden');
                 sideMenu.classList.remove('active');
-                overlay.classList.remove('active');
+                overlay.classList.add('hidden');
                 document.querySelectorAll('.popup').forEach(popup => {
-                    popup.classList.remove('active');
+                    popup.classList.add('hidden');
                 });
             });
 
@@ -378,220 +209,5 @@ $electionData = $currentElection ? [
             });
         });
     </script>
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            scroll-behavior: smooth;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            background-color: #c41f1f; 
-            padding: 10px 20px;
-            padding-left: 250px; 
-        }
-
-        .header-icons {
-            margin-right: 55px;
-            display: flex;
-            align-items: center;
-            margin-left: auto;
-        }
-
-        .header-icons img {
-            width: 24px;
-            height: 24px;
-            margin-right: 220px;
-            cursor: pointer;
-        }
-
-        .header-menu-icon {
-            display: block;
-        }
-
-        .header-menu {
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: #811111;
-            width: 250px;
-            height: 100%;
-            z-index: 1001;
-            padding-top: 20px;
-            transition: transform 0.3s ease;
-            transform: translateX(100%);
-            overflow-y: auto; /* Enable vertical scroll */
-        }
-
-        .header-menu.active {
-            transform: translateX(0);
-            display: block;
-        }
-
-        .header-menu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            text-align: center;
-        }
-
-        .header-student-info {
-            background-color: #811111;
-            padding: 15px;
-            color: white;
-            text-align: left;
-            border-bottom: 1px solid #c41f1f;
-        }
-
-        .header-student-info .header-name {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .header-student-info .header-id,
-        .header-student-info .header-department {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .header-voting-status {
-            border: none;
-            padding: 8px 16px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-
-        .voted {
-            background-color: #28a745; /* Use the same green color as the homepage */
-            color: white;
-        }
-
-        .not-voted {
-            background-color: #dc3545; /* Use the same red color as the homepage */
-            color: white;
-        }
-
-        .header-menu ul li {
-            padding: 15px 0;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            border-bottom: 1px solid #c41f1f;
-        }
-
-        .header-menu ul li a {
-            text-decoration: none;
-            color: white;
-            display: block;
-            width: 100%;
-            padding: 10px 0;
-        }
-
-        .header-menu ul li a:hover {
-            background-color: #c41f1f;
-        }
-
-        .header-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .header-overlay.active {
-            display: block;
-        }
-
-        .header-hidden {
-            display: none;
-        }
-
-        .header-logo {
-            width: 120px;
-            height: 120px;
-        }
-
-        .header-title {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding-left: 20px; 
-                justify-content: flex-start; 
-            }
-
-            .header-logo {
-                width: 80px;
-                height: auto;
-            }
-
-            .header-title {
-                font-size: 18px;
-            }
-        }
-
-        .header-main {
-            padding-top: 150px;
-            height: auto;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1002;
-            text-align: center;
-            min-width: 300px;
-        }
-
-        .popup.active {
-            display: block;
-        }
-
-        .popup p {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .popup button {
-            background-color: #c41f1f;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .popup button:hover {
-            background-color: #a01818;
-        }
-    </style>
 </body>
 </html>
