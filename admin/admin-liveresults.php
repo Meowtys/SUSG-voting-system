@@ -117,6 +117,49 @@ ob_start();
             font-size: 32px;
             color: #D97706;
         }
+        .vote-counter {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 0.5rem 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-width: 100px;
+            text-align: center;
+        }
+        .position-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .position-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #f3f4f6;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+            transition: width 0.5s ease-out;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .candidate-card {
+            border-left: 4px solid #ef4444;
+            transition: all 0.3s ease;
+        }
+        .candidate-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -142,71 +185,72 @@ ob_start();
                 currentPositionElement.textContent = positionName;
 
                 if (!candidates || candidates.length === 0) {
-                    resultsContainer.innerHTML = '<div class="text-gray-600">No candidates found for this position</div>';
+                    resultsContainer.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-users-slash text-gray-400 text-5xl mb-4"></i>
+                            <p class="text-gray-600">No candidates found for this position</p>
+                        </div>`;
                     return;
                 }
 
+                const resultsGrid = document.createElement('div');
+                resultsGrid.className = 'results-grid';
+
                 candidates.forEach((candidate, index) => {
                     const resultElement = document.createElement("div");
-                    resultElement.className = "transform transition-all duration-300 hover:scale-105 bg-white rounded-xl shadow-md mb-4 p-6 border-l-4 border-red-600";
+                    resultElement.className = "candidate-card bg-white rounded-xl shadow-md p-6";
                     
                     const voteCount = parseInt(candidate.vote_count) || 0;
                     const percentage = candidate.percentage || 0;
+                    const isLeading = index === 0 && voteCount > 0;
 
-                    let candidateContent;
-                    if (candidate.candidate_name === 'Abstain') {
-                        candidateContent = `
-                            <div class="flex items-center justify-between">
+                    let candidateContent = `
+                        <div class="relative ${isLeading ? 'pb-4' : ''}">
+                            ${isLeading ? '<div class="absolute -top-3 -right-3 bg-yellow-400 text-white p-2 rounded-full shadow-lg"><i class="fas fa-crown"></i></div>' : ''}
+                            <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center space-x-4">
-                                    <div class="abstain-icon">
-                                        <i class="fas fa-ban"></i>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-bold text-yellow-800">Abstain</h3>
-                                        <p class="text-sm text-yellow-600">Abstain Vote</p>
-                                    </div>
-                                </div>
-                        `;
-                    } else {
-                        candidateContent = `
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-4">
-                                    <div class="relative">
+                                    ${candidate.candidate_name === 'Abstain' ? `
+                                        <div class="abstain-icon">
+                                            <i class="fas fa-ban"></i>
+                                        </div>
+                                    ` : `
                                         <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
                                              src="../${candidate.candidate_image}" 
                                              alt="${candidate.candidate_name}">
-                                        ${index === 0 && voteCount > 0 ? '<span class="absolute -top-2 -right-2 text-2xl">👑</span>' : ''}
-                                    </div>
+                                    `}
                                     <div>
-                                        <h3 class="text-lg font-bold text-gray-800">${candidate.candidate_name}</h3>
-                                        <div class="flex flex-col space-y-1">
-                                            <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
-                                                ${candidate.college_name}
-                                            </span>
-                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
-                                                ${candidate.party_name}
-                                            </span>
-                                        </div>
+                                        <h3 class="text-lg font-bold ${candidate.candidate_name === 'Abstain' ? 'text-yellow-800' : 'text-gray-800'}">${candidate.candidate_name}</h3>
+                                        ${candidate.candidate_name !== 'Abstain' ? `
+                                            <div class="flex flex-col space-y-1">
+                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
+                                                    ${candidate.college_name || 'N/A'}
+                                                </span>
+                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
+                                                    ${candidate.party_name || 'Independent'}
+                                                </span>
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 </div>
-                        `;
-                    }
-
-                    candidateContent += `
-                            <div class="text-right">
-                                <div class="text-2xl font-bold text-red-600">${voteCount}</div>
-                                <div class="text-sm text-gray-500">votes (${percentage}%)</div>
                             </div>
-                        </div>
-                        <div class="mt-4 w-full bg-gray-200 rounded-full h-2.5">
-                            <div class="bg-red-600 h-2.5 rounded-full transition-all duration-500" 
-                                 style="width: ${percentage}%"></div>
+                            <div class="vote-counter mb-3">
+                                <span class="text-2xl font-bold text-white">${voteCount}</span>
+                                <span class="text-sm text-white opacity-90">votes</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="text-right text-sm text-gray-500 mt-1">
+                                ${percentage}% of total votes
+                            </div>
                         </div>
                     `;
 
                     resultElement.innerHTML = candidateContent;
-                    resultsContainer.appendChild(resultElement);
+                    resultsGrid.appendChild(resultElement);
                 });
+
+                resultsContainer.appendChild(resultsGrid);
             }
 
             // Initialize with first position
@@ -354,20 +398,30 @@ ob_start();
 
             <!-- Results Section -->
             <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-                <h2 class="text-2xl font-bold mb-6 text-gray-800">Position Results</h2>
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                    <i class="fas fa-chart-bar text-red-600 mr-2"></i>
+                    Position Results
+                </h2>
                 
                 <!-- Position Buttons -->
                 <div class="flex flex-wrap gap-2 mb-8">
                     <?php foreach ($positions as $position): ?>
-                        <button class="position-button transition-all duration-300 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transform hover:scale-105"
+                        <button class="position-button transition-all duration-300 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transform hover:scale-105 flex items-center"
                                 data-position-id="<?php echo htmlspecialchars($position['position_id']); ?>">
+                            <i class="fas fa-user-tie mr-2"></i>
                             <?php echo htmlspecialchars($position['position_name']); ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
 
                 <!-- Current Position Display -->
-                <h3 class="current-position text-xl font-semibold text-red-600 mb-6"></h3>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="current-position text-xl font-semibold text-red-600"></h3>
+                    <div class="text-sm text-gray-500">
+                        Auto-refreshing every 30 seconds
+                        <i class="fas fa-sync-alt ml-2 animate-spin"></i>
+                    </div>
+                </div>
 
                 <!-- Results Container -->
                 <div class="results space-y-4">
