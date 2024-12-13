@@ -125,16 +125,52 @@ foreach ($candidates as $candidate) {
             min-width: 100px;
         }
         .position-card {
-            background: linear-gradient(135deg, #fff 0%, #fee2e2 100%);
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(145deg, #fff 0%, #fee2e2 100%);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 20px -3px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             width: 100%;
             height: calc(100vh - 280px);
             display: flex;
             flex-direction: column;
-            padding: 1rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            position: relative;
+            overflow: hidden;
         }
+
+        .position-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #ef4444, #991b1b);
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+
+        .position-card h2 {
+            position: relative;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .position-card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2), transparent);
+        }
+
         .candidates-container {
             overflow-y: auto;
             flex-grow: 1;
@@ -159,19 +195,37 @@ foreach ($candidates as $candidate) {
             background: #dc2626;
         }
         .candidate-card {
-            padding: 1rem;
-            border-radius: 1rem;
+            padding: 1.25rem;
+            border-radius: 1.25rem;
             background: rgba(255, 255, 255, 0.95);
             transition: all 0.3s ease;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             border: 1px solid rgba(239, 68, 68, 0.1);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .candidate-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ef4444, transparent);
+            border-radius: 0 1.25rem 1.25rem 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .candidate-card:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px -3px rgba(239, 68, 68, 0.1);
+            transform: translateY(-3px) translateX(-2px);
+            box-shadow: 8px 8px 20px -6px rgba(239, 68, 68, 0.15);
+        }
+
+        .candidate-card:hover::after {
+            opacity: 1;
         }
 
         .candidate-info {
@@ -189,28 +243,34 @@ foreach ($candidates as $candidate) {
         }
 
         .candidate-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 0.75rem;
+            width: 90px;
+            height: 90px;
+            border-radius: 1rem;
             object-fit: cover;
-            border: 2px solid #fecaca;
-            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+            border: 3px solid #fecaca;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .candidate-card:hover .candidate-image {
+            border-color: #ef4444;
+            transform: scale(1.05);
         }
 
         .crown-badge {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -6px;
+            right: -6px;
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            padding: 0.35rem;
+            padding: 0.5rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.3);
+            box-shadow: 0 4px 8px -2px rgba(251, 191, 36, 0.5);
             transform: rotate(15deg);
+            transition: all 0.3s ease;
         }
 
-        .crown-badge svg {
-            width: 1rem;
-            height: 1rem;
+        .candidate-card:hover .crown-badge {
+            transform: rotate(30deg) scale(1.1);
         }
 
         .candidate-details {
@@ -235,19 +295,20 @@ foreach ($candidates as $candidate) {
         }
 
         .meta-tag {
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.75rem;
-            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            gap: 0.5rem;
+            box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
 
-        .meta-tag svg {
-            width: 0.875rem;
-            height: 0.875rem;
+        .meta-tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.15);
         }
 
         .votes-section {
@@ -265,9 +326,15 @@ foreach ($candidates as $candidate) {
 
         .vote-counter {
             background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.25rem;
             border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .candidate-card:hover .vote-counter {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
         }
 
         .vote-counter span:first-child {
@@ -293,17 +360,42 @@ foreach ($candidates as $candidate) {
         }
 
         .progress-bar {
-            height: 6px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.7);
+            height: 8px;
+            border-radius: 6px;
+            background: #fee2e2;
             overflow: hidden;
-            margin-top: 0.25rem;
+            margin-top: 0.5rem;
         }
+
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ef4444 0%, #b91c1c 100%);
-            transition: width 0.6s ease;
+            background: linear-gradient(90deg, #ef4444, #991b1b);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 6px;
+            position: relative;
         }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         .election-header {
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
             border-radius: 1rem;
