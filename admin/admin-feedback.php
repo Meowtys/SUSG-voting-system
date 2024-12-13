@@ -25,6 +25,11 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute(['election_id' => $currentElection['election_id']]);
 $feedbacks = $stmt->fetchAll();
+
+require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
+$sentimentCache = new SentimentCache();
+$overallSentiment = $sentimentCache->get('overall_sentiment', $currentElection['election_id']);
+$sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -121,9 +126,6 @@ $feedbacks = $stmt->fetchAll();
                 $avgRating = count($ratings) > 0 ? array_sum($ratings) / count($ratings) : 0;
                 
                 // Read sentiment cache
-                require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
-                $sentimentCache = new SentimentCache();
-                $overallSentiment = $sentimentCache->get('overall_sentiment');
                 $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
 
                 ?>
