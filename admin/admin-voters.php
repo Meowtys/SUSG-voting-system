@@ -7,21 +7,41 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
-// Fetch students from the database
-$stmt = $pdo->query("
-    SELECT students.*, colleges.college_name 
-    FROM students 
-    LEFT JOIN colleges ON students.college_id = colleges.college_id
-");
+// Get current election
+$stmt = $pdo->query("SELECT election_id, election_name FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    die("Please set a current election first before managing voters.");
+}
+
+// Modify the query to include election_id filter
+$query = "
+    SELECT s.*, c.college_name 
+    FROM students s 
+    JOIN colleges c ON s.college_id = c.college_id 
+    WHERE s.election_id = :election_id
+    ORDER BY s.student_id
+";
+$stmt = $pdo->prepare($query);
+$stmt->execute(['election_id' => $currentElection['election_id']]);
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch colleges from the database, excluding "Abstain"
-$collegesStmt = $pdo->query("SELECT * FROM colleges WHERE college_name != 'Abstain'");
+// Get colleges for the dropdown
+$collegesQuery = "SELECT * FROM colleges WHERE college_id != 0 ORDER BY college_name";
+$collegesStmt = $pdo->query($collegesQuery);
 $colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Start output buffering
-ob_start();
+// Calculate statistics for current election
+$totalStudents = count($students);
+$votedStudents = array_reduce($students, function($carry, $student) {
+    return $carry + ($student['has_voted'] ? 1 : 0);
+}, 0);
+$notVotedStudents = $totalStudents - $votedStudents;
+$votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents) * 100, 2) : 0;
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,7 +60,32 @@ ob_start();
     <!-- Main Section -->
     <main class="ml-64 p-8">
         <div class="max-w-7xl mx-auto">
-            <h1 class="text-4xl font-bold mb-8 text-gray-800">Voters Management</h1>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">Manage Voters</h1>
+                <div class="text-sm text-gray-600">
+                    Current Election: <span class="font-semibold text-red-600"><?php echo htmlspecialchars($currentElection['election_name']); ?></span>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Total Voters</h3>
+                    <p class="text-2xl font-bold text-gray-800"><?php echo $totalStudents; ?></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Voted</h3>
+                    <p class="text-2xl font-bold text-green-600"><?php echo $votedStudents; ?></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Not Voted</h3>
+                    <p class="text-2xl font-bold text-red-600"><?php echo $notVotedStudents; ?></p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Voting Percentage</h3>
+                    <p class="text-2xl font-bold text-blue-600"><?php echo $votingPercentage; ?>%</p>
+                </div>
+            </div>
             
             <!-- Add margin-bottom to create space between button and table container -->
             <div class="mb-8 text-right">
