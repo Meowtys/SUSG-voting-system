@@ -207,16 +207,25 @@ ob_start();
                     <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700">Candidate Image</label>
-                            <div class="flex items-center justify-center w-full">
-                                <label class="w-full flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <span class="mt-2 text-sm text-gray-500">Click to upload image</span>
+                            <div class="flex flex-col items-center space-y-4">
+                                <!-- Image Preview -->
+                                <div class="w-32 h-32 relative rounded-lg overflow-hidden bg-gray-100">
+                                    <img id="imagePreview" class="w-full h-full object-cover hidden">
+                                    <div id="placeholderIcon" class="absolute inset-0 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upload Button -->
+                                <label class="w-full flex items-center justify-center px-4 py-2 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
+                                    <span class="text-sm text-gray-500">Choose image</span>
                                     <input type="file" id="candidateImage" name="candidateImage" accept="image/*" required class="hidden">
                                 </label>
+                                <p class="text-xs text-gray-500">JPG, JPEG, PNG only</p>
                             </div>
-                            <p class="text-xs text-gray-500 text-center mt-2">JPG, JPEG, PNG only</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -321,16 +330,25 @@ ob_start();
                     <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700">Candidate Image</label>
-                            <div class="flex items-center justify-center w-full">
-                                <label class="w-full flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                    </svg>
-                                    <span class="mt-2 text-sm text-gray-500">Click to upload image</span>
+                            <div class="flex flex-col items-center space-y-4">
+                                <!-- Image Preview -->
+                                <div class="w-32 h-32 relative rounded-lg overflow-hidden bg-gray-100">
+                                    <img id="editImagePreview" class="w-full h-full object-cover hidden">
+                                    <div id="editPlaceholderIcon" class="absolute inset-0 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Upload Button -->
+                                <label class="w-full flex items-center justify-center px-4 py-2 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:border-red-500 transition-all">
+                                    <span class="text-sm text-gray-500">Choose image</span>
                                     <input type="file" id="editCandidateImage" name="candidateImage" accept="image/*" class="hidden">
                                 </label>
+                                <p class="text-xs text-gray-500">JPG, JPEG, PNG only</p>
                             </div>
-                            <p class="text-xs text-gray-500 text-center mt-2">JPG, JPEG, PNG only</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -388,6 +406,18 @@ ob_start();
         .modal input:focus, .modal select:focus {
             outline: none;
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+
+        .image-preview-container {
+            transition: all 0.3s ease;
+        }
+
+        .image-preview-container:hover {
+            transform: scale(1.05);
+        }
+
+        #imagePreview, #editImagePreview {
+            transition: all 0.3s ease;
         }
     </style>
 
@@ -471,6 +501,35 @@ ob_start();
                     .catch(error => console.error('Error:', error));
                 }
             });
+        });
+
+        // Image preview functionality
+        function setupImagePreview(inputId, previewId, placeholderId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            const placeholder = document.getElementById(placeholderId);
+
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.classList.add('hidden');
+                    placeholder.classList.remove('hidden');
+                }
+            });
+        }
+
+        // Initialize image preview for both modals
+        document.addEventListener('DOMContentLoaded', function() {
+            setupImagePreview('candidateImage', 'imagePreview', 'placeholderIcon');
+            setupImagePreview('editCandidateImage', 'editImagePreview', 'editPlaceholderIcon');
         });
     </script>
 </body>
