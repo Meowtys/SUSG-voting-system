@@ -1,15 +1,15 @@
-
 <?php
 require_once '../connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $candidateId = $_POST['candidateId'];
     $candidateName = $_POST['candidateName'];
-    $partyName = $_POST['partyName'];
+    $partyId = $_POST['partyId'];      // Changed from partyName
     $position = $_POST['position'];
     $college = $_POST['college'];
     $qualified = $_POST['qualified'];
     $remarks = $_POST['remarks'];
+    $electionId = $_POST['election_id']; // Add election_id
     $candidateImage = null;
 
     // Handle file upload
@@ -38,10 +38,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update candidate in the database
     $stmt = $pdo->prepare("
         UPDATE candidates 
-        SET candidate_name = ?, candidate_party = ?, position_id = ?, college_id = ?, qualified = ?, remarks = ?, candidate_image = COALESCE(?, candidate_image)
+        SET candidate_name = ?, 
+            party_id = ?,           -- Changed from candidate_party
+            position_id = ?, 
+            college_id = ?, 
+            qualified = ?, 
+            remarks = ?, 
+            candidate_image = COALESCE(?, candidate_image),
+            election_id = ?         -- Added election_id
         WHERE candidate_id = ?
     ");
-    if ($stmt->execute([$candidateName, $partyName, $position, $college, $qualified, $remarks, $candidateImage, $candidateId])) {
+    if ($stmt->execute([
+        $candidateName, 
+        $partyId,              // Use party_id instead of party_name
+        $position, 
+        $college, 
+        $qualified, 
+        $remarks, 
+        $candidateImage,
+        $electionId,           // Add election_id value
+        $candidateId
+    ])) {
         // Redirect back to the candidates page
         header('Location: admin-candidates.php');
         exit();

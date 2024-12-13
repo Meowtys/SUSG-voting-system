@@ -7,22 +7,37 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
-// Fetch candidates from the database
-$stmt = $pdo->query("
-    SELECT candidates.*, colleges.college_name, positions.position_name 
-    FROM candidates 
-    LEFT JOIN colleges ON candidates.college_id = colleges.college_id 
-    LEFT JOIN positions ON candidates.position_id = positions.position_id
+// Get current election
+$stmt = $pdo->query("SELECT election_id, election_name FROM elections WHERE is_current = 1 LIMIT 1");
+$currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$currentElection) {
+    die("Please set a current election first before managing candidates.");
+}
+
+// Fetch candidates with party names
+$stmt = $pdo->prepare("
+    SELECT c.*, co.college_name, p.position_name, pa.party_name 
+    FROM candidates c 
+    LEFT JOIN colleges co ON c.college_id = co.college_id 
+    LEFT JOIN positions p ON c.position_id = p.position_id
+    LEFT JOIN parties pa ON c.party_id = pa.party_id
+    WHERE c.election_id = :election_id
 ");
+$stmt->execute(['election_id' => $currentElection['election_id']]);
 $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch positions from the database
+// Fetch positions
 $positionsStmt = $pdo->query("SELECT * FROM positions");
 $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch colleges from the database, excluding "Abstain"
+// Fetch colleges, excluding "Abstain"
 $collegesStmt = $pdo->query("SELECT * FROM colleges WHERE college_name != 'Abstain'");
 $colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch parties
+$partiesStmt = $pdo->query("SELECT * FROM parties ORDER BY party_name");
+$parties = $partiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Start output buffering
 ob_start();
@@ -71,7 +86,7 @@ ob_start();
                         <?php foreach ($candidates as $candidate): ?>
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($candidate['candidate_name']); ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['candidate_party']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['party_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['position_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['college_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -108,6 +123,9 @@ ob_start();
                 <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
             </div>
             <form class="space-y-4" id="newCandidateForm" method="POST" action="create_candidate.php" enctype="multipart/form-data">
+                <!-- Add hidden input for election_id -->
+                <input type="hidden" name="election_id" value="<?php echo $currentElection['election_id']; ?>">
+                
                 <div>
                     <label for="candidateName" class="block text-sm font-medium text-gray-700">Candidate Name:</label>
                     <input type="text" id="candidateName" name="candidateName" required
@@ -115,9 +133,16 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="partyName" class="block text-sm font-medium text-gray-700">Party Name:</label>
-                    <input type="text" id="partyName" name="partyName" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                    <label for="partyId" class="block text-sm font-medium text-gray-700">Party:</label>
+                    <select id="partyId" name="partyId" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="">Select Party</option>
+                        <?php foreach ($parties as $party): ?>
+                            <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
+                                <?php echo htmlspecialchars($party['party_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -189,6 +214,8 @@ ob_start();
             </div>
             <form class="space-y-4" id="editCandidateForm" method="POST" action="edit_candidate.php" enctype="multipart/form-data">
                 <input type="hidden" id="editCandidateId" name="candidateId">
+                <input type="hidden" name="election_id" value="<?php echo $currentElection['election_id']; ?>">
+                
                 <div>
                     <label for="editCandidateName" class="block text-sm font-medium text-gray-700">Candidate Name:</label>
                     <input type="text" id="editCandidateName" name="candidateName" required
@@ -196,9 +223,16 @@ ob_start();
                 </div>
 
                 <div>
-                    <label for="editPartyName" class="block text-sm font-medium text-gray-700">Party Name:</label>
-                    <input type="text" id="editPartyName" name="partyName" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                    <label for="editPartyId" class="block text-sm font-medium text-gray-700">Party:</label>
+                    <select id="editPartyId" name="partyId" required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <option value="">Select Party</option>
+                        <?php foreach ($parties as $party): ?>
+                            <option value="<?php echo htmlspecialchars($party['party_id']); ?>">
+                                <?php echo htmlspecialchars($party['party_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -309,7 +343,7 @@ ob_start();
                 const candidate = JSON.parse(this.getAttribute('data-candidate'));
                 document.getElementById('editCandidateId').value = candidate.candidate_id;
                 document.getElementById('editCandidateName').value = candidate.candidate_name;
-                document.getElementById('editPartyName').value = candidate.candidate_party;
+                document.getElementById('editPartyId').value = candidate.party_id;
                 document.getElementById('editPosition').value = candidate.position_id;
                 document.getElementById('editCollege').value = candidate.college_id;
                 document.getElementById('editQualified').value = candidate.qualified;

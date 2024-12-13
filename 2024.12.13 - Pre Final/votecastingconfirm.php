@@ -36,6 +36,21 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         * {
             font-family: 'Poppins', sans-serif;
         }
+        .abstain-icon {
+            background: #FEF3C7;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .abstain-icon i {
+            font-size: 32px;
+            color: #D97706;
+        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -73,8 +88,8 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
                                     <!-- Abstain Card -->
                                     <div class="flex items-center bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                                        <div class="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-ban text-yellow-600 text-xl"></i>
+                                        <div class="abstain-icon">
+                                            <i class="fas fa-ban"></i>
                                         </div>
                                         <div class="ml-4">
                                             <h4 class="text-lg font-medium text-yellow-800">Abstain</h4>
@@ -161,46 +176,47 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         function submitVotes() {
             if (confirm("Are you sure you want to submit your final votes? This action cannot be undone.")) {
-                // Disable both buttons immediately to prevent further interaction
                 const submitButton = document.querySelector('button:last-child');
                 const returnButton = document.querySelector('button:first-child');
                 submitButton.disabled = true;
                 returnButton.disabled = true;
                 
-                // Add visual feedback that buttons are disabled
-                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
-                returnButton.classList.add('opacity-50', 'cursor-not-allowed');
-                
                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
+                // Get the votes directly from the session
+                const votes = <?php echo json_encode($_SESSION['selectedVotes'] ?? []); ?>;
+
+                // Log the data being sent (for debugging)
+                console.log('Submitting votes:', votes);
 
                 fetch("submit_votes.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(<?php echo json_encode($selectedVotes); ?>)
+                    body: JSON.stringify(votes)
                 })
-                .then(response => response.json())
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('Server response:', text);
+                        throw new Error('Invalid JSON response from server');
+                    }
+                })
                 .then(data => {
                     if (data.success) {
                         showSuccessAndRedirect();
                     } else {
-                        // Only re-enable buttons if submission fails
-                        alert("Failed to submit votes. Please try again.");
-                        submitButton.disabled = false;
-                        returnButton.disabled = false;
-                        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                        returnButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                        submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Final Vote';
+                        throw new Error(data.message || "Failed to submit votes");
                     }
                 })
                 .catch(error => {
-                    // Handle any errors and re-enable buttons
-                    alert("An error occurred: " + error.message);
+                    console.error("Error:", error);
+                    alert("Error submitting votes: " + error.message);
                     submitButton.disabled = false;
                     returnButton.disabled = false;
-                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-                    returnButton.classList.remove('opacity-50', 'cursor-not-allowed');
                     submitButton.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Submit Final Vote';
                 });
             }

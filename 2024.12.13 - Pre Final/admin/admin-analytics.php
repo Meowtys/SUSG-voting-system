@@ -9,12 +9,21 @@ require_once '../connect.php';
 require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
 
 try {
-    // Fetch ALL feedbacks with no limit
+    // Get current election ID first
+    $stmt = $pdo->query("SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1");
+    $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$currentElection) {
+        die("Please set a current election first before viewing analytics.");
+    }
+
+    // Fetch feedbacks for current election only
     $stmt = $pdo->prepare("SELECT f.*, s.student_name 
                           FROM feedbacks f 
                           JOIN students s ON f.student_id = s.student_id 
+                          WHERE f.election_id = :election_id
                           ORDER BY f.feedback_timestamp DESC");
-    $stmt->execute();
+    $stmt->execute(['election_id' => $currentElection['election_id']]);
     
     if ($stmt->rowCount() === 0) {
         $feedbacks = [];
@@ -37,9 +46,9 @@ $sentimentCache = new SentimentCache();
 
 // Process feedbacks with cache information
 try {
-    $feedbacksWithCache = array_map(function($feedback) use ($sentimentCache) {
+    $feedbacksWithCache = array_map(function($feedback) use ($sentimentCache, $currentElection) {
         $cacheKey = md5($feedback['suggestion']); // Create unique key for each feedback
-        $cachedSentiment = $sentimentCache->get($cacheKey);
+        $cachedSentiment = $sentimentCache->get($cacheKey, $currentElection['election_id']);
         return array_merge($feedback, [
             'cache_key' => $cacheKey,
             'cached_sentiment' => $cachedSentiment
@@ -168,22 +177,26 @@ try {
                 const feedbacks = <?= $feedbacksJSON ?>;
                 console.log('Raw feedbacks data:', feedbacks);
                 
-                // Debug check for data
-                if (feedbacks && feedbacks.length > 0) {
-                    console.table(feedbacks); // Shows data in table format in console
-                }
-
                 // Add loading indicator
                 const mainContent = document.querySelector('.analytics-container');
-                mainContent.innerHTML = '<div class="text-center p-4">Loading analytics...</div>' + mainContent.innerHTML;
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'text-center p-4 loading-indicator';
+                loadingDiv.innerHTML = 'Loading analytics...';
+                mainContent.insertBefore(loadingDiv, mainContent.firstChild);
 
-                if (!feedbacks || feedbacks.length === 0) {
-                    mainContent.innerHTML = `
+                // Debug check for data
+                if (feedbacks && feedbacks.length > 0) {
+                    console.table(feedbacks);
+                } else {
+                    // Remove loading indicator before showing no data message
+                    document.querySelector('.loading-indicator')?.remove();
+                    
+                    mainContent.insertAdjacentHTML('afterbegin', `
                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
                             <p class="font-bold">No Feedback Data</p>
                             <p>There are currently no feedbacks in the database.</p>
                         </div>
-                    ` + mainContent.innerHTML;
+                    `);
                     return;
                 }
 
@@ -739,8 +752,8 @@ try {
                     setTimeout(() => showComments('Positive'), 100);
                 }
 
-                // Remove loading indicator
-                mainContent.querySelector('.text-center')?.remove();
+                // Remove loading indicator at the end of processing
+                document.querySelector('.loading-indicator')?.remove();
 
                 // Add mismatch chart after other charts
                 const mismatchCtx = document.getElementById('mismatchChart').getContext('2d');
@@ -818,6 +831,9 @@ try {
                 }
 
             } catch (error) {
+                // Remove loading indicator before showing error
+                document.querySelector('.loading-indicator')?.remove();
+                
                 console.error("Error:", error);
                 console.error('Detailed error:', error);
                 console.error('Stack trace:', error.stack);

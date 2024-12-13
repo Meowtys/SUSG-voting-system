@@ -18,22 +18,24 @@ class SentimentCache {
         }
     }
 
-    public function get($key) {
+    public function get($key, $electionId) {
         if (!file_exists($this->cacheFile)) {
             return null;
         }
         
+        $cacheKey = $this->generateKey($key, $electionId);
         $cache = json_decode(file_get_contents($this->cacheFile), true);
-        return isset($cache[$key]) ? $cache[$key] : null;
+        return isset($cache[$cacheKey]) ? $cache[$cacheKey] : null;
     }
 
-    public function set($key, $value) {
+    public function set($key, $value, $electionId) {
         $cache = [];
         if (file_exists($this->cacheFile)) {
             $cache = json_decode(file_get_contents($this->cacheFile), true);
         }
         
-        $cache[$key] = $value;
+        $cacheKey = $this->generateKey($key, $electionId);
+        $cache[$cacheKey] = $value;
         file_put_contents($this->cacheFile, json_encode($cache), LOCK_EX);
     }
 
@@ -41,5 +43,21 @@ class SentimentCache {
         if (file_exists($this->cacheFile)) {
             unlink($this->cacheFile);
         }
+    }
+
+    public function clearElection($electionId) {
+        if (file_exists($this->cacheFile)) {
+            $cache = json_decode(file_get_contents($this->cacheFile), true);
+            foreach (array_keys($cache) as $key) {
+                if (strpos($key, "election_{$electionId}_") === 0) {
+                    unset($cache[$key]);
+                }
+            }
+            file_put_contents($this->cacheFile, json_encode($cache), LOCK_EX);
+        }
+    }
+
+    private function generateKey($key, $electionId) {
+        return "election_{$electionId}_{$key}";
     }
 }

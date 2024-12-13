@@ -10,6 +10,22 @@ if (isset($_SESSION['user'])) {
     $user = null;
 }
 
+// Get current election
+try {
+    require_once '../connect.php';
+    $stmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+    $stmt->execute();
+    $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // If no current election exists, get the most recent one
+    if (!$currentElection) {
+        $stmt = $pdo->query("SELECT * FROM elections ORDER BY created_at DESC LIMIT 1");
+        $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+} catch (PDOException $e) {
+    $currentElection = null;
+}
+
 // Determine the current page for dynamic highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
@@ -34,6 +50,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="space-y-8">
             <div class="space-y-6">
                 <h2 class="text-xl font-bold tracking-wider">SUSG COMELEC</h2>
+                
+                <!-- Current Election Status -->
+                <div class="bg-red-800 rounded-lg p-4">
+                    <p class="text-sm text-red-300 uppercase tracking-wider mb-2">Current Election</p>
+                    <?php if ($currentElection): ?>
+                        <p class="font-semibold text-white truncate mb-2"><?php echo htmlspecialchars($currentElection['election_name']); ?></p>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            <?php echo strtolower($currentElection['status']) === 'ongoing' 
+                                ? 'bg-green-100 text-green-800' 
+                                : (strtolower($currentElection['status']) === 'scheduled' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-gray-100 text-gray-800'); ?>">
+                            <?php echo htmlspecialchars($currentElection['status']); ?>
+                        </span>
+                    <?php else: ?>
+                        <p class="text-red-300 italic">No active election</p>
+                    <?php endif; ?>
+                </div>
+
                 <nav class="space-y-2">
                     <a href="admin-home.php" 
                        class="flex items-center px-4 py-3 rounded-lg transition-colors duration-200 <?php echo $current_page == 'admin-home.php' ? 'bg-white text-red-700' : 'hover:bg-red-600'; ?>">
