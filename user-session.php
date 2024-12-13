@@ -97,13 +97,29 @@ if (isset($_POST['signin'])) {
         exit();
     }
 
+    // First, get the current election
+    $election_stmt = $pdo->prepare("SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1");
+    $election_stmt->execute();
+    $current_election = $election_stmt->fetch();
+
+    if (!$current_election) {
+        $errors['login'] = 'No active election found';
+        $_SESSION['errors'] = $errors;
+        header('Location: loginasvoter.php');
+        exit();
+    }
+
+    // Modified query to include election verification
     $stmt = $pdo->prepare("
         SELECT students.*, colleges.college_name 
         FROM students 
         LEFT JOIN colleges ON students.college_id = colleges.college_id 
-        WHERE student_id = :student_id
+        WHERE student_id = :student_id AND election_id = :election_id
     ");
-    $stmt->execute(['student_id' => $student_id]);
+    $stmt->execute([
+        'student_id' => $student_id,
+        'election_id' => $current_election['election_id']
+    ]);
     $user = $stmt->fetch();
 
     // Debugging: Log the fetched user data
@@ -120,6 +136,7 @@ if (isset($_POST['signin'])) {
             'student_name' => $user['student_name'],
             'college_name' => $user['college_name'],
             'has_voted' => $user['has_voted'],
+            'election_id' => $user['election_id']  // Add election_id to session
         ];
 
         header('Location: homepage.php');
