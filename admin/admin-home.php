@@ -714,57 +714,107 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
         </div>
     </main>
 
-    <!-- Update modal styles -->
+    <!-- Update both modal structures -->
     <div id="newElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-red-700">Schedule New Election</h3>
-                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-4xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white">Schedule New Election</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
             </div>
-            <form method="POST" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Election Name/Title</label>
-                    <input type="text" name="election_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+            <!-- Form Section -->
+            <form method="POST" class="space-y-6 pt-20">
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Election Name/Title</label>
+                            <input type="text" name="election_name" required 
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-gray-700">Start Date and Time</label>
+                                <input type="datetime-local" name="start_datetime" required 
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-gray-700">End Date and Time</label>
+                                <input type="datetime-local" name="end_datetime" required 
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Start Date and Time</label>
-                    <input type="datetime-local" name="start_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                <!-- Submit Button Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" 
+                            class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Save Election
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">End Date and Time</label>
-                    <input type="datetime-local" name="end_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Save Election
-                </button>
             </form>
         </div>
     </div>
 
-    <!-- Edit Election Modal -->
+    <!-- Edit Election Modal with matching design -->
     <div id="editElectionModal" class="modal hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Edit Election</h3>
-                <span class="close cursor-pointer text-gray-600 text-2xl">&times;</span>
+        <div class="relative top-10 mx-auto p-8 border w-full max-w-4xl shadow-2xl rounded-2xl bg-white transform transition-all">
+            <!-- Header Section -->
+            <div class="absolute top-0 left-0 right-0 h-16 bg-gradient-to-r from-red-600 to-red-800 rounded-t-2xl">
+                <div class="flex justify-between items-center h-full px-8">
+                    <h3 class="text-2xl font-bold text-white">Edit Election</h3>
+                    <span class="close cursor-pointer text-white text-3xl hover:text-gray-200 transition-colors">&times;</span>
+                </div>
             </div>
-            <form method="POST" class="space-y-4">
+
+            <!-- Form Section -->
+            <form method="POST" class="space-y-6 pt-20">
                 <input type="hidden" id="edit_election_id" name="election_id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Election Name/Title</label>
-                    <input type="text" id="edit_election_name" name="election_name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">Election Name/Title</label>
+                            <input type="text" id="edit_election_name" name="election_name" required 
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
+                        <div class="space-y-4">
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-gray-700">Start Date and Time</label>
+                                <input type="datetime-local" id="edit_start_datetime" name="start_datetime" required 
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-sm font-semibold text-gray-700">End Date and Time</label>
+                                <input type="datetime-local" id="edit_end_datetime" name="end_datetime" required 
+                                       class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Start Date and Time</label>
-                    <input type="datetime-local" id="edit_start_datetime" name="start_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                <!-- Submit Button Section -->
+                <div class="pt-6 border-t border-gray-200">
+                    <button type="submit" name="edit_election"
+                            class="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-bold py-3 px-8 rounded-xl hover:from-red-700 hover:to-red-900 transform hover:-translate-y-0.5 transition-all duration-200">
+                        Save Changes
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">End Date and Time</label>
-                    <input type="datetime-local" id="edit_end_datetime" name="end_datetime" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <button type="submit" name="edit_election" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Save Changes
-                </button>
             </form>
         </div>
     </div>
@@ -781,6 +831,33 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
         <input type="hidden" id="set_current_election_id" name="election_id">
         <button type="submit" name="set_current_election">Set Current Election</button>
     </form>
+
+    <!-- Add these styles -->
+    <style>
+        .modal-content {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-10%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+
+        .modal input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        }
+    </style>
     
 </body>
 </html>
