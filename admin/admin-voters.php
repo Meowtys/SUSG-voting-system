@@ -52,6 +52,16 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="../script/adminload.js" type="module" defer></script>
+    <style>
+        /* Add this to your existing styles */
+        .blur-text {
+            filter: blur(4px);
+            transition: filter 0.2s ease;
+        }
+        .blur-text:hover {
+            filter: blur(0);
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Include Sidebar -->
@@ -115,7 +125,9 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($student['student_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($student['college_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <?php echo htmlspecialchars($student['password']); ?>
+                                <span class="blur-text cursor-pointer inline-block px-2 py-1 bg-gray-100 rounded">
+                                    <?php echo htmlspecialchars($student['password']); ?>
+                                </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <?php echo $student['has_voted'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
