@@ -50,6 +50,37 @@ function fetchCandidates($pdo, $position_id) {
 // Fetch positions from the database
 $positions_stmt = $pdo->query("SELECT * FROM positions");
 $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get student's college and max representatives allowed
+$collegeStmt = $pdo->prepare("
+    SELECT c.college_id, c.max_representatives 
+    FROM colleges c 
+    JOIN students s ON c.college_id = s.college_id 
+    WHERE s.student_id = ?
+");
+$collegeStmt->execute([$_SESSION['user']['student_id']]);
+$collegeInfo = $collegeStmt->fetch(PDO::FETCH_ASSOC);
+
+// Modify the candidates query to filter representatives by college
+$candidatesStmt = $pdo->prepare("
+    SELECT c.*, col.college_name, p.party_name, pos.position_name 
+    FROM candidates c
+    JOIN colleges col ON c.college_id = col.college_id
+    LEFT JOIN parties p ON c.party_id = p.party_id
+    JOIN positions pos ON c.position_id = pos.position_id
+    WHERE c.election_id = ? AND c.qualified = 1
+    AND (pos.position_name != 'Representative' OR 
+        (pos.position_name = 'Representative' AND c.college_id = ?))
+    ORDER BY pos.position_id, c.candidate_name
+");
+$candidatesStmt->execute([$election['election_id'], $collegeInfo['college_id']]);
+$candidates = $candidatesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Group candidates by position
+$candidatesByPosition = [];
+foreach ($candidates as $candidate) {
+    $candidatesByPosition[$candidate['position_name']][] = $candidate;
+}
 ?>
 
 <!DOCTYPE html>
@@ -133,6 +164,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script>
         const positions = <?php echo json_encode($positions); ?>;
+        const maxRepresentatives = <?php echo $collegeInfo['max_representatives']; ?>;
         let currentPositionIndex = 0;
         const selectedVotes = {};
 
@@ -145,9 +177,34 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 });
         }
 
+        // Modify the displayPosition function to handle multiple selections for representatives
         function displayPosition() {
             const position = positions[currentPositionIndex];
             document.getElementById("mainTitle").textContent = position.position_name;
+
+            // Add max representatives indicator for Representative position
+            const titleContainer = document.getElementById("mainTitle").parentElement;
+            const existingIndicator = document.querySelector('.max-reps-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+
+            if (position.position_name === 'Representative') {
+                const indicator = document.createElement('div');
+                indicator.className = 'max-reps-indicator mt-2 text-gray-600';
+                const selectedCount = selectedVotes['Representative']?.length || 0;
+                indicator.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span>Select up to ${maxRepresentatives} representatives</span>
+                        <span class="font-semibold text-red-600">${selectedCount}/${maxRepresentatives} selected</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div class="bg-red-600 h-2 rounded-full transition-all duration-300" 
+                             style="width: ${(selectedCount / maxRepresentatives) * 100}%"></div>
+                    </div>
+                `;
+                titleContainer.appendChild(indicator);
+            }
 
             fetchCandidates(position.position_id).then(candidates => {
                 const candidatesContainer = document.getElementById("candidatesContainer");
@@ -204,7 +261,39 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     `;
 
-                    candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
+                    // Modify the selection handling for representatives
+                    if (position.position_name === 'Representative') {
+                        candidateCard.addEventListener("click", () => {
+                            const currentSelections = selectedVotes['Representative'] || [];
+                            const isSelected = candidateCard.querySelector('.selected-overlay').classList.contains('hidden');
+                            
+                            if (isSelected && currentSelections.length >= maxRepresentatives) {
+                                alert(`You can only select up to ${maxRepresentatives} representatives.`);
+                                return;
+                            }
+
+                            const overlay = candidateCard.querySelector('.selected-overlay');
+                            if (isSelected) {
+                                // Add selection
+                                overlay.classList.remove('hidden');
+                                candidateCard.classList.add('ring-4', 'ring-red-600', 'ring-opacity-50');
+                                selectedVotes['Representative'] = [...currentSelections, candidate];
+                            } else {
+                                // Remove selection
+                                overlay.classList.add('hidden');
+                                candidateCard.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
+                                selectedVotes['Representative'] = currentSelections.filter(c => c.candidate_id !== candidate.candidate_id);
+                            }
+                            
+                            // Update the indicator
+                            const indicator = document.querySelector('.max-reps-indicator');
+                            const selectedCount = selectedVotes['Representative'].length;
+                            indicator.querySelector('span:last-child').textContent = `${selectedCount}/${maxRepresentatives} selected`;
+                            indicator.querySelector('.bg-red-600').style.width = `${(selectedCount / maxRepresentatives) * 100}%`;
+                        });
+                    } else {
+                        candidateCard.addEventListener("click", () => selectCandidate(candidateCard, candidate, position.position_name));
+                    }
                     candidatesContainer.appendChild(candidateCard);
 
                     // Show selection if previously selected
@@ -221,39 +310,55 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
         function selectCandidate(candidateCard, candidate, positionName) {
             const candidatesContainer = document.getElementById("candidatesContainer");
             const allCards = candidatesContainer.querySelectorAll('.candidate-card');
+            const overlay = candidateCard.querySelector('.selected-overlay');
             
-            // Remove selection from all cards
+            // Check if this candidate is already selected
+            const isSelected = !overlay.classList.contains('hidden');
+            
+            // Remove selection from all cards first
             allCards.forEach(card => {
                 card.querySelector('.selected-overlay').classList.add('hidden');
+                card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
             });
 
-            // Add selection to clicked card
-            const overlay = candidateCard.querySelector('.selected-overlay');
-            overlay.classList.remove('hidden');
+            if (!isSelected) {
+                // Select the new candidate if it wasn't previously selected
+                overlay.classList.remove('hidden');
+                candidateCard.classList.add('ring-4', 'ring-red-600', 'ring-opacity-50');
+                selectedVotes[positionName] = candidate;
+            } else {
+                // If it was already selected, deselect it
+                selectedVotes[positionName] = null;
+            }
             
-            selectedVotes[positionName] = candidate;
             updateSelectionState();
         }
 
+        // Modify the abstainVote function to handle representatives
         function abstainVote() {
             const position = positions[currentPositionIndex].position_name;
             const candidatesContainer = document.getElementById("candidatesContainer");
             const allCards = candidatesContainer.querySelectorAll('.candidate-card');
             
-            // Remove selection from all cards
             allCards.forEach(card => {
                 card.querySelector('.selected-overlay').classList.add('hidden');
                 card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
             });
             
-            // Create abstain object with custom display properties
-            selectedVotes[position] = { 
-                candidate_id: 0,
-                candidate_name: 'Abstain',
-                college_name: 'Abstain',
-                candidate_image: 'abstain-icon' // This will be handled specially in the confirmation page
-            };
-            goNext();
+            if (position === 'Representative') {
+                if (confirm('Are you sure you want to abstain from voting for any representatives?')) {
+                    selectedVotes[position] = [];
+                    goNext();
+                }
+            } else {
+                selectedVotes[position] = { 
+                    candidate_id: 0,
+                    candidate_name: 'Abstain',
+                    college_name: 'Abstain',
+                    candidate_image: 'abstain-icon'
+                };
+                goNext();
+            }
         }
 
         function updateSelectionState() {
@@ -271,10 +376,18 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
 
+        // Modify the goNext function to enforce vote selection
         function goNext() {
             const position = positions[currentPositionIndex].position_name;
-            if (!selectedVotes[position]) {
-                alert("Please select a candidate or choose to abstain before proceeding.");
+            
+            if (position === 'Representative') {
+                const selectedReps = selectedVotes[position]?.length || 0;
+                if (selectedReps === 0) {
+                    alert('Please select at least one representative or click Abstain to proceed.');
+                    return;
+                }
+            } else if (!selectedVotes[position]) {
+                alert("Please select a candidate to proceed.");
                 return;
             }
 
@@ -282,7 +395,20 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 currentPositionIndex++;
                 displayPosition();
             } else {
-                // Add election_id to the selected votes
+                // Check if all positions have votes
+                const hasAllVotes = positions.every(pos => {
+                    if (pos.position_name === 'Representative') {
+                        return selectedVotes[pos.position_name]?.length >= 0;
+                    }
+                    return selectedVotes[pos.position_name] !== undefined && selectedVotes[pos.position_name] !== null;
+                });
+
+                if (!hasAllVotes) {
+                    alert("Please ensure you have selected a candidate or abstained for all positions.");
+                    return;
+                }
+
+                // Proceed with vote submission
                 fetch("store_votes.php", {
                     method: "POST",
                     headers: {
@@ -353,32 +479,47 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
             console.log("Summary displayed:", summaryList.innerHTML); // Debugging log
         }
 
+        // Modify submitVotes function to add final validation
         function submitVotes() {
-        if (confirm("Are you sure you want to submit your votes? Once submitted, you will not be able to change them.")) {
-            fetch("submit_votes.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(selectedVotes)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Votes submitted successfully!");
-                    window.location.href = "homepage.php";
-                } else {
-                    alert("Failed to submit votes. Please try again. Error: " + data.message);
+            // Check if all positions have votes
+            const hasAllVotes = positions.every(pos => {
+                if (pos.position_name === 'Representative') {
+                    return selectedVotes[pos.position_name]?.length >= 0;
                 }
-            })
-            .catch(error => {
-                alert("An error occurred: " + error.message);
+                return selectedVotes[pos.position_name] !== undefined && selectedVotes[pos.position_name] !== null;
             });
-        } else {
-            // User canceled the confirmation
-            alert("Submission canceled. You can review or change your votes.");
+
+            if (!hasAllVotes) {
+                alert("Please ensure you have selected a candidate or abstained for all positions before submitting.");
+                return;
+            }
+
+            if (confirm("Are you sure you want to submit your final votes? This action cannot be undone.")) {
+                fetch("submit_votes.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(selectedVotes)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Votes submitted successfully!");
+                        window.location.href = "homepage.php";
+                    } else {
+                        alert("Failed to submit votes. Please try again. Error: " + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert("An error occurred: " + error.message);
+                });
+            } else {
+                // User canceled the confirmation
+                alert("Submission canceled. You can review or change your votes.");
+            }
         }
-        }
+
         // Initialize the first position display
         displayPosition();
     </script>    
