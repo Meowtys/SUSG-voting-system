@@ -20,6 +20,24 @@ if (!$currentElection) {
     die("No active election found.");
 }
 
+// Add election status check
+$now = new DateTime();
+$startDate = new DateTime($currentElection['start_datetime']);
+$endDate = new DateTime($currentElection['end_datetime']);
+
+$electionStatus = '';
+$statusClass = '';
+if ($now < $startDate) {
+    $electionStatus = 'Not Started';
+    $statusClass = 'bg-yellow-500';
+} elseif ($now > $endDate) {
+    $electionStatus = 'Ended';
+    $statusClass = 'bg-gray-500';
+} else {
+    $electionStatus = 'Ongoing';
+    $statusClass = 'bg-green-500';
+}
+
 // Get student's college
 $collegeStmt = $pdo->prepare("
     SELECT c.college_id, c.college_name 
@@ -292,6 +310,7 @@ foreach ($candidates as $candidate) {
             padding: 1.25rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+            position: relative;
         }
 
         .election-header h1 {
@@ -319,6 +338,57 @@ foreach ($candidates as $candidate) {
             50% { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
+
+        .live-indicator {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: white;
+            margin-top: 0.5rem;
+        }
+
+        .status-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .datetime-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-red-50">
@@ -328,20 +398,43 @@ foreach ($candidates as $candidate) {
         <div class="max-w-8xl mx-auto">
             <!-- Election Info -->
             <div class="election-header">
-                <h1 class="text-3xl font-bold text-white mb-4">Live Election Results</h1>
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <h2 class="text-xl font-bold text-red-100 mb-2">
-                        <?php echo htmlspecialchars($currentElection['election_name']); ?>
-                    </h2>
-                    <div class="text-red-100 font-medium text-sm">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <?php echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A'); ?>
-                            to
-                            <?php echo (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); ?>
+                <span class="live-indicator">
+                    <span class="live-dot"></span>
+                    <span class="text-sm font-medium text-white">LIVE</span>
+                </span>
+                
+                <div class="flex flex-col">
+                    <h1 class="text-3xl font-bold text-white mb-2">Live Election Results</h1>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-red-100">
+                                <?php echo htmlspecialchars($currentElection['election_name']); ?>
+                            </h2>
+                            
+                            <div class="status-section">
+                                <span class="status-badge <?php echo $statusClass; ?>">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <?php echo $electionStatus; ?>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="datetime-section">
+                            <div class="flex items-center gap-2 text-red-100 font-medium text-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <?php 
+                                    echo (new DateTime($currentElection['start_datetime']))->format('F j, Y - g:i A') . 
+                                         ' to ' . 
+                                         (new DateTime($currentElection['end_datetime']))->format('F j, Y - g:i A'); 
+                                ?>
+                            </div>
                         </div>
                     </div>
                 </div>
