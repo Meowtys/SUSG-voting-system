@@ -177,22 +177,26 @@ try {
                 const feedbacks = <?= $feedbacksJSON ?>;
                 console.log('Raw feedbacks data:', feedbacks);
                 
-                // Debug check for data
-                if (feedbacks && feedbacks.length > 0) {
-                    console.table(feedbacks); // Shows data in table format in console
-                }
-
                 // Add loading indicator
                 const mainContent = document.querySelector('.analytics-container');
-                mainContent.innerHTML = '<div class="text-center p-4">Loading analytics...</div>' + mainContent.innerHTML;
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'text-center p-4 loading-indicator';
+                loadingDiv.innerHTML = 'Loading analytics...';
+                mainContent.insertBefore(loadingDiv, mainContent.firstChild);
 
-                if (!feedbacks || feedbacks.length === 0) {
-                    mainContent.innerHTML = `
+                // Debug check for data
+                if (feedbacks && feedbacks.length > 0) {
+                    console.table(feedbacks);
+                } else {
+                    // Remove loading indicator before showing no data message
+                    document.querySelector('.loading-indicator')?.remove();
+                    
+                    mainContent.insertAdjacentHTML('afterbegin', `
                         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
                             <p class="font-bold">No Feedback Data</p>
                             <p>There are currently no feedbacks in the database.</p>
                         </div>
-                    ` + mainContent.innerHTML;
+                    `);
                     return;
                 }
 
@@ -748,8 +752,8 @@ try {
                     setTimeout(() => showComments('Positive'), 100);
                 }
 
-                // Remove loading indicator
-                mainContent.querySelector('.text-center')?.remove();
+                // Remove loading indicator at the end of processing
+                document.querySelector('.loading-indicator')?.remove();
 
                 // Add mismatch chart after other charts
                 const mismatchCtx = document.getElementById('mismatchChart').getContext('2d');
@@ -827,6 +831,9 @@ try {
                 }
 
             } catch (error) {
+                // Remove loading indicator before showing error
+                document.querySelector('.loading-indicator')?.remove();
+                
                 console.error("Error:", error);
                 console.error('Detailed error:', error);
                 console.error('Stack trace:', error.stack);
