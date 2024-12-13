@@ -231,7 +231,11 @@ ob_start();
                                                 <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
                                                     ${candidate.college_name || 'N/A'}
                                                 </span>
-                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                                <span class="px-2 py-1 ${
+                                                    candidate.party_name === 'CAUSE' ? 'bg-green-100 text-green-800' :
+                                                    candidate.party_name === 'SURE' ? 'bg-blue-100 text-blue-800' :
+                                                    'bg-red-100 text-red-800'
+                                                } text-xs font-medium rounded-full">
                                                     ${candidate.party_name || 'Independent'}
                                                 </span>
                                             </div>
