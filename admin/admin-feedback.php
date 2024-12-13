@@ -105,6 +105,29 @@ $feedbacks = $stmt->fetchAll();
         .remove-btn:hover {
             opacity: 0.8;
         }
+
+        .rating {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+            display: inline-block;
+        }
+
+        .rating.good {
+            background-color: #e0f2e9;
+            color: #2e7d32;
+        }
+
+        .rating.average {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .rating.poor {
+            background-color: #ffebee;
+            color: #c62828;
+        }
 </style>
 </head>
 <body>
@@ -121,6 +144,7 @@ $feedbacks = $stmt->fetchAll();
                     <thead>
                         <tr>
                             <th>Author</th>
+                            <th>Rating</th>
                             <th>Comment</th>
                             <th>Submitted on</th>
                             <th>Action</th>
@@ -130,6 +154,21 @@ $feedbacks = $stmt->fetchAll();
                         <?php foreach ($feedbacks as $feedback): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($feedback['student_name']); ?></td>
+                            <td>
+                                <?php 
+                                    $ratingClass = '';
+                                    if ($feedback['experience'] >= 4) {
+                                        $ratingClass = 'good';
+                                    } elseif ($feedback['experience'] >= 2) {
+                                        $ratingClass = 'average';
+                                    } else {
+                                        $ratingClass = 'poor';
+                                    }
+                                ?>
+                                <span class="rating <?php echo $ratingClass; ?>">
+                                    <?php echo $feedback['experience']; ?>/5
+                                </span>
+                            </td>
                             <td class="comment"><?php echo htmlspecialchars($feedback['suggestion']); ?></td>
                             <td><?php echo date('m/d/Y \a\t h:ia', strtotime($feedback['feedback_timestamp'])); ?></td>
                             <td><button class="remove-btn" data-id="<?php echo $feedback['feedback_id']; ?>">Remove</button></td>
