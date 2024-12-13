@@ -351,6 +351,49 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             // Update statuses immediately and then every minute
             updateAllElectionStatuses();
             setInterval(updateAllElectionStatuses, 60000);
+
+            // Add this new function to update current election status
+            function updateCurrentElectionStatus() {
+                const currentStatusSpan = document.querySelector('.current-election-status');
+                if (currentStatusSpan) {
+                    const startDateTime = new Date(currentStatusSpan.dataset.start);
+                    const endDateTime = new Date(currentStatusSpan.dataset.end);
+                    const now = new Date();
+                    
+                    let newStatus;
+                    if (now < startDateTime) {
+                        newStatus = 'Scheduled';
+                    } else if (now >= startDateTime && now <= endDateTime) {
+                        newStatus = 'Ongoing';
+                    } else {
+                        newStatus = 'Completed';
+                    }
+
+                    const currentStatus = currentStatusSpan.textContent.trim();
+                    if (currentStatus !== newStatus) {
+                        currentStatusSpan.textContent = newStatus;
+                        currentStatusSpan.className = `font-semibold ${newStatus.toLowerCase() === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'} current-election-status`;
+                        
+                        // Update database via AJAX
+                        const electionId = currentStatusSpan.dataset.electionId;
+                        if (electionId) {
+                            fetch('update_election_status.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: `election_id=${electionId}&status=${newStatus}`
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Add updateCurrentElectionStatus to the interval checks
+            if (document.querySelector('.current-election-status')) {
+                updateCurrentElectionStatus();
+                setInterval(updateCurrentElectionStatus, 60000); // Check every minute
+            }
         });
     </script>
 </head>
@@ -420,7 +463,14 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                 <h2 class="text-2xl font-bold mb-4 text-gray-800">Current Election Status</h2>
                 <?php if ($currentElection): ?>
                     <p class="text-lg mb-2">Name: <span class="font-semibold"><?php echo htmlspecialchars($currentElection['election_name']); ?></span></p>
-                    <p class="text-lg">Status: <span class="font-semibold <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'; ?>"><?php echo htmlspecialchars($currentElection['status']); ?></span></p>
+                    <p class="text-lg">Status: 
+                        <span class="current-election-status font-semibold <?php echo strtolower($currentElection['status']) === 'ongoing' ? 'text-red-600 blink' : 'text-red-600'; ?>"
+                              data-election-id="<?php echo htmlspecialchars($currentElection['election_id']); ?>"
+                              data-start="<?php echo htmlspecialchars($currentElection['start_datetime']); ?>"
+                              data-end="<?php echo htmlspecialchars($currentElection['end_datetime']); ?>">
+                            <?php echo htmlspecialchars($currentElection['status']); ?>
+                        </span>
+                    </p>
                 <?php else: ?>
                     <p class="text-lg text-gray-600">No election scheduled.</p>
                 <?php endif; ?>
