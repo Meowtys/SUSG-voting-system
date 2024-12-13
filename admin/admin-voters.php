@@ -15,7 +15,7 @@ if (!$currentElection) {
     die("Please set a current election first before managing voters.");
 }
 
-// Modify the query to include election_id filter
+// Modify the query to include password
 $query = "
     SELECT s.*, c.college_name 
     FROM students s 
@@ -102,6 +102,7 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Student ID</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Student Name</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">College</th>
+                            <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Password</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider">Has Voted</th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
                             <th class="px-6 py-4 text-left text-sm font-medium text-red-700 uppercase tracking-wider"></th>
@@ -113,6 +114,9 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($student['student_id']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><?php echo htmlspecialchars($student['student_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($student['college_name']); ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <?php echo htmlspecialchars($student['password']); ?>
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <?php echo $student['has_voted'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                                     <?php echo $student['has_voted'] ? 'Yes' : 'No'; ?>
@@ -182,6 +186,18 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                     </select>
                 </div>
 
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password:</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        <button type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                                onclick="togglePasswordVisibility()">
+                            <i class="fas fa-eye" id="togglePassword"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <button type="submit" 
                         class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
                     Submit
@@ -204,6 +220,7 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
             document.getElementById('studentName').value = '';
             document.getElementById('college').value = '';
             document.getElementById('hasVoted').value = '0';
+            document.getElementById('password').value = '';
             modalTitle.textContent = "Add New Student";
             modal.style.display = "block";
         });
@@ -220,6 +237,7 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                 document.getElementById('studentFormId').value = student.student_id;
                 document.getElementById('studentId').value = student.student_id;
                 document.getElementById('studentName').value = student.student_name;
+                document.getElementById('password').value = student.password;
                 document.getElementById('college').value = student.college_id;
                 document.getElementById('hasVoted').value = student.has_voted;
                 modalTitle.textContent = "Edit Student";
@@ -251,6 +269,22 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                 }
             });
         });
+
+        // Add password toggle functionality
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('togglePassword');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
     </script>
 </body>
 </html>
