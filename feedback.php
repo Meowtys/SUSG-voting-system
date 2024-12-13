@@ -64,57 +64,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include 'header.php'; ?>
 
     <main class="min-h-screen flex items-center justify-center p-8">
-        <div class="w-full max-w-2xl">
+        <div class="w-full max-w-xl"> <!-- Changed from max-w-2xl to max-w-xl -->
             <!-- Feedback Container -->
             <div class="bg-white rounded-xl shadow-xl overflow-hidden transform hover:shadow-2xl transition-all duration-300">
                 <!-- Feedback Header -->
-                <div class="bg-gradient-to-r from-red-600 to-red-800 px-8 py-6">
-                    <h1 class="text-3xl font-bold text-white text-center">Share Your Thoughts!</h1>
-                    <p class="text-red-100 text-center mt-2">Help us improve your voting experience</p>
+                <div class="bg-gradient-to-r from-red-600 to-red-800 px-6 py-5"> <!-- Reduced padding -->
+                    <h1 class="text-2xl font-bold text-white text-center">Share Your Thoughts!</h1> <!-- Reduced text size -->
+                    <p class="text-red-100 text-center mt-1 text-sm">Help us improve your voting experience</p> <!-- Added text-sm -->
                 </div>
 
-                <form id="feedback-form" class="p-8 space-y-8">
+                <form id="feedback-form" class="p-6 space-y-6"> <!-- Reduced padding and spacing -->
                     <!-- Rating Section -->
-                    <div class="text-center space-y-6">
-                        <label class="block text-2xl font-semibold text-gray-800">
+                    <div class="text-center space-y-4"> <!-- Reduced spacing -->
+                        <label class="block text-xl font-semibold text-gray-800"> <!-- Reduced text size -->
                             How would you rate your experience?
                         </label>
-                        <div class="flex justify-center space-x-8">
+                        <div class="flex justify-center space-x-4"> <!-- Reduced spacing -->
                             <?php for($i = 1; $i <= 5; $i++): ?>
                                 <button type="button" 
-                                        class="rating-option w-16 h-16 rounded-full border-2 border-gray-300 flex items-center justify-center text-2xl font-bold transition-all duration-200 hover:scale-110 transform hover:border-red-500"
+                                        class="rating-option w-14 h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-xl font-bold transition-all duration-200 hover:scale-110 transform hover:border-red-500"
                                         data-value="<?php echo $i; ?>">
                                     <?php echo $i; ?>
                                 </button>
                             <?php endfor; ?>
                         </div>
                         <input type="hidden" name="experience" id="experience" value="0">
-                        <div class="flex justify-between text-sm text-gray-600 px-12">
+                        <div class="flex justify-between text-sm text-gray-600 px-8">
                             <span class="flex items-center">
-                                <i class="fas fa-frown text-red-500 text-xl mr-2"></i>
+                                <i class="fas fa-frown text-red-500 text-lg mr-2"></i>
                                 <span class="font-medium">Poor</span>
                             </span>
                             <span class="flex items-center">
                                 <span class="font-medium">Excellent</span>
-                                <i class="fas fa-smile text-green-500 text-xl ml-2"></i>
+                                <i class="fas fa-smile text-green-500 text-lg ml-2"></i>
                             </span>
                         </div>
                     </div>
 
                     <!-- Suggestion Section -->
-                    <div class="space-y-4">
-                        <label class="block text-2xl font-semibold text-gray-800 text-center">
+                    <div class="space-y-3"> <!-- Reduced spacing -->
+                        <label class="block text-xl font-semibold text-gray-800 text-center">
                             Any suggestions for improvement?
                         </label>
                         <textarea name="suggestion" 
-                                class="w-full h-48 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700 text-lg"
+                                class="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700"
                                 placeholder="Share your ideas with us..."></textarea>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="pt-6">
+                    <div class="pt-4"> <!-- Reduced padding -->
                         <button type="submit"
-                                class="w-full bg-red-600 hover:bg-red-700 text-white text-lg font-semibold rounded-xl py-4 transition duration-300 flex items-center justify-center group">
+                                class="w-full bg-red-600 hover:bg-red-700 text-white text-base font-semibold rounded-lg py-3 transition duration-300 flex items-center justify-center group">
                             <i class="fas fa-paper-plane mr-2 group-hover:translate-x-1 transition-transform"></i>
                             Submit Feedback
                         </button>
