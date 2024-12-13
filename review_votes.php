@@ -50,189 +50,98 @@ foreach ($votes as $vote) {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUSG Election System - Review Votes</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        main {
-            background-color: #f5e8e7;
-        }
-
-        body {
             font-family: 'Poppins', sans-serif;
-        }
-
-        .vote-summary-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 30px;
-            min-height: 90vh;
-        }
-
-        h1.title {
-            font-size: 36px;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .votes-box {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 100%;
-            max-width: 800px;
-            text-align: center;
-        }
-
-        .votes-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .divider {
-            border: 1px solid #e0e0e0;
-            width: 90%;
-            margin: 10px auto 20px auto;
-        }
-
-        .vote-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .vote-item {
-            flex: 0 0 48%;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .position-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .candidate-summary {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: #f8d0d0;
-            padding: 10px;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
-
-        .candidate-summary:hover {
-            transform: translateY(-5px);
-        }
-
-        .candidate-photo {
-            width: 70px;
-            height: 70px;
-            background-color: #d3a5a5;
-            border-radius: 5px;
-        }
-
-        .candidate-info h4 {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .candidate-info p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .back-btn {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
-
-        .back-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        @media (max-width: 768px) {
-            .vote-summary {
-                flex-direction: column;
-            }
-
-            .vote-item {
-                width: 100%;
-            }
-
-            .back-btn {
-                width: 100%;
-            }
         }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
 
-<body>
-
-    <!-- Header Section -->
+<body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
-    <main class="vote-summary-container">
-        <h1 class="title">Review Your Votes</h1>
-        <div class="votes-box">
-            <h2 class="votes-title">Your Votes</h2>
-            <hr class="divider">
-            <div class="vote-summary">
-                <?php foreach ($positions as $position): ?>
-                    <?php if (isset($selectedVotes[$position['position_name']])): ?>
-                        <div class="vote-item">
-                            <h3 class="position-title"><?php echo htmlspecialchars($position['position_name']); ?></h3>
-                            <div class="candidate-summary">
+    <main class="min-h-screen p-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Review Header -->
+            <div class="bg-white rounded-xl shadow-xl p-8 mb-8 border-l-4 border-red-600">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">Review Your Votes</h1>
+                <div class="text-gray-600">
+                    Here's a summary of your submitted votes for the SUSG Election.
+                </div>
+            </div>
+
+            <!-- Votes Summary Box -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-red-50 px-6 py-4 border-b border-red-100">
+                    <h2 class="text-xl font-semibold text-red-800">Your Submitted Votes</h2>
+                </div>
+                
+                <div class="p-6 grid gap-6">
+                    <?php foreach ($positions as $position): ?>
+                        <?php if (isset($selectedVotes[$position['position_name']])): ?>
+                            <div class="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                                    <i class="fas fa-user-tie text-red-600 mr-2"></i>
+                                    <?php echo htmlspecialchars($position['position_name']); ?>
+                                </h3>
+                                
                                 <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
-                                    <div class="candidate-info">
-                                        <h4>Abstain</h4>
+                                    <!-- Abstain Card -->
+                                    <div class="flex items-center bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                                        <div class="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-ban text-yellow-600 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h4 class="text-lg font-medium text-yellow-800">Abstain</h4>
+                                            <p class="text-sm text-yellow-600">You abstained for this position</p>
+                                        </div>
                                     </div>
                                 <?php else: ?>
-                                    <div class="candidate-photo">
-                                        <img src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']]); ?>" alt="Candidate Photo" style="width: 100%; height: 100%; object-fit: cover;">
-                                    </div>
-                                    <div class="candidate-info">
-                                        <h4><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?></h4>
-                                        <p><?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?></p>
+                                    <!-- Candidate Card -->
+                                    <div class="flex items-center bg-white rounded-lg p-4 border border-gray-200">
+                                        <img class="w-16 h-16 rounded-lg object-cover shadow-sm" 
+                                             src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']] ?? 'asset/default-candidate.png'); ?>" 
+                                             alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                        <div class="ml-4">
+                                            <h4 class="text-lg font-medium text-gray-800">
+                                                <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>
+                                            </h4>
+                                            <div class="flex items-center mt-1">
+                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                                                    <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 <?php endif; ?>
                             </div>
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Back Button -->
+            <div class="flex justify-center mt-8">
+                <button onclick="navigateTo('countdown.php')" 
+                        class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg flex items-center justify-center transition duration-300 transform hover:-translate-y-1">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Countdown
+                </button>
             </div>
         </div>
-
-        <button class="back-btn" onclick="navigateTo('countdown.php')">Back to Countdown</button>
     </main>
 
-    <!-- Footer Section -->
     <?php include 'footer.php'; ?>
+
     <script>
         function navigateTo(page) {
             window.location.href = page;
