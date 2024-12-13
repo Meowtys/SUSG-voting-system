@@ -44,11 +44,36 @@ function updateElectionStatuses($pdo) {
 updateElectionStatuses($pdo);
 
 // Fetch current election details
-$electionStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC LIMIT 1");
+$electionStmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
+$electionStmt->execute();
 $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
 
+// If no current election is set, get the most recent one
+if (!$currentElection) {
+    $electionStmt = $pdo->query("SELECT * FROM elections ORDER BY created_at DESC LIMIT 1");
+    $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
+    
+    // If there's an election, set it as current
+    if ($currentElection) {
+        $updateStmt = $pdo->prepare("UPDATE elections SET is_current = 1 WHERE election_id = ?");
+        $updateStmt->execute([$currentElection['election_id']]);
+    }
+}
+
+// Set default values if still no election exists
+if (!$currentElection) {
+    $currentElection = [
+        'election_id' => null,
+        'election_name' => 'No Active Election',
+        'start_datetime' => date('Y-m-d H:i:s'),
+        'end_datetime' => date('Y-m-d H:i:s'),
+        'status' => 'None',
+        'is_current' => 0
+    ];
+}
+
 // Fetch all elections
-$allElectionsStmt = $pdo->query("SELECT * FROM elections ORDER BY election_id DESC");
+$allElectionsStmt = $pdo->query("SELECT * FROM elections ORDER BY created_at DESC");
 $allElections = $allElectionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
