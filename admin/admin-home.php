@@ -512,10 +512,16 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                         <?php echo htmlspecialchars($election['election_name']); ?>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-900 truncate start-datetime">
-                                        <?php echo htmlspecialchars($election['start_datetime']); ?>
+                                        <?php 
+                                            $startDate = new DateTime($election['start_datetime']);
+                                            echo $startDate->format('M j, Y g:i A'); 
+                                        ?>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-900 truncate end-datetime">
-                                        <?php echo htmlspecialchars($election['end_datetime']); ?>
+                                        <?php 
+                                            $endDate = new DateTime($election['end_datetime']);
+                                            echo $endDate->format('M j, Y g:i A'); 
+                                        ?>
                                     </td>
                                     <td class="px-4 py-4">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -526,10 +532,16 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                         </span>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-500 truncate">
-                                        <?php echo htmlspecialchars($election['created_at']); ?>
+                                        <?php 
+                                            $createdDate = new DateTime($election['created_at']);
+                                            echo $createdDate->format('M j, Y g:i A'); 
+                                        ?>
                                     </td>
                                     <td class="px-4 py-4 text-sm text-gray-500 truncate">
-                                        <?php echo htmlspecialchars($election['updated_at']); ?>
+                                        <?php 
+                                            $updatedDate = new DateTime($election['updated_at']);
+                                            echo $updatedDate->format('M j, Y g:i A'); 
+                                        ?>
                                     </td>
                                     <td class="px-4 py-4">
                                         <div class="flex flex-col space-y-1">
