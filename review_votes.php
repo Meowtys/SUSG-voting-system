@@ -62,6 +62,37 @@ foreach ($votes as $vote) {
         * {
             font-family: 'Poppins', sans-serif;
         }
+        .abstain-icon {
+            background: #FEF3C7;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .abstain-icon i {
+            font-size: 32px;
+            color: #D97706;
+        }
+        /* Add abstain icon styles */
+        .abstain-icon-placeholder {
+            width: 64px;
+            height: 64px;
+            background: #FEF3C7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .abstain-icon-placeholder i {
+            font-size: 32px;
+            color: #D97706;
+        }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
@@ -97,8 +128,8 @@ foreach ($votes as $vote) {
                                 <?php if ($selectedVotes[$position['position_name']]['candidate_id'] == 0): ?>
                                     <!-- Abstain Card -->
                                     <div class="flex items-center bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                                        <div class="w-12 h-12 bg-yellow-200 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-ban text-yellow-600 text-xl"></i>
+                                        <div class="abstain-icon">
+                                            <i class="fas fa-ban"></i>
                                         </div>
                                         <div class="ml-4">
                                             <h4 class="text-lg font-medium text-yellow-800">Abstain</h4>
@@ -108,18 +139,28 @@ foreach ($votes as $vote) {
                                 <?php else: ?>
                                     <!-- Candidate Card -->
                                     <div class="flex items-center bg-white rounded-lg p-4 border border-gray-200">
-                                        <img class="w-16 h-16 rounded-lg object-cover shadow-sm" 
-                                             src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']] ?? 'asset/default-candidate.png'); ?>" 
-                                             alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                        <?php if ($selectedVotes[$position['position_name']]['candidate_name'] === 'Abstain'): ?>
+                                            <div class="abstain-icon">
+                                                <i class="fas fa-ban"></i>
+                                            </div>
+                                        <?php else: ?>
+                                            <img class="w-16 h-16 rounded-lg object-cover shadow-sm" 
+                                                 src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']] ?? 'asset/default-candidate.png'); ?>" 
+                                                 alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                        <?php endif; ?>
                                         <div class="ml-4">
-                                            <h4 class="text-lg font-medium text-gray-800">
+                                            <h4 class="text-lg font-medium <?php echo $selectedVotes[$position['position_name']]['candidate_name'] === 'Abstain' ? 'text-yellow-800' : 'text-gray-800'; ?>">
                                                 <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>
                                             </h4>
-                                            <div class="flex items-center mt-1">
-                                                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                                                    <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
-                                                </span>
-                                            </div>
+                                            <?php if ($selectedVotes[$position['position_name']]['candidate_name'] !== 'Abstain'): ?>
+                                                <div class="flex items-center mt-1">
+                                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                                                        <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
+                                                    </span>
+                                                </div>
+                                            <?php else: ?>
+                                                <p class="text-sm text-yellow-600">You abstained for this position</p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 <?php endif; ?>
