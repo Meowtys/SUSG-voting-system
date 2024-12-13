@@ -264,22 +264,28 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 currentPositionIndex++;
                 displayPosition();
             } else {
-                console.log("Reached the last position, redirecting to confirmation page"); // Debugging log
-                // Store selected votes in session and redirect to confirmation page
+                // Add election_id to the selected votes
                 fetch("store_votes.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(selectedVotes)
+                    body: JSON.stringify({
+                        votes: selectedVotes,
+                        isConfirmation: true
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         window.location.href = "votecastingconfirm.php";
                     } else {
-                        alert("Failed to store votes. Please try again.");
+                        alert("Failed to store votes: " + (data.message || "Unknown error"));
                     }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while storing votes.");
                 });
             }
         }
