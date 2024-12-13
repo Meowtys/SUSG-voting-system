@@ -115,40 +115,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         // ...handle other AJAX actions if necessary...
     } else {
-        // Handle regular POST requests
-        if (isset($_POST['election_name']) && !isset($_POST['edit_election'])) {
-            $electionName = $_POST['election_name'];
-            $startDatetime = $_POST['start_datetime'];
-            $endDatetime = $_POST['end_datetime'];
-            $status = 'Scheduled';
-
-            $stmt = $pdo->prepare("INSERT INTO elections (election_name, start_datetime, end_datetime, status) VALUES (?, ?, ?, ?)");
-            if ($stmt->execute([$electionName, $startDatetime, $endDatetime, $status])) {
-                // Clear any cached data
-                $stmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
-                $stmt->execute();
-                $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                header('Location: admin-home.php');
-                exit();
-            }
-        } elseif (isset($_POST['edit_election'])) {
+        // Handle form submissions
+        if (isset($_POST['edit_election'])) {
+            // This is an edit submission
             $electionId = $_POST['election_id'];
             $electionName = $_POST['election_name'];
             $startDatetime = $_POST['start_datetime'];
             $endDatetime = $_POST['end_datetime'];
 
-            $stmt = $pdo->prepare("UPDATE elections SET election_name = ?, start_datetime = ?, end_datetime = ? WHERE election_id = ?");
+            $stmt = $pdo->prepare("
+                UPDATE elections 
+                SET election_name = ?, 
+                    start_datetime = ?, 
+                    end_datetime = ?, 
+                    updated_at = NOW() 
+                WHERE election_id = ?
+            ");
+            
             if ($stmt->execute([$electionName, $startDatetime, $endDatetime, $electionId])) {
-                // Clear any cached data
-                $stmt = $pdo->prepare("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
-                $stmt->execute();
-                $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
-                
                 header('Location: admin-home.php');
                 exit();
             }
-        } elseif (isset($_POST['toggle_election'])) {
+        } elseif (isset($_POST['election_name'])) {
+            // This is a new election submission
+            $electionName = $_POST['election_name'];
+            $startDatetime = $_POST['start_datetime'];
+            $endDatetime = $_POST['end_datetime'];
+            $status = 'Scheduled';
+
+            $stmt = $pdo->prepare("
+                INSERT INTO elections 
+                (election_name, start_datetime, end_datetime, status) 
+                VALUES (?, ?, ?, ?)
+            ");
+            
+            if ($stmt->execute([$electionName, $startDatetime, $endDatetime, $status])) {
+                header('Location: admin-home.php');
+                exit();
+            }
+        }
+        // ... rest of the existing POST handling code ...
+        elseif (isset($_POST['toggle_election'])) {
             $electionId = $_POST['election_id'];
             $newStatus = $_POST['new_status'];
 
@@ -780,6 +787,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
             <!-- Form Section -->
             <form method="POST" class="space-y-6 pt-20">
                 <input type="hidden" id="edit_election_id" name="election_id">
+                <input type="hidden" name="edit_election" value="1">
                 <div class="grid grid-cols-2 gap-8">
                     <!-- Left Column -->
                     <div class="space-y-6 bg-gray-50 p-6 rounded-xl">
