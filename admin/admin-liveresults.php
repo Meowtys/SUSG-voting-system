@@ -102,6 +102,21 @@ ob_start();
         .float-animation {
             animation: float 3s ease-in-out infinite;
         }
+        .abstain-icon {
+            background: #FEF3C7;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .abstain-icon i {
+            font-size: 32px;
+            color: #D97706;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -138,27 +153,46 @@ ob_start();
                     const voteCount = parseInt(candidate.vote_count) || 0;
                     const percentage = candidate.percentage || 0;
 
-                    resultElement.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="relative">
-                                    <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
-                                         src="../${candidate.candidate_image}" 
-                                         alt="${candidate.candidate_name}">
-                                    ${index === 0 && voteCount > 0 ? '<span class="absolute -top-2 -right-2 text-2xl">👑</span>' : ''}
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-bold text-gray-800">${candidate.candidate_name}</h3>
-                                    <div class="flex flex-col space-y-1">
-                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
-                                            ${candidate.college_name}
-                                        </span>
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
-                                            ${candidate.party_name}
-                                        </span>
+                    let candidateContent;
+                    if (candidate.candidate_name === 'Abstain') {
+                        candidateContent = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="abstain-icon">
+                                        <i class="fas fa-ban"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-yellow-800">Abstain</h3>
+                                        <p class="text-sm text-yellow-600">Abstain Vote</p>
                                     </div>
                                 </div>
-                            </div>
+                        `;
+                    } else {
+                        candidateContent = `
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="relative">
+                                        <img class="h-16 w-16 rounded-lg object-cover border-2 border-red-600" 
+                                             src="../${candidate.candidate_image}" 
+                                             alt="${candidate.candidate_name}">
+                                        ${index === 0 && voteCount > 0 ? '<span class="absolute -top-2 -right-2 text-2xl">👑</span>' : ''}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800">${candidate.candidate_name}</h3>
+                                        <div class="flex flex-col space-y-1">
+                                            <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full inline-block w-fit">
+                                                ${candidate.college_name}
+                                            </span>
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full inline-block w-fit">
+                                                ${candidate.party_name}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                        `;
+                    }
+
+                    candidateContent += `
                             <div class="text-right">
                                 <div class="text-2xl font-bold text-red-600">${voteCount}</div>
                                 <div class="text-sm text-gray-500">votes (${percentage}%)</div>
@@ -169,6 +203,8 @@ ob_start();
                                  style="width: ${percentage}%"></div>
                         </div>
                     `;
+
+                    resultElement.innerHTML = candidateContent;
                     resultsContainer.appendChild(resultElement);
                 });
             }

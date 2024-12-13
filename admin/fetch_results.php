@@ -16,8 +16,14 @@ try {
             c.candidate_id,
             c.candidate_name,
             c.candidate_image,
-            col.college_name,
-            p.party_name,
+            CASE 
+                WHEN c.candidate_name = 'Abstain' THEN NULL 
+                ELSE col.college_name 
+            END as college_name,
+            CASE 
+                WHEN c.candidate_name = 'Abstain' THEN NULL 
+                ELSE p.party_name 
+            END as party_name,
             COUNT(v.vote_id) as vote_count,
             (
                 SELECT COUNT(DISTINCT student_id) 
@@ -26,7 +32,7 @@ try {
                 AND election_id = :election_id
             ) as total_votes
         FROM candidates c
-        INNER JOIN colleges col ON c.college_id = col.college_id
+        LEFT JOIN colleges col ON c.college_id = col.college_id
         LEFT JOIN parties p ON c.party_id = p.party_id
         LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
             AND v.election_id = :election_id
@@ -38,7 +44,9 @@ try {
             c.candidate_image,
             col.college_name,
             p.party_name
-        ORDER BY vote_count DESC
+        ORDER BY 
+            CASE WHEN c.candidate_name = 'Abstain' THEN 1 ELSE 0 END,
+            vote_count DESC
     ");
 
     $stmt->execute([
