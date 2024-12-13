@@ -183,7 +183,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="p-6">
                             <h3 class="text-xl font-bold text-gray-800 mb-2">${candidate.candidate_name}</h3>
-                            <p class="text-gray-600">${candidate.candidate_party}</p>
+                            <p class="text-gray-600">${candidate.party_name}</p>
                         </div>
                         <div class="selected-overlay hidden absolute inset-0 bg-red-600/20 rounded-xl">
                             <div class="absolute top-4 right-4 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center">
