@@ -170,9 +170,34 @@ foreach ($votes as $vote) {
                                                     <!-- Party Name -->
                                                     <?php if (!empty($selectedVotes[$position['position_name']]['party_name'])): ?>
                                                         <div class="flex-1">
-                                                            <div class="flex items-center p-2 bg-red-100 rounded-lg">
-                                                                <i class="fas fa-users text-red-800 text-lg mr-2"></i>
-                                                                <span class="text-red-800 text-base font-medium truncate">
+                                                            <div class="flex items-center p-2 <?php 
+                                                                $partyName = $selectedVotes[$position['position_name']]['party_name'];
+                                                                if ($partyName === 'CAUSE') {
+                                                                    echo 'bg-green-100';
+                                                                } elseif ($partyName === 'SURE') {
+                                                                    echo 'bg-blue-100';
+                                                                } else {
+                                                                    echo 'bg-red-100';
+                                                                }
+                                                            ?> rounded-lg">
+                                                                <i class="fas fa-users text-<?php 
+                                                                    if ($partyName === 'CAUSE') {
+                                                                        echo 'green';
+                                                                    } elseif ($partyName === 'SURE') {
+                                                                        echo 'blue';
+                                                                    } else {
+                                                                        echo 'red';
+                                                                    }
+                                                                ?>-800 text-lg mr-2"></i>
+                                                                <span class="text-<?php 
+                                                                    if ($partyName === 'CAUSE') {
+                                                                        echo 'green';
+                                                                    } elseif ($partyName === 'SURE') {
+                                                                        echo 'blue';
+                                                                    } else {
+                                                                        echo 'red';
+                                                                    }
+                                                                ?>-800 text-base font-medium truncate">
                                                                     <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['party_name']); ?>
                                                                 </span>
                                                             </div>
