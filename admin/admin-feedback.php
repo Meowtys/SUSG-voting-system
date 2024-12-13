@@ -20,115 +20,7 @@ $feedbacks = $stmt->fetchAll();
     <title>Comelec - Voter's Feedback</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
-    <style>
-        .content {
-            flex-grow: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s ease;
-            overflow-y: auto;
-        }
-    
-        h1 {
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-align: left;
-            color: #333;
-        }
-
-        /* Management CSS */
-        .mngment-box {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 30px 20px;
-            width: 95%;
-            max-width: 3000px;
-            margin-bottom: 40px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .mngment-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        .divider {
-            border: 1px solid #e0e0e0;
-            width: 90%;
-            margin: 20px auto 30px auto;
-        }
-
-        .mngment-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0 auto;
-            width: 90%;
-            font-size: 16px;
-            flex-direction: column;
-            text-align: left;
-        }
-
-        .comment {
-            font-size: 15px;
-            padding: 10px; 
-        }
-
-        .mngment-table tr {
-            border-bottom: 1px solid #cfcfcf;
-        }
-
-        .mngment-table th {
-            font-size: 18px;
-            padding: 15px 5px;
-        }
-
-        .mngment-table td {
-            padding: 10px; 
-            color: #4f4f4f;
-        }
-
-        /* Buttons */
-        .remove-btn {
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            font-size: 15px;
-            border-radius: 4px;
-            background-color: #f44336; 
-            color: white;
-        }
-
-        .remove-btn:hover {
-            opacity: 0.8;
-        }
-
-        .rating {
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-            background-color: #f0f0f0;
-            display: inline-block;
-        }
-
-        .rating.good {
-            background-color: #e0f2e9;
-            color: #2e7d32;
-        }
-
-        .rating.average {
-            background-color: #fff3e0;
-            color: #f57c00;
-        }
-
-        .rating.poor {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-</style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
@@ -137,41 +29,46 @@ $feedbacks = $stmt->fetchAll();
 
     <!-- Main Section -->
     <main>
-        <div class="content">
-            <h1>Feedback</h1>
-            <div class="mngment-box">
-                <table class="mngment-table">
+        <div class="flex-grow p-10 transition-all duration-300 overflow-y-auto">
+            <h1 class="text-3xl mb-8 text-left text-gray-800">Feedback</h1>
+            <div class="bg-white rounded-lg p-8 w-[95%] max-w-[3000px] mb-10 text-center shadow-md">
+                <table class="w-[90%] mx-auto text-left">
                     <thead>
-                        <tr>
-                            <th>Author</th>
-                            <th>Rating</th>
-                            <th>Comment</th>
-                            <th>Submitted on</th>
-                            <th>Action</th>
+                        <tr class="border-b border-gray-300">
+                            <th class="text-lg py-4 px-2">Author</th>
+                            <th class="text-lg py-4 px-2">Rating</th>
+                            <th class="text-lg py-4 px-2">Comment</th>
+                            <th class="text-lg py-4 px-2">Submitted on</th>
+                            <th class="text-lg py-4 px-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($feedbacks as $feedback): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($feedback['student_name']); ?></td>
-                            <td>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-3 px-2 text-gray-700"><?php echo htmlspecialchars($feedback['student_name']); ?></td>
+                            <td class="py-3 px-2">
                                 <?php 
                                     $ratingClass = '';
                                     if ($feedback['experience'] >= 4) {
-                                        $ratingClass = 'good';
+                                        $ratingClass = 'bg-green-100 text-green-800';
                                     } elseif ($feedback['experience'] >= 2) {
-                                        $ratingClass = 'average';
+                                        $ratingClass = 'bg-orange-100 text-orange-800';
                                     } else {
-                                        $ratingClass = 'poor';
+                                        $ratingClass = 'bg-red-100 text-red-800';
                                     }
                                 ?>
-                                <span class="rating <?php echo $ratingClass; ?>">
+                                <span class="font-bold px-3 py-1 rounded-md inline-block <?php echo $ratingClass; ?>">
                                     <?php echo $feedback['experience']; ?>/5
                                 </span>
                             </td>
-                            <td class="comment"><?php echo htmlspecialchars($feedback['suggestion']); ?></td>
-                            <td><?php echo date('m/d/Y \a\t h:ia', strtotime($feedback['feedback_timestamp'])); ?></td>
-                            <td><button class="remove-btn" data-id="<?php echo $feedback['feedback_id']; ?>">Remove</button></td>
+                            <td class="py-3 px-2 text-gray-700 text-sm"><?php echo htmlspecialchars($feedback['suggestion']); ?></td>
+                            <td class="py-3 px-2 text-gray-700"><?php echo date('m/d/Y \a\t h:ia', strtotime($feedback['feedback_timestamp'])); ?></td>
+                            <td class="py-3 px-2">
+                                <button class="remove-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm" 
+                                        data-id="<?php echo $feedback['feedback_id']; ?>">
+                                    Remove
+                                </button>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
