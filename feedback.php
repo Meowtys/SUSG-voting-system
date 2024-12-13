@@ -49,243 +49,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Leave a Feedback</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        /* Global styling */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        body, html {
+        * {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Full-width header and footer */
-        #header, #footer {
-            width: 100%;
-        }
-
-        /* Ensures header and footer span full width */
-        header, footer {
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* Main section for centering feedback form */
-        main {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-            width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-            margin-top: 50px;
-            margin-bottom: 25px;
-        }
-
-        /* Feedback container styling */
-        .feedback-container {
-            background-color: #fff;
-            width: 400px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .feedback-title {
-            background-color: #c41f1f;
-            color: white;
-            padding: 10px;
-            border-radius: 8px 8px 0 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .rating-section {
-            margin: 20px 0;
-            font-size: 16px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .rating-options {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .rating-option {
-            font-size: 20px;
-            color: #333;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #333;
-            border-radius: 50%;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .rating-option.selected {
-            background-color: #c41f1f;
-            color: white;
-            border-color: #c41f1f;
-        }
-
-        .rating-description {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .suggestion-section {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-            margin-top: 20px;
-        }
-
-        .suggestion-box {
-            width: 100%;
-            height: 80px;
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            resize: none;
-            box-sizing: border-box;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .btn {
-            width: 48%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .cancel-btn {
-            background-color: #333;
-            color: white;
-        }
-
-        .submit-btn {
-            background-color: #c41f1f;
-            color: white;
-        }
-
-        .submit-btn:hover,
-        .cancel-btn:hover {
-            opacity: 0.8;
-        }
-
-        /* Success message styling */
-        .success-message {
-            color: green;
-            font-size: 16px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            z-index: 1002;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .popup.active {
-            display: block;
-        }
-
-        .popup button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #c41f1f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        /* Overlay styling */
-        .header-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-
-        .header-overlay.active {
-            display: block;
         }
     </style>
     <script src="script/load.js" type="module" defer></script>
 </head>
-<body>
 
-    <!-- Header Section -->
+<body class="bg-gray-50">
     <?php include 'header.php'; ?>
 
-    <!-- Main Section -->
-    <main>
-        <div class="feedback-container">
-            <div class="feedback-title">Leave us your feedback!</div>
-            <form id="feedback-form">
-                <div class="rating-section">
-                    How would you rate your experience?
+    <main class="min-h-screen flex items-center justify-center p-8">
+        <div class="w-full max-w-2xl">
+            <!-- Feedback Container -->
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden transform hover:shadow-2xl transition-all duration-300">
+                <!-- Feedback Header -->
+                <div class="bg-gradient-to-r from-red-600 to-red-800 px-8 py-6">
+                    <h1 class="text-3xl font-bold text-white text-center">Share Your Thoughts!</h1>
+                    <p class="text-red-100 text-center mt-2">Help us improve your voting experience</p>
                 </div>
-                <div class="rating-options">
-                    <div class="rating-option" data-value="1">1</div>
-                    <div class="rating-option" data-value="2">2</div>
-                    <div class="rating-option" data-value="3">3</div>
-                    <div class="rating-option" data-value="4">4</div>
-                    <div class="rating-option" data-value="5">5</div>
-                </div>
-                <input type="hidden" name="experience" id="experience" value="0">
-                <div class="rating-description">
-                    <span>1 - Bad</span>
-                    <span>5 - Excellent</span>
-                </div>
-                <div class="suggestion-section">
-                    Do you have any suggestions to make the website or the service better?
-                </div>
-                <textarea class="suggestion-box" name="suggestion" placeholder="Type here..."></textarea>
-                <div class="actions">
-                    <button type="button" class="btn cancel-btn" onclick="navigateTo('homepage.php')">CANCEL</button>
-                    <button type="submit" class="btn submit-btn">SUBMIT</button>
-                </div>
-            </form>
+
+                <form id="feedback-form" class="p-8 space-y-8">
+                    <!-- Rating Section -->
+                    <div class="text-center">
+                        <label class="block text-xl font-semibold text-gray-800 mb-6">
+                            How would you rate your experience?
+                        </label>
+                        <div class="flex justify-center space-x-6">
+                            <?php for($i = 1; $i <= 5; $i++): ?>
+                                <button type="button" 
+                                        class="rating-option w-14 h-14 rounded-full border-2 border-gray-300 flex items-center justify-center text-xl font-bold transition-all duration-200 hover:scale-110 transform"
+                                        data-value="<?php echo $i; ?>">
+                                    <?php echo $i; ?>
+                                </button>
+                            <?php endfor; ?>
+                        </div>
+                        <input type="hidden" name="experience" id="experience" value="0">
+                        <div class="flex justify-between text-sm text-gray-600 mt-4 px-8">
+                            <span class="flex items-center"><i class="fas fa-frown text-red-500 mr-2"></i>Poor</span>
+                            <span class="flex items-center">Excellent<i class="fas fa-smile text-green-500 ml-2"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Suggestion Section -->
+                    <div class="space-y-4">
+                        <label class="block text-xl font-semibold text-gray-800 text-center">
+                            Any suggestions for improvement?
+                        </label>
+                        <textarea name="suggestion" 
+                                class="w-full h-40 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700"
+                                placeholder="Share your ideas with us..."></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" 
+                                onclick="window.history.back()"
+                                class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition duration-300 flex items-center">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Back
+                        </button>
+                        <button type="submit"
+                                class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-300 flex items-center">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 
-    <!-- Footer Section -->
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4 transform transition-all duration-300">
+            <div class="text-center">
+                <div class="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-check-circle text-5xl text-green-500"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Thank You!</h2>
+                <p class="text-gray-600 mb-6">Your feedback helps us improve the voting system.</p>
+                <button onclick="closeModal()" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center">
+                    <i class="fas fa-times mr-2"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <?php include 'footer.php'; ?>
 
     <script>
@@ -296,8 +152,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             ratingOptions.forEach(option => {
                 option.addEventListener('click', function () {
-                    ratingOptions.forEach(opt => opt.classList.remove('selected'));
-                    option.classList.add('selected');
+                    // Remove selected state from all options
+                    ratingOptions.forEach(opt => {
+                        opt.classList.remove('bg-red-600', 'text-white', 'border-red-600', 'scale-110');
+                    });
+                    // Add selected state to clicked option
+                    option.classList.add('bg-red-600', 'text-white', 'border-red-600', 'scale-110');
                     experienceInput.value = option.getAttribute('data-value');
                 });
             });
@@ -305,11 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             feedbackForm.addEventListener('submit', function (event) {
                 event.preventDefault();
 
-                const experience = experienceInput.value;
-                const suggestion = feedbackForm.querySelector('textarea[name="suggestion"]').value.trim();
-
-                if (experience === "0" || suggestion === "") {
-                    alert("Please provide a rating and a suggestion.");
+                if (experienceInput.value === "0") {
+                    alert("Please provide a rating before submitting.");
                     return;
                 }
 
@@ -322,14 +179,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("Feedback submitted. Thank you!");
-                        feedbackForm.reset();
-                        ratingOptions.forEach(opt => opt.classList.remove('selected'));
-                        experienceInput.value = "0";
+                        document.getElementById('successModal').classList.remove('hidden');
                     }
                 });
             });
         });
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('feedback-form').reset();
+            // Remove selected state from all rating options
+            document.querySelectorAll('.rating-option').forEach(opt => {
+                opt.classList.remove('bg-red-600', 'text-white', 'border-red-600', 'scale-110');
+            });
+            document.getElementById('experience').value = "0";
+        }
 
         function navigateTo(page) {
             window.location.href = page;
