@@ -7,13 +7,21 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
 
 require_once '../connect.php';
 
-// Get current election
-$stmt = $pdo->query("SELECT election_id, election_name FROM elections WHERE is_current = 1 LIMIT 1");
+// Get current election with full details
+$stmt = $pdo->query("
+    SELECT * FROM elections 
+    WHERE is_current = 1 
+    LIMIT 1
+");
 $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$currentElection) {
     die("Please set a current election first before viewing results.");
 }
+
+// Store datetime values for JavaScript
+$startDatetime = $currentElection['start_datetime'];
+$endDatetime = $currentElection['end_datetime'];
 
 // Fetch positions from the database
 $positionsStmt = $pdo->query("SELECT * FROM positions");
@@ -23,23 +31,42 @@ $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 function getLiveResults($pdo, $positionId, $electionId) {
     $stmt = $pdo->prepare("
         SELECT 
-            c.candidate_name, 
-            pa.party_name, 
-            c.candidate_image, 
-            COUNT(v.vote_id) AS votes
+            c.candidate_name,
+            c.candidate_image,
+            co.college_name,
+            pa.party_name,
+            COUNT(v.vote_id) as vote_count,
+            (SELECT COUNT(*) FROM votes 
+             WHERE position_id = :position_id 
+             AND election_id = :election_id) as total_position_votes
         FROM candidates c
-        LEFT JOIN votes v ON v.candidate_id = c.candidate_id AND v.election_id = :election_id
+        LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
+            AND v.election_id = :election_id
+        LEFT JOIN colleges co ON c.college_id = co.college_id
         LEFT JOIN parties pa ON c.party_id = pa.party_id
         WHERE c.position_id = :position_id 
         AND c.election_id = :election_id
         GROUP BY c.candidate_id
-        ORDER BY votes DESC
+        ORDER BY vote_count DESC
     ");
+    
     $stmt->execute([
-        'position_id' => $positionId,
-        'election_id' => $electionId
+        ':position_id' => $positionId,
+        ':election_id' => $electionId
     ]);
+    
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Create API endpoint for fetching results
+if (isset($_GET['fetch_results'])) {
+    $positionId = $_GET['position_id'] ?? null;
+    if ($positionId) {
+        $results = getLiveResults($pdo, $positionId, $currentElection['election_id']);
+        header('Content-Type: application/json');
+        echo json_encode($results);
+        exit;
+    }
 }
 
 // Start output buffering if needed
