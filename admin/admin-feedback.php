@@ -182,7 +182,19 @@ $feedbacks = $stmt->fetchAll();
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900"><?php echo htmlspecialchars($feedback['suggestion']); ?></div>
+                                    <div class="text-sm text-gray-900">
+                                        <?php 
+                                        $shortText = htmlspecialchars($feedback['suggestion']);
+                                        if (strlen($shortText) > 100) {
+                                            $shortText = substr($shortText, 0, 100) . '...';
+                                            echo $shortText;
+                                            echo '<button class="expand-comment ml-2 text-blue-600 hover:text-blue-800 text-sm">Read more</button>';
+                                            echo '<span class="hidden full-comment">' . htmlspecialchars($feedback['suggestion']) . '</span>';
+                                        } else {
+                                            echo $shortText;
+                                        }
+                                        ?>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4" data-order="<?php echo strtotime($feedback['feedback_timestamp']); ?>">
                                     <div class="text-sm text-gray-500"><?php echo date('M d, Y \a\t h:i A', strtotime($feedback['feedback_timestamp'])); ?></div>
@@ -201,6 +213,32 @@ $feedbacks = $stmt->fetchAll();
             </div>
         </div>
     </main>
+    <!-- Add this modal at the bottom of the body, before closing body tag -->
+    <div id="commentModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Full Comment</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-500">
+                    <span class="text-2xl">&times;</span>
+                </button>
+            </div>
+            <div class="comment-content space-y-4">
+                <div class="text-sm text-gray-600">
+                    <div class="font-medium text-gray-900 mb-1">Author</div>
+                    <div id="modalAuthor" class="mb-4"></div>
+                    
+                    <div class="font-medium text-gray-900 mb-1">Rating</div>
+                    <div id="modalRating" class="mb-4"></div>
+                    
+                    <div class="font-medium text-gray-900 mb-1">Date</div>
+                    <div id="modalDate" class="mb-4"></div>
+                    
+                    <div class="font-medium text-gray-900 mb-1">Comment</div>
+                    <div id="modalComment" class="whitespace-pre-wrap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // Initialize DataTable
         $(document).ready(function() {
@@ -213,8 +251,19 @@ $feedbacks = $stmt->fetchAll();
                     { 
                         targets: 2,
                         render: function(data, type, row) {
-                            if (type === 'display' && data.length > 100) {
-                                return data.substr(0, 100) + '...';
+                            if (type === 'display') {
+                                let shortText = data;
+                                if (data.length > 100) {
+                                    shortText = data.substr(0, 100) + '...';
+                                    return `<div class="text-sm text-gray-900">
+                                        ${shortText}
+                                        <button class="expand-comment ml-2 text-blue-600 hover:text-blue-800 text-sm">
+                                            Read more
+                                        </button>
+                                        <span class="hidden full-comment">${data}</span>
+                                    </div>`;
+                                }
+                                return `<div class="text-sm text-gray-900">${shortText}</div>`;
                             }
                             return data;
                         }
@@ -234,6 +283,37 @@ $feedbacks = $stmt->fetchAll();
                     $('.dataTables_paginate .paginate_button.current').addClass('bg-blue-500 text-white hover:bg-blue-600');
                     $('.dataTables_info').addClass('text-sm text-gray-600');
                 }
+            });
+
+            // Handle comment expansion
+            $('#feedbackTable').on('click', '.expand-comment', function(e) {
+                e.preventDefault();
+                const row = $(this).closest('tr');
+                const authorName = row.find('td:first-child .text-sm').text();
+                const rating = row.find('td:nth-child(2) span').clone();
+                const fullComment = $(this).siblings('.full-comment').text();
+                const date = row.find('td:nth-child(4) .text-sm').text();
+
+                // Populate modal
+                $('#modalAuthor').text(authorName);
+                $('#modalRating').html(rating);
+                $('#modalComment').text(fullComment);
+                $('#modalDate').text(date);
+
+                // Show modal
+                $('#commentModal').removeClass('hidden');
+            });
+
+            // Close modal handlers
+            $('.close-modal, #commentModal').on('click', function(e) {
+                if (e.target === this) {
+                    $('#commentModal').addClass('hidden');
+                }
+            });
+
+            // Prevent modal close when clicking inside modal content
+            $('.modal-content').on('click', function(e) {
+                e.stopPropagation();
             });
         });
 
