@@ -75,7 +75,7 @@ ob_start();
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['position_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($candidate['college_name']); ?></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <?php echo $candidate['qualified'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
+                                <span class="px-3 py-1 inline-flex text-base leading-5 font-semibold rounded-full <?php echo $candidate['qualified'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'; ?>">
                                     <?php echo $candidate['qualified'] ? 'Yes' : 'No'; ?>
                                 </span>
                             </td>
