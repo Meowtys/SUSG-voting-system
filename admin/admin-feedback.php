@@ -96,28 +96,54 @@ $feedbacks = $stmt->fetchAll();
             </div>
 
             <!-- Feedback Summary Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <?php
-                $totalRating = 0;
                 $ratings = array_column($feedbacks, 'experience');
                 $avgRating = count($ratings) > 0 ? array_sum($ratings) / count($ratings) : 0;
-                $positiveCount = count(array_filter($ratings, function($r) { return $r >= 4; }));
-                $negativeCount = count(array_filter($ratings, function($r) { return $r <= 2; }));
+                
+                // Read sentiment cache
+                require_once dirname(__FILE__) . '/../cache/SentimentCache.php';
+                $sentimentCache = new SentimentCache();
+                $overallSentiment = $sentimentCache->get('overall_sentiment');
+                $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
+
                 ?>
                 <!-- Average Rating Card -->
                 <div class="bg-white rounded-lg p-6 shadow-sm">
                     <div class="text-sm font-medium text-gray-500 mb-1">Average Rating</div>
                     <div class="text-2xl font-bold text-gray-900"><?php echo number_format($avgRating, 1); ?>/5.0</div>
+                    <div class="text-sm text-gray-600 mt-2">Based on all feedback</div>
                 </div>
-                <!-- Positive Feedback Card -->
+                <!-- Latest Activity Card -->
                 <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <div class="text-sm font-medium text-gray-500 mb-1">Positive Feedback</div>
-                    <div class="text-2xl font-bold text-green-600"><?php echo $positiveCount; ?></div>
-                </div>
-                <!-- Negative Feedback Card -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <div class="text-sm font-medium text-gray-500 mb-1">Needs Improvement</div>
-                    <div class="text-2xl font-bold text-red-600"><?php echo $negativeCount; ?></div>
+                    <div class="text-sm font-medium text-gray-500 mb-1">Latest Activity</div>
+                    <div class="text-sm text-gray-600 mt-2">
+                        <?php
+                        if (count($feedbacks) > 0) {
+                            $latestFeedback = $feedbacks[0];
+                            $latestFeedbackDate = date('M d, Y \a\t h:i A', strtotime($latestFeedback['feedback_timestamp']));
+                            $latestFeedbackAuthor = htmlspecialchars($latestFeedback['student_name']);
+                            $latestFeedbackComment = htmlspecialchars($latestFeedback['suggestion']);
+                            $latestFeedbackRating = $latestFeedback['experience'];
+
+                            $ratingClass = '';
+                            if ($latestFeedbackRating >= 4) {
+                                $ratingClass = 'bg-green-100 text-green-800';
+                            } elseif ($latestFeedbackRating >= 2) {
+                                $ratingClass = 'bg-yellow-100 text-yellow-800';
+                            } else {
+                                $ratingClass = 'bg-red-100 text-red-800';
+                            }
+
+                            echo "<div class='text-sm font-medium text-gray-900'>Author: $latestFeedbackAuthor</div>";
+                            echo "<div class='text-sm text-gray-600'>Comment: $latestFeedbackComment</div>";
+                            echo "<div class='text-sm text-gray-600'>Rating: <span class='inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium $ratingClass'>$latestFeedbackRating/5</span></div>";
+                            echo "<div class='text-sm text-gray-500'>Submitted on: $latestFeedbackDate</div>";
+                        } else {
+                            echo "<div class='text-sm text-gray-600'>No feedback available.</div>";
+                        }
+                        ?>
+                    </div>
                 </div>
             </div>
 
