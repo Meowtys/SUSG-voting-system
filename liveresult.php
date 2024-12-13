@@ -112,9 +112,10 @@ foreach ($candidates as $candidate) {
             box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             width: 100%;
-            height: calc(100vh - 250px); /* Set fixed height */
+            height: calc(100vh - 280px);
             display: flex;
             flex-direction: column;
+            padding: 1rem;
         }
         .candidates-container {
             overflow-y: auto;
@@ -140,11 +141,11 @@ foreach ($candidates as $candidate) {
             background: #dc2626;
         }
         .candidate-card {
-            padding: 1.5rem;
+            padding: 1rem;
             border-radius: 1rem;
             background: rgba(255, 255, 255, 0.95);
             transition: all 0.3s ease;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             border: 1px solid rgba(239, 68, 68, 0.1);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
@@ -165,28 +166,33 @@ foreach ($candidates as $candidate) {
 
         .candidate-image-wrapper {
             position: relative;
-            width: 100px;
+            width: 80px;
             flex-shrink: 0;
         }
 
         .candidate-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 1rem;
+            width: 80px;
+            height: 80px;
+            border-radius: 0.75rem;
             object-fit: cover;
-            border: 3px solid #fecaca;
+            border: 2px solid #fecaca;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
         }
 
         .crown-badge {
             position: absolute;
-            top: -10px;
-            right: -10px;
+            top: -8px;
+            right: -8px;
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            padding: 0.5rem;
+            padding: 0.35rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px -1px rgba(251, 191, 36, 0.3);
             transform: rotate(15deg);
+        }
+
+        .crown-badge svg {
+            width: 1rem;
+            height: 1rem;
         }
 
         .candidate-details {
@@ -197,10 +203,11 @@ foreach ($candidates as $candidate) {
         }
 
         .candidate-name {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #1f2937;
             line-height: 1.2;
+            margin-bottom: -0.25rem;
         }
 
         .candidate-meta {
@@ -210,19 +217,24 @@ foreach ($candidates as $candidate) {
         }
 
         .meta-tag {
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 0.75rem;
             border-radius: 0.75rem;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.25rem;
             box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
         }
 
+        .meta-tag svg {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+
         .votes-section {
-            margin-top: 1.25rem;
-            padding-top: 1.25rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
             border-top: 1px solid rgba(239, 68, 68, 0.1);
         }
 
@@ -235,25 +247,39 @@ foreach ($candidates as $candidate) {
 
         .vote-counter {
             background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
         }
 
+        .vote-counter span:first-child {
+            font-size: 1.5rem;
+        }
+
+        .vote-counter span:last-child {
+            font-size: 0.75rem;
+        }
+
         .vote-percentage {
-            font-size: 1.25rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #1f2937;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
+
+        .vote-percentage svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
         .progress-bar {
-            height: 8px;
+            height: 6px;
             border-radius: 4px;
             background: rgba(255, 255, 255, 0.7);
             overflow: hidden;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
         .progress-fill {
             height: 100%;
@@ -263,10 +289,20 @@ foreach ($candidates as $candidate) {
         .election-header {
             background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
             border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
         }
+
+        .election-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .election-header h2 {
+            font-size: 1.25rem;
+        }
+
         .refresh-timer {
             position: fixed;
             bottom: 1rem;
