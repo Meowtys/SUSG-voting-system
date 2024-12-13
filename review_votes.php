@@ -30,11 +30,13 @@ $default_abstain_image = 'path/to/default_abstain_image.png';
 
 // Retrieve selected votes from the database
 $selectedVotes = [];
-$votes_stmt = $pdo->prepare("SELECT v.candidate_id, c.candidate_name, c.college_id, p.position_name, col.college_name 
+$votes_stmt = $pdo->prepare("SELECT v.candidate_id, c.candidate_name, c.college_id, p.position_name, 
+                                    col.college_name, par.party_name
                              FROM votes v
                              JOIN candidates c ON v.candidate_id = c.candidate_id
                              JOIN positions p ON v.position_id = p.position_id
                              JOIN colleges col ON c.college_id = col.college_id
+                             LEFT JOIN parties par ON c.party_id = par.party_id
                              WHERE v.student_id = ?");
 $votes_stmt->execute([$user['student_id']]);
 $votes = $votes_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,7 +45,8 @@ foreach ($votes as $vote) {
     $selectedVotes[$vote['position_name']] = [
         'candidate_id' => $vote['candidate_id'],
         'candidate_name' => $vote['candidate_name'],
-        'college_name' => $vote['college_name']
+        'college_name' => $vote['college_name'],
+        'party_name' => $vote['party_name']
     ];
 }
 ?>
@@ -153,10 +156,28 @@ foreach ($votes as $vote) {
                                                 <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>
                                             </h4>
                                             <?php if ($selectedVotes[$position['position_name']]['candidate_name'] !== 'Abstain'): ?>
-                                                <div class="flex items-center mt-1">
-                                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                                                        <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
-                                                    </span>
+                                                <div class="flex flex-row items-center space-x-3">
+                                                    <!-- College Name -->
+                                                    <div class="flex-1">
+                                                        <div class="flex items-center p-2 bg-red-100 rounded-lg">
+                                                            <i class="fas fa-university text-red-800 text-lg mr-2"></i>
+                                                            <span class="text-red-800 text-base font-medium truncate">
+                                                                <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['college_name']); ?>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Party Name -->
+                                                    <?php if (!empty($selectedVotes[$position['position_name']]['party_name'])): ?>
+                                                        <div class="flex-1">
+                                                            <div class="flex items-center p-2 bg-red-100 rounded-lg">
+                                                                <i class="fas fa-users text-red-800 text-lg mr-2"></i>
+                                                                <span class="text-red-800 text-base font-medium truncate">
+                                                                    <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['party_name']); ?>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             <?php else: ?>
                                                 <p class="text-sm text-yellow-600">You abstained for this position</p>
