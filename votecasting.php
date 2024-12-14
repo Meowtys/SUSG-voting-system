@@ -167,6 +167,7 @@ foreach ($candidates as $candidate) {
         const maxRepresentatives = <?php echo $collegeInfo['max_representatives']; ?>;
         let currentPositionIndex = 0;
         const selectedVotes = {};
+        let isAbstainingForRepresentatives = false;
 
         function fetchCandidates(position_id) {
             return fetch(`fetch_candidates.php?position_id=${position_id}`)
@@ -382,8 +383,8 @@ foreach ($candidates as $candidate) {
             
             if (position === 'Representative') {
                 const selectedReps = selectedVotes[position]?.length || 0;
-                if (selectedReps === 0) {
-                    alert('Please select at least one representative or click Abstain to proceed.');
+                if (selectedReps === 0 ) {
+                    alert('Please select at least one representative');
                     return;
                 }
             } else if (!selectedVotes[position]) {
