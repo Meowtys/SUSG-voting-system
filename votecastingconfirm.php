@@ -289,10 +289,18 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div id="redirectProgress" class="bg-red-600 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
-            <button onclick="redirectNow()" 
-                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
-                Go to Homepage Now
-            </button>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="window.location.href='review_votes.php'" 
+                        class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-eye mr-2"></i>
+                    Review Votes
+                </button>
+                <button onclick="redirectNow()" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-home mr-2"></i>
+                    Go to Homepage
+                </button>
+            </div>
         </div>
     </div>
 
