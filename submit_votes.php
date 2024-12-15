@@ -70,7 +70,7 @@ try {
                             qualified, election_id, party_id
                         ) VALUES (
                             'Abstain', 0, :position_id, 
-                            0, :election_id, 3
+                            0, :election_id, NULL
                         )
                     ");
                     $createAbstainStmt->execute([
@@ -159,7 +159,7 @@ try {
                             qualified, election_id, party_id
                         ) VALUES (
                             'Abstain', 0, :position_id, 
-                            0, :election_id, 3
+                            0, :election_id, NULL
                         )
                     ");
                     $createAbstainStmt->execute([
