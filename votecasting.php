@@ -342,24 +342,32 @@ foreach ($candidates as $candidate) {
             const candidatesContainer = document.getElementById("candidatesContainer");
             const allCards = candidatesContainer.querySelectorAll('.candidate-card');
             
-            allCards.forEach(card => {
-                card.querySelector('.selected-overlay').classList.add('hidden');
-                card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
-            });
+            // Position-specific confirmation messages
+            const confirmMessages = {
+                'President': 'Are you sure you want to abstain from voting for any presidential candidates?',
+                'Vice President': 'Are you sure you want to abstain from voting for any vice-presidential candidates?',
+                'Representative': 'Are you sure you want to abstain from voting for any representatives?'
+            };
             
-            if (position === 'Representative') {
-                if (confirm('Are you sure you want to abstain from voting for any representatives?')) {
-                    hasAbstained = true;  // Set abstention flag
+            const confirmMessage = confirmMessages[position] || `Are you sure you want to abstain from voting for ${position}?`;
+            
+            if (confirm(confirmMessage)) {
+                allCards.forEach(card => {
+                    card.querySelector('.selected-overlay').classList.add('hidden');
+                    card.classList.remove('ring-4', 'ring-red-600', 'ring-opacity-50');
+                });
+                
+                if (position === 'Representative') {
+                    hasAbstained = true;
                     selectedVotes[position] = [];
-                    goNext();
+                } else {
+                    selectedVotes[position] = { 
+                        candidate_id: 0,
+                        candidate_name: 'Abstain',
+                        college_name: 'Abstain',
+                        candidate_image: 'abstain-icon'
+                    };
                 }
-            } else {
-                selectedVotes[position] = { 
-                    candidate_id: 0,
-                    candidate_name: 'Abstain',
-                    college_name: 'Abstain',
-                    candidate_image: 'abstain-icon'
-                };
                 goNext();
             }
         }
