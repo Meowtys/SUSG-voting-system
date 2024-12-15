@@ -46,26 +46,41 @@ try {
         }
 
         // Handle representatives differently
-        if ($position === 'Representative' && is_array($candidate)) {
-            // Insert vote for each representative
-            foreach ($candidate as $rep) {
-                // Verify candidate exists and belongs to current election
-                $checkCandidateStmt = $pdo->prepare("
+        if ($position === 'Representative') {
+            // Check if it's an empty array (abstain case) or has actual votes
+            if (empty($candidate) || (is_array($candidate) && count($candidate) === 0)) {
+                // Handle abstain for representatives
+                $abstainStmt = $pdo->prepare("
                     SELECT candidate_id FROM candidates 
-                    WHERE candidate_id = :candidate_id 
-                    AND election_id = :election_id
+                    WHERE position_id = :position_id 
+                    AND election_id = :election_id 
+                    AND candidate_name = 'Abstain'
                 ");
-                $checkCandidateStmt->execute([
-                    ':candidate_id' => $rep['candidate_id'],
+                $abstainStmt->execute([
+                    ':position_id' => $position_id,
                     ':election_id' => $election_id
                 ]);
-                $candidate_id = $checkCandidateStmt->fetchColumn();
+                $abstain_id = $abstainStmt->fetchColumn();
 
-                if (!$candidate_id) {
-                    throw new Exception("Invalid representative selection");
+                if (!$abstain_id) {
+                    // Create abstain candidate for representatives
+                    $createAbstainStmt = $pdo->prepare("
+                        INSERT INTO candidates (
+                            candidate_name, college_id, position_id, 
+                            qualified, election_id, party_id
+                        ) VALUES (
+                            'Abstain', 0, :position_id, 
+                            1, :election_id, 3
+                        )
+                    ");
+                    $createAbstainStmt->execute([
+                        ':position_id' => $position_id,
+                        ':election_id' => $election_id
+                    ]);
+                    $abstain_id = $pdo->lastInsertId();
                 }
 
-                // Insert representative vote
+                // Insert abstain vote for representatives
                 $stmt = $pdo->prepare("
                     INSERT INTO votes (
                         student_id, position_id, candidate_id, 
@@ -79,9 +94,46 @@ try {
                 $stmt->execute([
                     ':student_id' => $user_id,
                     ':position_id' => $position_id,
-                    ':candidate_id' => $candidate_id,
+                    ':candidate_id' => $abstain_id,
                     ':election_id' => $election_id
                 ]);
+            } else {
+                // Insert vote for each representative
+                foreach ($candidate as $rep) {
+                    // Verify candidate exists and belongs to current election
+                    $checkCandidateStmt = $pdo->prepare("
+                        SELECT candidate_id FROM candidates 
+                        WHERE candidate_id = :candidate_id 
+                        AND election_id = :election_id
+                    ");
+                    $checkCandidateStmt->execute([
+                        ':candidate_id' => $rep['candidate_id'],
+                        ':election_id' => $election_id
+                    ]);
+                    $candidate_id = $checkCandidateStmt->fetchColumn();
+
+                    if (!$candidate_id) {
+                        throw new Exception("Invalid representative selection");
+                    }
+
+                    // Insert representative vote
+                    $stmt = $pdo->prepare("
+                        INSERT INTO votes (
+                            student_id, position_id, candidate_id, 
+                            election_id, vote_timestamp
+                        ) VALUES (
+                            :student_id, :position_id, :candidate_id, 
+                            :election_id, NOW()
+                        )
+                    ");
+                    
+                    $stmt->execute([
+                        ':student_id' => $user_id,
+                        ':position_id' => $position_id,
+                        ':candidate_id' => $candidate_id,
+                        ':election_id' => $election_id
+                    ]);
+                }
             }
         } else {
             // Handle abstain vote
