@@ -11,6 +11,12 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 
+// Redirect if user has already voted
+if ($user['has_voted']) {
+    header('Location: homepage.php');
+    exit();
+}
+
 // Retrieve selected votes from session
 $selectedVotes = isset($_SESSION['selectedVotes']) ? $_SESSION['selectedVotes'] : [];
 
@@ -290,7 +296,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="window.location.href='review_votes.php?source=confirmation'" 
+                <button onclick="window.location.href='review_votes.php?from=home'" 
                         class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-eye mr-2"></i>
                     Review Votes
