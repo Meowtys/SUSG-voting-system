@@ -132,6 +132,11 @@ $electionData = $currentElection ? [
         <button onclick="closeHeaderPopup('no-election')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
     </div>
 
+    <div class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-80" id="not-voted-popup">
+        <p class="text-gray-800 mb-4">You haven't cast your vote yet.</p>
+        <button onclick="closeHeaderPopup('not-voted-popup')" class="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition duration-300">Close</button>
+    </div>
+
     <!-- Dropdown Menu -->
     <?php if ($user): ?>
     <nav class="header-menu fixed top-0 right-0 w-72 h-full bg-gradient-to-b from-[#811111] to-[#621111] z-50 flex flex-col" id="header-side-menu">
@@ -202,17 +207,15 @@ $electionData = $currentElection ? [
                         <span>Vote</span>
                     </a>
                 </li>
-                <!-- Add Review Votes link -->
-                <?php if ($user['has_voted']): ?>
+                <!-- Replace the conditional Review Votes section with this -->
                 <li class="menu-item-hover">
-                    <a href="review_votes.php?from=home" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                    <a href="javascript:void(0);" onclick="handleReviewVotesClick()" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <span>Review Votes</span>
                     </a>
                 </li>
-                <?php endif; ?>
                 <li class="menu-item-hover">
                     <a href="liveresult.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -283,6 +286,15 @@ $electionData = $currentElection ? [
                 showHeaderPopup('election-ended');
             } else {
                 window.location.href = 'votecasting.php';
+            }
+        }
+
+        // Add this new function to handle Review Votes click
+        function handleReviewVotesClick() {
+            if (!headerHasVoted) {
+                showHeaderPopup('not-voted-popup');
+            } else {
+                window.location.href = 'review_votes.php?from=home';
             }
         }
 
