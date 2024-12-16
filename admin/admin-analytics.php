@@ -200,7 +200,7 @@ try {
                     return;
                 }
 
-                const apiKey = 'a777cea33da118e4703a82dddefab1a4'; // MeaningCloud API key
+                const apiKey = '1d27e7bc01cf6e76d42e2115883bfbae'; // MeaningCloud API key
                 // backup key 'a777cea33da118e4703a82dddefab1a4'
 
                 // Function to handle API errors
