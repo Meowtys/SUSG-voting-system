@@ -496,75 +496,80 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
             }
         }
 
-        // Table sorting functionality
+        // Updated table sorting functionality
         document.addEventListener('DOMContentLoaded', function() {
             const table = document.querySelector('table');
-            const headers = table.querySelectorAll('th[data-sort]');
+            const allHeaders = table.querySelectorAll('th');
             let currentSort = {
                 column: null,
                 direction: 'asc'
             };
 
-            headers.forEach(header => {
-                header.addEventListener('click', () => {
-                    const column = header.dataset.sort;
-                    
-                    // Reset all headers
-                    headers.forEach(h => {
-                        h.classList.remove('asc', 'desc', 'active');
-                    });
+            allHeaders.forEach((header, headerIndex) => {
+                if (header.dataset.sort) {
+                    header.addEventListener('click', () => {
+                        const column = header.dataset.sort;
+                        
+                        // Reset all headers
+                        allHeaders.forEach(h => {
+                            h.classList.remove('asc', 'desc', 'active');
+                        });
 
-                    // Determine sort direction
-                    if (currentSort.column === column) {
-                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        currentSort.column = column;
-                        currentSort.direction = 'asc';
-                    }
-
-                    // Add appropriate classes
-                    header.classList.add(currentSort.direction, 'active');
-
-                    // Get table body and rows
-                    const tbody = table.querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-
-                    // Sort rows
-                    const sortedRows = rows.sort((a, b) => {
-                        let aValue = a.querySelector(`td:nth-child(${Array.from(headers).indexOf(header) + 1})`).textContent.trim();
-                        let bValue = b.querySelector(`td:nth-child(${Array.from(headers).indexOf(header) + 1})`).textContent.trim();
-
-                        // Special handling for has_voted column
-                        if (column === 'has_voted') {
-                            aValue = aValue === 'Yes' ? 1 : 0;
-                            bValue = bValue === 'Yes' ? 1 : 0;
-                        }
-
-                        // Handle numeric student IDs
-                        if (column === 'student_id') {
-                            return currentSort.direction === 'asc' 
-                                ? aValue.localeCompare(bValue, undefined, {numeric: true})
-                                : bValue.localeCompare(aValue, undefined, {numeric: true});
-                        }
-
-                        if (currentSort.direction === 'asc') {
-                            return aValue > bValue ? 1 : -1;
+                        // Determine sort direction
+                        if (currentSort.column === column) {
+                            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
                         } else {
-                            return aValue < bValue ? 1 : -1;
+                            currentSort.column = column;
+                            currentSort.direction = 'asc';
                         }
-                    });
 
-                    // Clear and append sorted rows
-                    while (tbody.firstChild) {
-                        tbody.removeChild(tbody.firstChild);
-                    }
-                    sortedRows.forEach(row => tbody.appendChild(row));
+                        // Add appropriate classes
+                        header.classList.add(currentSort.direction, 'active');
 
-                    // Add animation to sorted rows
-                    sortedRows.forEach((row, index) => {
-                        row.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s`;
+                        // Get table body and rows
+                        const tbody = table.querySelector('tbody');
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                        // Sort rows
+                        const sortedRows = rows.sort((a, b) => {
+                            let aValue = a.querySelector(`td:nth-child(${headerIndex + 1})`).textContent.trim();
+                            let bValue = b.querySelector(`td:nth-child(${headerIndex + 1})`).textContent.trim();
+
+                            // Special handling for has_voted column
+                            if (column === 'has_voted') {
+                                aValue = aValue === 'Yes' ? 1 : 0;
+                                bValue = bValue === 'Yes' ? 1 : 0;
+
+                                return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                            }
+
+                            // Handle student_id as strings with numeric comparison
+                            if (column === 'student_id') {
+                                return currentSort.direction === 'asc' 
+                                    ? aValue.localeCompare(bValue, undefined, { numeric: true })
+                                    : bValue.localeCompare(aValue, undefined, { numeric: true });
+                            }
+
+                            // For other columns
+                            if (currentSort.direction === 'asc') {
+                                return aValue.localeCompare(bValue);
+                            } else {
+                                return bValue.localeCompare(aValue);
+                            }
+                        });
+
+                        // Clear and append sorted rows
+                        while (tbody.firstChild) {
+                            tbody.removeChild(tbody.firstChild);
+                        }
+                        sortedRows.forEach(row => tbody.appendChild(row));
+
+                        // Add animation to sorted rows
+                        sortedRows.forEach((row, index) => {
+                            row.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s`;
+                        });
                     });
-                });
+                }
             });
         });
 
