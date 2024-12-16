@@ -290,7 +290,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="window.location.href='review_votes.php'" 
+                <button onclick="window.location.href='review_votes.php?source=confirmation'" 
                         class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-eye mr-2"></i>
                     Review Votes

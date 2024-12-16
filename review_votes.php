@@ -333,10 +333,15 @@ foreach ($votes as $vote) {
 
             <!-- Back Button -->
             <div class="flex justify-center mt-8">
-                <button onclick="navigateTo('countdown.php')" 
+                <?php 
+                $fromParam = isset($_GET['from']) ? $_GET['from'] : '';
+                $showHomeButton = ($fromParam === 'home');
+                ?>
+                
+                <button onclick="navigateTo('<?php echo $showHomeButton ? 'homepage.php' : 'countdown.php'; ?>')" 
                         class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg flex items-center justify-center transition duration-300 transform hover:-translate-y-1">
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    Back to Countdown
+                    <i class="fas <?php echo $showHomeButton ? 'fa-home' : 'fa-arrow-left'; ?> mr-2"></i>
+                    <?php echo $showHomeButton ? 'Back to Homepage' : 'Back to Countdown'; ?>
                 </button>
             </div>
         </div>
