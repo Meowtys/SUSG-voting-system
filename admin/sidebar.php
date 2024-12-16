@@ -4,10 +4,9 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 
 // Check if the user is logged in
-if (isset($_SESSION['user'])) {
-    $user = $_SESSION['user'];
-} else {
-    $user = null;
+if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+    header('Location: ../loginascomelec.php');
+    exit();
 }
 
 // Get current election
