@@ -9,6 +9,20 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+require_once 'connect.php';
+
+// Check if user has voted by querying the database
+$student_id = $_SESSION['user']['student_id'];
+$check_votes_stmt = $pdo->prepare("SELECT COUNT(*) FROM votes WHERE student_id = ?");
+$check_votes_stmt->execute([$student_id]);
+$has_voted = (bool)$check_votes_stmt->fetchColumn();
+
+if (!$has_voted) {
+    $_SESSION['show_popup'] = 'not-voted';
+    header('Location: homepage.php');
+    exit();
+}
+
 $user = $_SESSION['user'];
 
 require_once 'connect.php';
