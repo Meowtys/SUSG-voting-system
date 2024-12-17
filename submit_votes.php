@@ -32,6 +32,15 @@ try {
         throw new Exception("No active election found");
     }
 
+    // Get voter's college_id
+    $voterStmt = $pdo->prepare("SELECT college_id FROM students WHERE student_id = ?");
+    $voterStmt->execute([$user_id]);
+    $voter_college_id = $voterStmt->fetchColumn();
+
+    if (!$voter_college_id) {
+        throw new Exception("Could not determine voter's college");
+    }
+
     $pdo->beginTransaction();
 
     // Process votes
@@ -49,31 +58,34 @@ try {
         if ($position === 'Representative') {
             // Check if it's an empty array (abstain case) or has actual votes
             if (empty($candidate) || (is_array($candidate) && count($candidate) === 0)) {
-                // Handle abstain for representatives
+                // Handle abstain for representatives - now with college_id
                 $abstainStmt = $pdo->prepare("
                     SELECT candidate_id FROM candidates 
                     WHERE position_id = :position_id 
                     AND election_id = :election_id 
                     AND candidate_name = 'Abstain'
+                    AND college_id = :college_id
                 ");
                 $abstainStmt->execute([
                     ':position_id' => $position_id,
-                    ':election_id' => $election_id
+                    ':election_id' => $election_id,
+                    ':college_id' => $voter_college_id
                 ]);
                 $abstain_id = $abstainStmt->fetchColumn();
 
                 if (!$abstain_id) {
-                    // Create abstain candidate for representatives
+                    // Create abstain candidate for representatives with voter's college_id
                     $createAbstainStmt = $pdo->prepare("
                         INSERT INTO candidates (
                             candidate_name, college_id, position_id, 
                             qualified, election_id, party_id
                         ) VALUES (
-                            'Abstain', 0, :position_id, 
+                            'Abstain', :college_id, :position_id, 
                             0, :election_id, NULL
                         )
                     ");
                     $createAbstainStmt->execute([
+                        ':college_id' => $voter_college_id,
                         ':position_id' => $position_id,
                         ':election_id' => $election_id
                     ]);
