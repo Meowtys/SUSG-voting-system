@@ -100,7 +100,7 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </div>
                                             <div class="ml-4">
                                                 <h4 class="text-lg font-medium text-yellow-800">Abstain</h4>
-                                                <p class="text-sm text-yellow-600">You chose to abstain for representatives</p>
+                                                <p class="text-sm text-yellow-600">You chose to abstain for this position</p>
                                             </div>
                                         </div>
                                     <?php else: ?>
