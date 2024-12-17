@@ -266,7 +266,7 @@ ob_start();
                                     <span class="text-xs text-white opacity-90">votes</span>
                                 </div>
                             </div>
-                            <div class="progress-container">
+                            <div class="progress-container">    
                                 <div class="progress-bar">
                                     <div class="progress-fill" style="width: ${percentage}%"></div>
                                 </div>
@@ -370,6 +370,13 @@ ob_start();
                     fetchResults(currentPositionId, document.querySelector('.current-position').textContent);
                 }
             });
+
+            // Add auto-refresh functionality
+            setInterval(() => {
+                if (currentPositionId) {
+                    fetchResults(currentPositionId, document.querySelector('.current-position').textContent);
+                }
+            }, 30000); // Refresh every 30 seconds
         });
     </script>
 </head>
