@@ -179,10 +179,38 @@ foreach ($candidates as $candidate) {
                 });
         }
 
+        // Add this college abbreviations mapping right after the script tag starts
+        const collegeAbbreviations = {
+            'College of Computer Studies': 'CCS',
+            'College of Agriculture': 'AGRI',
+            'College of Arts and Science': 'CAS',
+            'College of Business Administration': 'CBA',
+            'College of Education': 'COE',
+            'College of Engineering and Design': 'CED',
+            'Law School': 'LAW',
+            'College of Mass Communication': 'CMC',
+            'College of Nursing': 'CON',
+            'College of Performing and Visual Arts': 'COPVA',
+            'Institute of Clinical Laboratory Sciences': 'ICLS',
+            'Institute of Environmental and Marine Sciences': 'IEMS',
+            'Institute of Rehabilitative Sciences': 'IRS',
+            'Junior High School': 'JHS',
+            'Medical School': 'MED',
+            'School of Public Affairs and Governance': 'SPAG',
+            'Senior High School': 'SHS'
+        };
+
         // Modify the displayPosition function to handle multiple selections for representatives
         function displayPosition() {
             const position = positions[currentPositionIndex];
-            document.getElementById("mainTitle").textContent = position.position_name;
+            if (position.position_name === 'Representative') {
+                // Get user's college from PHP session
+                const userCollege = <?php echo json_encode($_SESSION['user']['college_name']); ?>;
+                const collegeAbbr = collegeAbbreviations[userCollege] || userCollege;
+                document.getElementById("mainTitle").textContent = `${collegeAbbr} Representative`;
+            } else {
+                document.getElementById("mainTitle").textContent = position.position_name;
+            }
 
             // Add max representatives indicator for Representative position
             const titleContainer = document.getElementById("mainTitle").parentElement;
