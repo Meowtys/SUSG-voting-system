@@ -53,11 +53,20 @@ try {
     }
 
     $sql .= " GROUP BY 
-            c.candidate_id, 
+            CASE 
+                WHEN c.candidate_name = 'Abstain' THEN 'Abstain'
+                ELSE c.candidate_id
+            END,
             c.candidate_name, 
             c.candidate_image,
-            col.college_name,
-            p.party_name
+            CASE 
+                WHEN c.candidate_name = 'Abstain' THEN NULL
+                ELSE col.college_name
+            END,
+            CASE 
+                WHEN c.candidate_name = 'Abstain' THEN NULL
+                ELSE p.party_name
+            END
         ORDER BY 
             CASE WHEN c.candidate_name = 'Abstain' THEN 1 ELSE 0 END,
             vote_count DESC";
