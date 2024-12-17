@@ -25,6 +25,27 @@ require_once 'connect.php';
 // Fetch positions from the database
 $positions_stmt = $pdo->query("SELECT * FROM positions");
 $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Add college abbreviations mapping
+$collegeAbbreviations = [
+    'College of Computer Studies' => 'CCS',
+    'College of Agriculture' => 'AGRI',
+    'College of Arts and Science' => 'CAS',
+    'College of Business Administration' => 'CBA',
+    'College of Education' => 'COE',
+    'College of Engineering and Design' => 'CED',
+    'Law School' => 'LAW',
+    'College of Mass Communication' => 'CMC',
+    'College of Nursing' => 'CON',
+    'College of Performing and Visual Arts' => 'COPVA',
+    'Institute of Clinical Laboratory Sciences' => 'ICLS',
+    'Institute of Environmental and Marine Sciences' => 'IEMS',
+    'Institute of Rehabilitative Sciences' => 'IRS',
+    'Junior High School' => 'JHS',
+    'Medical School' => 'MED',
+    'School of Public Affairs and Governance' => 'SPAG',
+    'Senior High School' => 'SHS'
+];
 ?>
 
 <!DOCTYPE html>
@@ -89,7 +110,11 @@ $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-300">
                                     <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
                                         <i class="fas fa-user-tie text-red-600 mr-2"></i>
-                                        <?php echo htmlspecialchars($position['position_name']); ?>
+                                        <?php
+                                        $userCollege = $_SESSION['user']['college_name'];
+                                        $collegeAbbr = isset($collegeAbbreviations[$userCollege]) ? $collegeAbbreviations[$userCollege] : $userCollege;
+                                        echo $collegeAbbr . ' Representative';
+                                        ?>
                                     </h3>
                                     
                                     <?php if (empty($selectedVotes[$position['position_name']])): ?>
