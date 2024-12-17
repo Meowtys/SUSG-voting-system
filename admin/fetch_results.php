@@ -6,12 +6,13 @@ header('Content-Type: application/json');
 try {
     $position_id = $_GET['position_id'] ?? null;
     $election_id = $_GET['election_id'] ?? null;
+    $college_id = $_GET['college_id'] ?? null;
 
     if (!$position_id || !$election_id) {
         throw new Exception('Missing required parameters');
     }
 
-    $stmt = $pdo->prepare("
+    $sql = "
         SELECT 
             c.candidate_id,
             c.candidate_name,
@@ -37,8 +38,14 @@ try {
         LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
             AND v.election_id = :election_id
         WHERE c.position_id = :position_id 
-        AND c.election_id = :election_id
-        GROUP BY 
+        AND c.election_id = :election_id";
+
+    // Add college filter if specified
+    if ($college_id) {
+        $sql .= " AND (c.college_id = :college_id OR c.candidate_name = 'Abstain')";
+    }
+
+    $sql .= " GROUP BY 
             c.candidate_id, 
             c.candidate_name, 
             c.candidate_image,
@@ -46,13 +53,20 @@ try {
             p.party_name
         ORDER BY 
             CASE WHEN c.candidate_name = 'Abstain' THEN 1 ELSE 0 END,
-            vote_count DESC
-    ");
+            vote_count DESC";
 
-    $stmt->execute([
+    $stmt = $pdo->prepare($sql);
+    
+    $params = [
         ':position_id' => $position_id,
         ':election_id' => $election_id
-    ]);
+    ];
+    
+    if ($college_id) {
+        $params[':college_id'] = $college_id;
+    }
+
+    $stmt->execute($params);
 
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     

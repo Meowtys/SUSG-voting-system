@@ -27,6 +27,10 @@ $endDatetime = $currentElection['end_datetime'];
 $positionsStmt = $pdo->query("SELECT * FROM positions");
 $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch colleges for the dropdown
+$collegesStmt = $pdo->query("SELECT * FROM colleges ORDER BY college_name");
+$colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Function to get live results for current election
 function getLiveResults($pdo, $positionId, $electionId) {
     $stmt = $pdo->prepare("
@@ -170,9 +174,24 @@ ob_start();
             const resultsContainer = document.querySelector(".results");
             const currentPositionElement = document.querySelector(".current-position");
             const countdownBox = document.querySelector('.countdown-box');
+            const collegeFilter = document.getElementById('collegeFilter');
+            const collegeSelect = document.getElementById('collegeSelect');
+            let currentPositionId = null;
 
             function fetchResults(positionId, positionName) {
-                fetch(`fetch_results.php?position_id=${positionId}&election_id=<?php echo $currentElection['election_id']; ?>`)
+                currentPositionId = positionId;
+                const collegeId = collegeSelect.value;
+                let url = `fetch_results.php?position_id=${positionId}&election_id=<?php echo $currentElection['election_id']; ?>`;
+                
+                // Add college_id to URL if filtering and position is Representative
+                if (collegeId && positionName.includes('Representative')) {
+                    url += `&college_id=${collegeId}`;
+                }
+
+                // Show/hide college filter based on position
+                collegeFilter.style.display = positionName.includes('Representative') ? 'block' : 'none';
+
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         console.log('Fetched data:', data); // Debug log
@@ -344,6 +363,13 @@ ob_start();
                     fetchResults(positionId, positionName);
                 });
             });
+
+            // Add college filter change event
+            collegeSelect.addEventListener('change', function() {
+                if (currentPositionId) {
+                    fetchResults(currentPositionId, document.querySelector('.current-position').textContent);
+                }
+            });
         });
     </script>
 </head>
@@ -424,6 +450,19 @@ ob_start();
                             <?php echo htmlspecialchars($position['position_name']); ?>
                         </button>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- College Filter -->
+                <div id="collegeFilter" class="hidden mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter by College:</label>
+                    <select id="collegeSelect" class="form-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring focus:ring-red-200 transition">
+                        <option value="">All Colleges</option>
+                        <?php foreach ($colleges as $college): ?>
+                            <option value="<?php echo htmlspecialchars($college['college_id']); ?>">
+                                <?php echo htmlspecialchars($college['college_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <!-- Current Position Display -->
