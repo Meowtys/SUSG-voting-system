@@ -27,22 +27,29 @@ try {
             END as party_name,
             COUNT(v.vote_id) as vote_count,
             (
-                SELECT COUNT(DISTINCT student_id) 
-                FROM votes 
-                WHERE position_id = :position_id 
-                AND election_id = :election_id
+                SELECT COUNT(DISTINCT v_sub.vote_id) 
+                FROM votes v_sub
+                INNER JOIN students s_sub ON v_sub.student_id = s_sub.student_id
+                WHERE v_sub.position_id = :position_id 
+                AND v_sub.election_id = :election_id";
+
+    if ($college_id) {
+        $sql .= " AND s_sub.college_id = :college_id";
+    }
+
+    $sql .= "
             ) as total_votes
         FROM candidates c
         LEFT JOIN colleges col ON c.college_id = col.college_id
         LEFT JOIN parties p ON c.party_id = p.party_id
         LEFT JOIN votes v ON c.candidate_id = v.candidate_id 
             AND v.election_id = :election_id
+        LEFT JOIN students s ON v.student_id = s.student_id
         WHERE c.position_id = :position_id 
         AND c.election_id = :election_id";
 
-    // Add college filter if specified
     if ($college_id) {
-        $sql .= " AND (c.college_id = :college_id OR c.candidate_name = 'Abstain')";
+        $sql .= " AND s.college_id = :college_id";
     }
 
     $sql .= " GROUP BY 
