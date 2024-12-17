@@ -28,7 +28,7 @@ $positionsStmt = $pdo->query("SELECT * FROM positions");
 $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch colleges for the dropdown
-$collegesStmt = $pdo->query("SELECT * FROM colleges ORDER BY college_name");
+$collegesStmt = $pdo->query("SELECT * FROM colleges WHERE college_name != 'Abstain' ORDER BY college_name");
 $colleges = $collegesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Function to get live results for current election
