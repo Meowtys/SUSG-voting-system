@@ -82,8 +82,8 @@
         <div class="start-container">
             <h2 class="title">Choose Your Login</h2>
             <div class="button-group">
-                <a href="loginasvoter.php" class="start-btn">Login as Voter</a>
-                <a href="loginascomelec.php" class="start-btn">Login as Comelec</a>
+                <a href="voter/login.php" class="start-btn">Login as Voter</a>
+                <a href="comelec/login.php" class="start-btn">Login as Comelec</a>
             </div>
         </div>
     </div>

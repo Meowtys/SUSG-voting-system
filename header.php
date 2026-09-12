@@ -12,7 +12,7 @@ if (isset($_SESSION['user'])) {
 
 // Add database connection if not already included
 if (!isset($pdo)) {
-    require_once 'connect.php';
+    require_once __DIR__ . '/config/database.php';
 }
 
 // Add election status check
@@ -32,8 +32,8 @@ $electionData = $currentElection ? [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Header</title>
-    <link rel="stylesheet" href="asset/css/app.css">
-    <link rel="stylesheet" href="asset/vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="/susg-voting-system/asset/css/app.css">
+    <link rel="stylesheet" href="/susg-voting-system/asset/vendor/fontawesome/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -94,7 +94,7 @@ $electionData = $currentElection ? [
 <body>
     <!-- Header -->
     <header class="flex items-center bg-[#c41f1f] px-4 md:px-20 py-2">
-        <img src="asset/susglogo.png" alt="Logo" class="w-20 md:w-32">
+        <img src="/susg-voting-system/asset/susglogo.png" alt="Logo" class="w-20 md:w-32">
         <span class="text-white text-lg md:text-2xl font-bold ml-4">SUSG Election System</span>
         <?php if ($user): ?>
         <div class="ml-auto">
@@ -142,7 +142,7 @@ $electionData = $currentElection ? [
         <!-- Enhanced Menu Header -->
         <div class="p-6 bg-[#811111]/50 backdrop-blur-sm">
             <div class="flex items-center justify-between mb-6">
-                <img src="asset/susglogo.png" alt="SUSG Logo" class="w-12 h-12 rounded-lg">
+                <img src="/susg-voting-system/asset/susglogo.png" alt="SUSG Logo" class="w-12 h-12 rounded-lg">
                 <button onclick="closeMenu()" class="text-white/80 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -191,7 +191,7 @@ $electionData = $currentElection ? [
         <div class="flex-1 overflow-y-auto py-2">
             <ul class="space-y-1">
                 <li class="menu-item-hover">
-                    <a href="homepage.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                    <a href="/susg-voting-system/voter/homepage.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
@@ -216,7 +216,7 @@ $electionData = $currentElection ? [
                     </a>
                 </li>
                 <li class="menu-item-hover">
-                    <a href="liveresult.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                    <a href="/susg-voting-system/voter/liveresult.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
@@ -224,7 +224,7 @@ $electionData = $currentElection ? [
                     </a>
                 </li>
                 <li class="menu-item-hover">
-                    <a href="countdown.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                    <a href="/susg-voting-system/voter/countdown.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -232,7 +232,7 @@ $electionData = $currentElection ? [
                     </a>
                 </li>
                 <li class="menu-item-hover">
-                    <a href="feedback.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
+                    <a href="/susg-voting-system/voter/feedback.php" class="flex items-center space-x-3 px-6 py-3 text-white/90 hover:text-white hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                         </svg>
@@ -240,7 +240,7 @@ $electionData = $currentElection ? [
                     </a>
                 </li>
                 <li class="menu-item-hover mt-4">
-                    <a href="logout.php?type=voter" class="flex items-center space-x-3 px-6 py-3 text-red-300 hover:text-red-200 hover:bg-white/5 transition-colors duration-200">
+                    <a href="/susg-voting-system/technical/auth/logout.php?type=voter" class="flex items-center space-x-3 px-6 py-3 text-red-300 hover:text-red-200 hover:bg-white/5 transition-colors duration-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
@@ -284,7 +284,7 @@ $electionData = $currentElection ? [
             } else if (now > endTime) {
                 showHeaderPopup('election-ended');
             } else {
-                window.location.href = 'votecasting.php';
+                window.location.href = '/susg-voting-system/voter/votecasting.php';
             }
         }
 
@@ -293,7 +293,7 @@ $electionData = $currentElection ? [
             if (!headerHasVoted) {
                 showHeaderPopup('not-voted-popup');
             } else {
-                window.location.href = 'review_votes.php?from=home';
+                window.location.href = '/susg-voting-system/voter/review_votes.php?from=home';
             }
         }
 

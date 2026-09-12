@@ -145,38 +145,38 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-section">
-                <img src="asset/supnglogo.png" alt="Election Logo" class="footer-logo">
+                <img src="/susg-voting-system/asset/supnglogo.png" alt="Election Logo" class="footer-logo">
             </div>
             <div class="footer-section">
                 <h3>About Election</h3>
                 <ul>
-                    <li><a href="footer-guidelines.php" target="_blank">Election Guidelines</a></li>
-                    <li><a href="footer-candidateregistration.php" target="_blank">Candidate Registration</a></li>
+                    <li><a href="/susg-voting-system/footer-guidelines.php" target="_blank">Election Guidelines</a></li>
+                    <li><a href="/susg-voting-system/footer-candidateregistration.php" target="_blank">Candidate Registration</a></li>
                     <li><a href="#" target="_blank">Comelec Registration</a></li>
-                    <li><a href="footer-policy.php" target="_blank">Data Privacy Policy</a></li>
+                    <li><a href="/susg-voting-system/footer-policy.php" target="_blank">Data Privacy Policy</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Help & Support</h3>
                 <ul>
-                    <li><a href="footer-faq.php" target="_blank">FAQs</a></li>
-                    <li><a href="footer-voting.php" target="_blank">How to Vote</a></li>
-                    <li><a href="footer-howtofilecandidacy.php" target="_blank">How to File Candidacy</a></li>
+                    <li><a href="/susg-voting-system/footer-faq.php" target="_blank">FAQs</a></li>
+                    <li><a href="/susg-voting-system/footer-voting.php" target="_blank">How to Vote</a></li>
+                    <li><a href="/susg-voting-system/footer-howtofilecandidacy.php" target="_blank">How to File Candidacy</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Election Services</h3>
                 <ul>
-                    <li><a href="footer-electionmonitoring.php" target="_blank">Election Monitoring</a></li>
-                    <li><a href="footer-realtime.php" target="_blank">Real-Time Results</a></li>
+                    <li><a href="/susg-voting-system/footer-electionmonitoring.php" target="_blank">Election Monitoring</a></li>
+                    <li><a href="/susg-voting-system/footer-realtime.php" target="_blank">Real-Time Results</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Follow Us</h3>
                 <div class="footer-social-icons">
-                    <a href="https://www.facebook.com/TheSUSG" target="_blank"><img src="asset/facebook.png" alt="Facebook"></a>
-                    <a href="https://www.instagram.com/officialsusg/" target="_blank"><img src="asset/instagramdark.png" alt="Instagram"></a>
-                    <a href="https://x.com/silliman_u" target="_blank"><img src="asset/twitter.png" alt="Twitter"></a>
+                    <a href="https://www.facebook.com/TheSUSG" target="_blank"><img src="/susg-voting-system/asset/facebook.png" alt="Facebook"></a>
+                    <a href="https://www.instagram.com/officialsusg/" target="_blank"><img src="/susg-voting-system/asset/instagramdark.png" alt="Instagram"></a>
+                    <a href="https://x.com/silliman_u" target="_blank"><img src="/susg-voting-system/asset/twitter.png" alt="Twitter"></a>
                 </div>
             </div>
         </div>

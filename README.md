@@ -5,17 +5,29 @@ The **SUSG Voting System** is a secure, transparent, and user-friendly digital p
 ## Project Layout
 
 ```text
-config/          Database and application configuration
-asset/           Images, generated CSS, and bundled vendor assets
-cssscript/       Page-specific stylesheets
-script/          Frontend JavaScript modules
-cache/           Sentiment cache support
-admin/           Comelec pages and admin actions
-sql/             Database schema and seed dump
-*.php            Public pages and backward-compatible endpoint URLs
+config/             Database and application configuration
+asset/              Images, generated CSS, and bundled vendor assets
+cssscript/          Page-specific stylesheets
+script/             Frontend JavaScript modules
+technical/auth/     Authentication and session endpoints
+technical/cache/    Sentiment cache implementation
+technical/comelec/  Comelec form and API endpoints
+technical/voter/    Voter form and API endpoints
+comelec/            Comelec pages
+voter/              Voter pages
+
+sql/                Database schema and seed dump
+*.php               Shared layouts and informational pages
 ```
 
-The public PHP filenames are intentionally kept at the project root so existing links, form actions, and XAMPP URLs continue to work. Shared database configuration lives in `config/database.php`; `connect.php` remains as a compatibility entry point for the existing pages.
+The application implementations are organized under `voter/`, `comelec/`, and `technical/`. Shared database configuration lives in `config/database.php`; the root contains only shared layouts and informational pages.
+
+Primary application routes:
+
+- Voter login: `http://localhost/susg-voting-system/voter/login.php`
+- Voter home: `http://localhost/susg-voting-system/voter/homepage.php`
+- Comelec login: `http://localhost/susg-voting-system/comelec/login.php`
+- Comelec dashboard: `http://localhost/susg-voting-system/comelec/index.php`
 
 ---
 
