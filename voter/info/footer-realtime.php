@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Real Time Results</title>
-    <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link rel="icon" href="../../asset/susglogo.png" type="image/png">
 </head>
     <style>
         .main {
@@ -93,7 +93,7 @@
 <body>
 
     <!-- Header Section -->
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../../header.php'; ?>
 
     <!-- Main Section -->
     <main>
@@ -146,7 +146,7 @@
     </main>
 
     <!-- Footer Section -->
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../../footer.php'; ?>
 
 </body>
 </html>

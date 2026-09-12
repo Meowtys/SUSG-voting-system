@@ -14,6 +14,7 @@ technical/comelec/  Comelec form and API endpoints
 technical/voter/    Voter form and API endpoints
 comelec/            Comelec pages
 voter/              Voter pages
+voter/info/         Voter-facing informational pages
 
 sql/                Database schema and seed dump
 *.php               Shared layouts and informational pages

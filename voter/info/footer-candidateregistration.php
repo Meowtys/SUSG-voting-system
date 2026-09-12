@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch and sanitize input data
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Candidate Registration</title>
-    <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link rel="icon" href="../../asset/susglogo.png" type="image/png">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
     <!-- Header Section -->
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../../header.php'; ?>
 
     <!-- Main Section -->
     <main>
@@ -525,7 +525,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </main>
 
     <!-- Footer Section -->
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../../footer.php'; ?>
 
 </body>
 </html>

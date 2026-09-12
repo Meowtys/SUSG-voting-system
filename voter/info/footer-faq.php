@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - FAQ</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <link rel="icon" href="asset/susglogo.png" type="image/png">
+    <link rel="icon" href="../../asset/susglogo.png" type="image/png">
     <style>
         body, html {
             margin: 0;
@@ -95,7 +95,7 @@
 <body>
 
     <!-- Header Section -->
-    <?php include 'header.php'; ?>
+    <?php include __DIR__ . '/../../header.php'; ?>
 
     <!-- Main Section -->
     <main>
@@ -130,7 +130,7 @@
     </main>
 
     <!-- Footer Section -->
-    <?php include 'footer.php'; ?>
+    <?php include __DIR__ . '/../../footer.php'; ?>
 
 </body>
 </html>
