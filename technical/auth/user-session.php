@@ -27,12 +27,10 @@ $errors = [];
 
 // Handle Comelec login
 if (isset($_POST['signin_comelec'])) {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = $_POST['password'];
-
-    // Debugging: Log the received username and password
-    error_log("Received Username: $username");
-    error_log("Received Password: $password");
+    $username = isset($_POST['username'])
+        ? filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING)
+        : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
 
     if (empty($username)) {
         $errors['username'] = 'Username cannot be empty';
@@ -52,13 +50,6 @@ if (isset($_POST['signin_comelec'])) {
     $stmt->execute(['username' => $username]);
     $user = $stmt->fetch();
 
-    // Debugging: Log the fetched user data
-    if ($user) {
-        error_log("Comelec user found: " . print_r($user, true));
-    } else {
-        error_log("Comelec user not found");
-    }
-
     // Compare plain text passwords
     if ($user && $password === $user['password']) {
         $_SESSION['comelec_name'] = $user['comelec_name'];
@@ -76,12 +67,10 @@ if (isset($_POST['signin_comelec'])) {
 
 // Handle Voter login
 if (isset($_POST['signin'])) {
-    $student_id = filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING);
-    $password = $_POST['password'];
-
-    // Debugging: Log the received student_id and password
-    error_log("Received Student ID: $student_id");
-    error_log("Received Password: $password");
+    $student_id = isset($_POST['student_id'])
+        ? filter_input(INPUT_POST, 'student_id', FILTER_SANITIZE_STRING)
+        : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
 
     if (empty($student_id)) {
         $errors['student_id'] = 'Student ID cannot be empty';
@@ -121,13 +110,6 @@ if (isset($_POST['signin'])) {
         'election_id' => $current_election['election_id']
     ]);
     $user = $stmt->fetch();
-
-    // Debugging: Log the fetched user data
-    if ($user) {
-        error_log("User found: " . print_r($user, true));
-    } else {
-        error_log("User not found");
-    }
 
     // Compare plain text passwords
     if ($user && $password === $user['password']) {
