@@ -92,7 +92,6 @@ foreach ($candidates as $candidate) {
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <link rel="stylesheet" href="../asset/css/app.css">
     <link rel="stylesheet" href="../asset/vendor/fontawesome/css/all.min.css">
-    <script src="../script/load.js" type="module" defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         * {

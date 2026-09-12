@@ -6,7 +6,6 @@
     <title>SUSG Election System - How to File Candidacy</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <script src="script/mainload.js" type="module" defer></script>
     <style>
         .main {
             padding-top: 150px;

@@ -81,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-family: 'Poppins', sans-serif;
         }
     </style>
-    <script src="../script/load.js" type="module" defer></script>
 </head>
 
 <body class="bg-gray-50">

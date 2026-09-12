@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Real Time Results</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <script src="script/mainload.js" type="module" defer></script>
 </head>
     <style>
         .main {

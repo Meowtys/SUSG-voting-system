@@ -125,7 +125,6 @@ foreach ($votes as $vote) {
             color: #D97706;
         }
     </style>
-    <script src="../script/load.js" type="module" defer></script>
 </head>
 
 <body class="bg-gray-50">

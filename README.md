@@ -8,7 +8,6 @@ The **SUSG Voting System** is a secure, transparent, and user-friendly digital p
 config/             Database and application configuration
 asset/              Images, generated CSS, and bundled vendor assets
 cssscript/          Page-specific stylesheets
-script/             Frontend JavaScript modules
 technical/auth/     Authentication and session endpoints
 technical/cache/    Sentiment cache implementation
 technical/comelec/  Comelec form and API endpoints

@@ -150,7 +150,6 @@ if (isset($_SESSION['errors'])) {
             }
         }
     </style>
-    <script src="../script/mainload.js" type="module" defer></script>
 </head>
 <body>
     

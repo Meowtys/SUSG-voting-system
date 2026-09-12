@@ -15,7 +15,6 @@ if (session_status() == PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Candidate Registration</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <script src="script/mainload.js" type="module" defer></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;

@@ -76,7 +76,6 @@
             line-height: 1.6;
         }
     </style>
-    <script src="script/mainload.js" type="module" defer></script>
 </head>
 <body>
 

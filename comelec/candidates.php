@@ -51,7 +51,6 @@ ob_start();
     <link rel="stylesheet" href="../asset/vendor/fontawesome/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <link rel="stylesheet" href="../asset/css/app.css">
-    <script src="../script/adminload.js" type="module" defer></script>
 </head>
 <body class="bg-gray-50">
     <!-- Include Sidebar -->

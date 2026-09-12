@@ -69,7 +69,6 @@
             margin-bottom: 10px;
         }
     </style>
-    <script src="script/mainload.js" type="module" defer></script>
 </head>
 <body>
 

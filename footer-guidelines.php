@@ -71,7 +71,6 @@
         }
 
     </style>
-    <script src="script/mainload.js" type="module" defer></script>
 </head>
 <body>
 

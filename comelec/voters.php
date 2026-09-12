@@ -64,7 +64,6 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
     <link rel="stylesheet" href="../asset/vendor/fontawesome/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
     <link rel="stylesheet" href="../asset/css/app.css">
-    <script src="../script/adminload.js" type="module" defer></script>
     <style>
         /* Add this to your existing styles */
         .blur-text {
