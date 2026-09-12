@@ -50,7 +50,7 @@ $electionData = $currentElection ? [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Homepage</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="asset/css/app.css">
 </head>
 <body class="bg-gray-50">
 

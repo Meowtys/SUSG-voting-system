@@ -52,7 +52,7 @@ $userStatus = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Countdown</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="asset/css/app.css">
     <style>
         @keyframes blink {
             50% { opacity: 0; }

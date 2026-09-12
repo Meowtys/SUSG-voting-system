@@ -37,13 +37,12 @@ $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comelec - Voter's Feedback</title>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.tailwind.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../asset/vendor/datatables/dataTables.min.css">
+    <link rel="stylesheet" href="../asset/vendor/fontawesome/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.tailwind.min.js"></script>
+    <link rel="stylesheet" href="../asset/css/app.css">
+    <script src="../asset/vendor/jquery/jquery.min.js"></script>
+    <script src="../asset/vendor/datatables/dataTables.min.js"></script>
     <style>
         /* Custom DataTables Styling */
         .dataTables_wrapper {

@@ -188,10 +188,10 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Comelec - Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="../asset/vendor/fontawesome/css/all.min.css">
     <link rel="icon" href="../asset/susglogo.png" type="image/png">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="../asset/vendor/chart.js/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="../asset/css/app.css">
     <style>
         @keyframes blink {
             50% { opacity: 0; }

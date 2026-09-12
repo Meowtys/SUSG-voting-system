@@ -1,0 +1,24 @@
+{
+  "name": "susg-voting-system-assets",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned frontend dependencies and production asset build for the SUSG voting system.",
+  "scripts": {
+    "build": "node scripts/build-assets.mjs",
+    "build:css": "tailwindcss -i ./src/css/app.css -o ./asset/css/app.css --minify"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "7.3.1",
+    "@tailwindcss/cli": "4.3.3",
+    "@tensorflow-models/toxicity": "1.2.2",
+    "@tensorflow/tfjs": "4.22.0",
+    "chart.js": "4.5.1",
+    "datatables.net": "2.3.5",
+    "datatables.net-dt": "2.3.5",
+    "jquery": "3.7.1",
+    "tailwindcss": "4.3.3"
+  },
+  "overrides": {
+    "node-fetch": "2.7.0"
+  }
+}
