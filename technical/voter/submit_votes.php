@@ -3,21 +3,29 @@
 error_reporting(0);
 ini_set('display_errors', 0);
 
-require_once __DIR__ . '/../../config/database.php';
-
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
 header('Content-Type: application/json');
 
-try {
-    if (!isset($_SESSION['user'])) {
-        throw new Exception("User not logged in");
-    }
+if (!isset($_SESSION['user'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Access denied']);
+    exit;
+}
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
+require_once __DIR__ . '/../../config/database.php';
+
+try {
     $data = json_decode(file_get_contents('php://input'), true);
-    if (!$data) {
+    if (!is_array($data) || !$data) {
         throw new Exception("Invalid JSON data received");
     }
 

@@ -3,11 +3,25 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['user'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Access denied']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
 // Get JSON data
 $data = json_decode(file_get_contents('php://input'), true);
 
 try {
-    if (!isset($data['votes'])) {
+    if (!is_array($data) || !isset($data['votes']) || !is_array($data['votes'])) {
         throw new Exception("No vote data received");
     }
 

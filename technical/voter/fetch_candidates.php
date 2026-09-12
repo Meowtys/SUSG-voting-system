@@ -3,6 +3,20 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+header('Content-Type: application/json');
+
+if (!isset($_SESSION['user'])) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Access denied']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+    exit;
+}
+
 require_once __DIR__ . '/../../config/database.php';
 
 if (isset($_GET['position_id'])) {
@@ -45,6 +59,5 @@ if (isset($_GET['position_id'])) {
     ]);
     $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    header('Content-Type: application/json');
     echo json_encode($candidates);
 }

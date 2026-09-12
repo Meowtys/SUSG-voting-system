@@ -344,8 +344,12 @@ $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
                 button.addEventListener('click', function () {
                     const feedbackId = this.getAttribute('data-id');
                     if (confirm('Do you really want to delete this feedback?')) {
-                        fetch(`../technical/comelec/remove-feedback.php?id=${feedbackId}`, {
-                            method: 'GET'
+                        fetch('../technical/comelec/remove-feedback.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ id: feedbackId })
                         }).then(response => response.json())
                           .then(data => {
                               if (data.success) {
