@@ -31,10 +31,11 @@ The **SUSG Voting System** is a secure, transparent, and user-friendly digital p
 
 ## ⚙️ Setup Instructions (Localhost)
 
-1. **Install XAMPP**  
+1. **Place the project in XAMPP**
    Download and install [XAMPP](https://www.apachefriends.org/index.html) if not already installed.
+   Place this project inside `C:/xampp/htdocs/susg-voting-system`.
 
-2. **Install frontend dependencies**
+2. **Build the frontend assets**
    Install [Node.js](https://nodejs.org/) 20 or newer, then run these commands from the project directory:
    ```sh
    npm install
@@ -42,29 +43,28 @@ The **SUSG Voting System** is a secure, transparent, and user-friendly digital p
    ```
    The build compiles Tailwind CSS for production and copies pinned third-party assets into `asset/`. Re-run `npm run build` after changing frontend markup or updating dependencies.
 
-3. **Clone or Download the Repository**
-   Place the project folder inside your `htdocs` directory (usually found in `C:/xampp/htdocs`):
-4. **Import the Database**
+3. **Import the database**
 
 - Open **phpMyAdmin** (`http://localhost/phpmyadmin`)
-- Create a new database (e.g., `susg_voting_db`)
+- Create a database named `votesusg`
 - Import the provided `sql/votesusg.sql` file
 
-5. **Configure Database Connection**
+4. **Check the database connection**
 
-- Open the project folder
-- Edit the `config.php` or equivalent DB connection file:
-  ```php
-  $host = "localhost";
-  $username = "root";
-  $password = "";
-  $database = "susg_voting_db";
+- The default local XAMPP settings used by `connect.php` are:
+  ```text
+  host: localhost
+  database: votesusg
+  username: root
+  password: (empty)
   ```
-6. **Start the Server**
+- If your MySQL credentials differ, update `connect.php`.
+
+5. **Start the server**
 
 - Open **XAMPP Control Panel**
 - Start **Apache** and **MySQL**
-- Go to your browser and visit:
+- Visit:
   ```
   http://localhost/susg-voting-system/
   ```
