@@ -2,6 +2,21 @@
 
 The **SUSG Voting System** is a secure, transparent, and user-friendly digital platform designed for managing student elections at Silliman University. Built to ensure integrity, ease of access, and real-time vote tallying, this system supports authenticated voting, candidate management, and results reporting.
 
+## Project Layout
+
+```text
+config/          Database and application configuration
+asset/           Images, generated CSS, and bundled vendor assets
+cssscript/       Page-specific stylesheets
+script/          Frontend JavaScript modules
+cache/           Sentiment cache support
+admin/           Comelec pages and admin actions
+sql/             Database schema and seed dump
+*.php            Public pages and backward-compatible endpoint URLs
+```
+
+The public PHP filenames are intentionally kept at the project root so existing links, form actions, and XAMPP URLs continue to work. Shared database configuration lives in `config/database.php`; `connect.php` remains as a compatibility entry point for the existing pages.
+
 ---
 
 ## 🧩 Features
