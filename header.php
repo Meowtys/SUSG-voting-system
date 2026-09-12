@@ -32,7 +32,7 @@ $electionData = $currentElection ? [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Header</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
     <!-- Add Heroicons (for icons) -->
     <script src="https://unpkg.com/@heroicons/v2/24/outline/esm/index.js"></script>
     <style>

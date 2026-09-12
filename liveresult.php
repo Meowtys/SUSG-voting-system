@@ -108,7 +108,7 @@ foreach ($candidates as $candidate) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SUSG Election System - Live Results</title>
     <link rel="icon" href="asset/susglogo.png" type="image/png">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         * {
