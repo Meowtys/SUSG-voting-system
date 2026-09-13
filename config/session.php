@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 const SESSION_IDLE_TIMEOUTS = [
-    'voter' => 30,
-    'comelec' => 30,
+    'voter' => 20 * 60,
+    'comelec' => 10 * 60,
 ];
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -99,6 +99,7 @@ function validate_session_activity(
         }
 
         $message = "You've been logged out due to inactivity.";
+        $_SESSION['error_message'] = $message;
 
         if ($jsonResponse) {
             http_response_code(401);
@@ -110,7 +111,6 @@ function validate_session_activity(
             exit;
         }
 
-        $_SESSION['error_message'] = $message;
         header('Location: ' . $loginRedirect);
         exit;
     }
@@ -136,17 +136,19 @@ function validate_voter_election(PDO $pdo, string $loginRedirect, bool $jsonResp
 
     unset($_SESSION['user'], $_SESSION['selectedVotes']);
 
+    $message = 'The election has changed, please log in again.';
+    $_SESSION['error_message'] = $message;
+
     if ($jsonResponse) {
         http_response_code(401);
         header('Content-Type: application/json');
         echo json_encode([
             'success' => false,
-            'message' => 'The election has changed, please log in again.'
+            'message' => $message
         ]);
         exit;
     }
 
-    $_SESSION['error_message'] = 'The election has changed, please log in again.';
     header('Location: ' . $loginRedirect);
     exit;
 }

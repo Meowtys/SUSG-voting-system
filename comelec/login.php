@@ -1,5 +1,8 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+
+$errorMessage = $_SESSION['error_message'] ?? null;
+unset($_SESSION['error_message']);
 
 // Only redirect if already logged in as Comelec
 if (isset($_SESSION['is_comelec_logged_in'])) {
@@ -167,6 +170,12 @@ if (isset($_SESSION['errors'])) {
             <div class="login-page-box">
                 <img src="../asset/sulogo.png" alt="University Logo" class="login-page-logo">
                 <h2 class="login-page-title">Login as Comelec</h2>
+
+                <?php if ($errorMessage): ?>
+                    <p class="login-page-error-message">
+                        <?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?>
+                    </p>
+                <?php endif; ?>
                 
                 <form id="loginForm" method="POST" action="../technical/auth/user-session.php">
                     <div class="login-page-input-group">

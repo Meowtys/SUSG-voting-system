@@ -358,14 +358,31 @@ $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
                                 'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                             },
                             body: JSON.stringify({ id: feedbackId })
-                        }).then(response => response.json())
+                        }).then(async response => {
+                            const data = await response.json();
+
+                            if (response.status === 401) {
+                                window.location.href = 'login.php';
+                                return null;
+                            }
+
+                            return data;
+                        })
                           .then(data => {
+                              if (!data) {
+                                  return;
+                              }
+
                               if (data.success) {
                                   const row = this.parentNode.parentNode;
                                   row.parentNode.removeChild(row);
                               } else {
-                                  alert('Failed to remove feedback.');
+                                  alert(data.message || 'Failed to remove feedback.');
                               }
+                          })
+                          .catch(error => {
+                              console.error('Error:', error);
+                              alert('Failed to remove feedback.');
                           });
                     }
                 });

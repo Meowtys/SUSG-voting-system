@@ -1,12 +1,32 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
 
-if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
-    header('Location: login.php');
-    exit();
-}
+$isSetCurrentElectionAjax =
+    $_SERVER['REQUEST_METHOD'] === 'POST'
+    && isset($_POST['ajax'], $_POST['set_current_election'])
+    && $_POST['ajax'] == 1;
 
-validate_session_activity('comelec', 'login.php');
+if ($isSetCurrentElectionAjax) {
+    if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+        http_response_code(403);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Access denied'
+        ]);
+        exit();
+    }
+
+    validate_session_activity('comelec', 'login.php', true);
+    validate_csrf_token(true);
+} else {
+    if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
+        header('Location: login.php');
+        exit();
+    }
+
+    validate_session_activity('comelec', 'login.php');
+}
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../technical/cache/SentimentCache.php';
@@ -347,11 +367,27 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         // Send AJAX request
                         fetch('index.php', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
+                            },
                             body: `set_current_election=1&election_id=${electionId}&ajax=1`
                         })
-                        .then(response => response.json())
+                        .then(async response => {
+                            const data = await response.json();
+
+                            if (response.status === 401) {
+                                window.location.href = 'login.php';
+                                return null;
+                            }
+
+                            return data;
+                        })
                         .then(data => {
+                            if (!data) {
+                                return;
+                            }
+
                             if (data.success) {
                                 location.reload();
                             } else {
@@ -415,6 +451,25 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                             'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                         },
                         body: `election_id=${electionId}&status=${newStatus}`
+                    })
+                    .then(async response => {
+                        const data = await response.json();
+
+                        if (response.status === 401) {
+                            window.location.href = 'login.php';
+                            return null;
+                        }
+
+                        return data;
+                    })
+                    .then(data => {
+                        if (data && !data.success) {
+                            alert(data.message || 'Failed to update election status.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to update election status.');
                     });
                 }
             }
@@ -465,6 +520,25 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                     'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                                 },
                                 body: `election_id=${electionId}&status=${newStatus}`
+                            })
+                            .then(async response => {
+                                const data = await response.json();
+
+                                if (response.status === 401) {
+                                    window.location.href = 'login.php';
+                                    return null;
+                                }
+
+                                return data;
+                            })
+                            .then(data => {
+                                if (data && !data.success) {
+                                    alert(data.message || 'Failed to update election status.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert('Failed to update election status.');
                             });
                         }
                     }

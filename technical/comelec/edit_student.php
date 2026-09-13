@@ -6,7 +6,7 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
     exit('Access denied');
 }
 
-validate_session_activity('comelec', '../../comelec/login.php', true);
+validate_session_activity('comelec', '../../comelec/login.php');
 
 validate_csrf_token();
 

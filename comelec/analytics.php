@@ -300,7 +300,7 @@ try {
                         
                         // Save to server cache using the SentimentCache PHP class
                         const currentElectionId = <?php echo $currentElection['election_id']; ?>;
-                        await fetch('../technical/cache/save_sentiment.php', {
+                        const cacheResponse = await fetch('../technical/cache/save_sentiment.php', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -312,6 +312,19 @@ try {
                                 election_id: currentElectionId
                             })
                         });
+
+                        const cacheData = await cacheResponse.json();
+                        if (cacheResponse.status === 401) {
+                            window.location.href = 'login.php';
+                            return result;
+                        }
+
+                        if (!cacheResponse.ok || !cacheData.success) {
+                            console.warn(
+                                'Failed to save sentiment cache:',
+                                cacheData.message || 'Unknown error'
+                            );
+                        }
 
                         return result;
                     } catch (error) {

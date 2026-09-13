@@ -472,15 +472,31 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                         },
                         body: JSON.stringify({ studentId })
                     })
-                    .then(response => response.json())
+                    .then(async response => {
+                        const data = await response.json();
+
+                        if (response.status === 401) {
+                            window.location.href = 'login.php';
+                            return null;
+                        }
+
+                        return data;
+                    })
                     .then(data => {
+                        if (!data) {
+                            return;
+                        }
+
                         if (data.success) {
                             location.reload();
                         } else {
-                            alert('Failed to delete student. Please try again.');
+                            alert(data.message || 'Failed to delete student. Please try again.');
                         }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to delete student. Please try again.');
+                    });
                 }
             });
         });
