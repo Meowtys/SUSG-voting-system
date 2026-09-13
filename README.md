@@ -24,6 +24,7 @@ The application implementations are organized under `voter/`, `comelec/`, and `t
 
 Primary application routes:
 
+- Start page: 'http://localhost/susg-voting-system/start.php'
 - Voter login: `http://localhost/susg-voting-system/voter/login.php`
 - Voter home: `http://localhost/susg-voting-system/voter/homepage.php`
 - Comelec login: `http://localhost/susg-voting-system/comelec/login.php`
