@@ -1,7 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../config/session.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -450,7 +448,8 @@ foreach ($candidates as $candidate) {
                 fetch("../technical/voter/store_votes.php", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": "<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"
                     },
                     body: JSON.stringify({
                         votes: selectedVotes,
@@ -581,7 +580,8 @@ foreach ($candidates as $candidate) {
                 fetch("../technical/voter/submit_votes.php", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": "<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>"
                     },
                     body: JSON.stringify(selectedVotes)
                 })
