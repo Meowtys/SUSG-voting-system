@@ -52,8 +52,8 @@ $userCollege = $collegeStmt->fetch(PDO::FETCH_ASSOC);
 $positionsStmt = $pdo->query("SELECT * FROM positions ORDER BY position_id");
 $positions = $positionsStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Modified query to get candidates with vote counts for current election, excluding abstain
-// and filtering representatives by college
+// Get candidates with vote counts for the current election,
+// including Abstain and filtering representatives by college
 $candidatesStmt = $pdo->prepare("
     SELECT 
         c.*, 
@@ -72,11 +72,12 @@ $candidatesStmt = $pdo->prepare("
     JOIN positions p ON c.position_id = p.position_id
     LEFT JOIN parties pa ON c.party_id = pa.party_id
     LEFT JOIN colleges col ON c.college_id = col.college_id
-    WHERE c.election_id = ? 
-    AND c.candidate_name != 'Abstain'
+    WHERE c.election_id = ?
     AND (p.position_name != 'Representative' OR 
         (p.position_name = 'Representative' AND c.college_id = ?))
-    ORDER BY p.position_id, vote_count DESC
+    ORDER BY p.position_id,
+             CASE WHEN c.candidate_name = 'Abstain' THEN 1 ELSE 0 END,
+             vote_count DESC
 ");
 
 $candidatesStmt->execute([
@@ -550,7 +551,12 @@ foreach ($candidates as $candidate) {
                                         <div class="candidate-card">
                                             <div class="candidate-info">
                                                 <div class="candidate-image-wrapper">
-                                                    <?php if (!empty($candidate['candidate_image'])): ?>
+                                                    <?php if ($candidate['candidate_name'] === 'Abstain'): ?>
+                                                        <div class="candidate-image flex items-center justify-center bg-yellow-100 text-yellow-600"
+                                                             aria-label="Abstain">
+                                                            <i class="fas fa-ban text-2xl"></i>
+                                                        </div>
+                                                    <?php elseif (!empty($candidate['candidate_image'])): ?>
                                                         <img src="../<?= htmlspecialchars($candidate['candidate_image'], ENT_QUOTES, 'UTF-8') ?>"
                                                              alt="<?= htmlspecialchars($candidate['candidate_name'], ENT_QUOTES, 'UTF-8') ?>"
                                                              class="candidate-image">
@@ -559,7 +565,9 @@ foreach ($candidates as $candidate) {
                                                             <i class="fas fa-user text-2xl"></i>
                                                         </div>
                                                     <?php endif; ?>
-                                                    <?php if ($index === 0 && $candidate['vote_count'] > 0): ?>
+                                                    <?php if ($candidate['candidate_name'] !== 'Abstain'
+                                                        && $index === 0
+                                                        && $candidate['vote_count'] > 0): ?>
                                                         <div class="crown-badge">
                                                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
                                                                 <path fill-rule="evenodd" d="M10 2l1.85 3.75 4.15.6-3 2.925.7 4.175L10 11.75 6.3 13.45l.7-4.175-3-2.925 4.15-.6L10 2z"/>
@@ -573,6 +581,7 @@ foreach ($candidates as $candidate) {
                                                         <?= htmlspecialchars($candidate['candidate_name']) ?>
                                                     </h3>
                                                     
+                                                    <?php if ($candidate['candidate_name'] !== 'Abstain'): ?>
                                                     <div class="candidate-meta">
                                                         <span class="meta-tag bg-red-50 text-red-700">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -595,6 +604,7 @@ foreach ($candidates as $candidate) {
                                                             </span>
                                                         <?php endif; ?>
                                                     </div>
+                                                    <?php endif; ?>
                                                     
                                                     <div class="votes-section">
                                                         <div class="vote-stats">

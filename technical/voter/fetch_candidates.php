@@ -45,6 +45,7 @@ if (isset($_GET['position_id'])) {
         WHERE c.position_id = ? 
         AND c.qualified = 1
         AND c.election_id = ?
+        AND c.candidate_name <> 'Abstain'
         AND (
             positions.position_name != 'Representative' 
             OR 
