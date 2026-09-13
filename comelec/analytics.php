@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('Location: login.php');
     exit();
@@ -301,6 +302,7 @@ try {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                             },
                             body: JSON.stringify({
                                 key: cacheKey,

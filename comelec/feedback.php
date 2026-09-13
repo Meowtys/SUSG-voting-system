@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('Location: login.php');
     exit();
@@ -347,7 +348,8 @@ $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
                         fetch('../technical/comelec/remove-feedback.php', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                             },
                             body: JSON.stringify({ id: feedbackId })
                         }).then(response => response.json())

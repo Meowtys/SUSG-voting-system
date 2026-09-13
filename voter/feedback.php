@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -23,6 +23,8 @@ if (!$currentElection) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    validate_csrf_token(true);
+
     $experience = isset($_POST['experience']) ? (int)$_POST['experience'] : 0;
     $suggestion = isset($_POST['suggestion']) ? trim($_POST['suggestion']) : '';
 
@@ -97,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <form id="feedback-form" class="p-6 space-y-6"> <!-- Reduced padding and spacing -->
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                     <!-- Rating Section -->
                     <div class="text-center space-y-4"> <!-- Reduced spacing -->
                         <label class="block text-xl font-semibold text-gray-800"> <!-- Reduced text size -->

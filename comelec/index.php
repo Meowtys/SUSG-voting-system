@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('Location: login.php');
     exit();
@@ -396,6 +397,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                         },
                         body: `election_id=${electionId}&status=${newStatus}`
                     });
@@ -445,6 +447,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/x-www-form-urlencoded',
+                                    'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                                 },
                                 body: `election_id=${electionId}&status=${newStatus}`
                             });
