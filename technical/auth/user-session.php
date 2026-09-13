@@ -1,7 +1,6 @@
 <?php
+require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/database.php';
-
-session_start();
 
 // Store the previous page URL in session for proper redirection after logout
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['current_page'])) {
@@ -54,6 +53,7 @@ if (isset($_POST['signin_comelec'])) {
     if ($user && $password === $user['password']) {
         $_SESSION['comelec_name'] = $user['comelec_name'];
         $_SESSION['is_comelec_logged_in'] = true; // Add session variable to track Comelec login
+        $_SESSION['comelec_last_activity'] = time();
 
         header('Location: ../../comelec/index.php');
         exit();
@@ -120,6 +120,7 @@ if (isset($_POST['signin'])) {
             'has_voted' => $user['has_voted'],
             'election_id' => $user['election_id']  // Add election_id to session
         ];
+        $_SESSION['voter_last_activity'] = time();
 
         header('Location: ../../voter/homepage.php');
         exit();

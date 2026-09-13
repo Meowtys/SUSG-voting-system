@@ -7,6 +7,8 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+validate_session_activity('voter', 'login.php');
+
 require_once __DIR__ . '/../config/database.php';
 
 validate_voter_election($pdo, 'login.php');

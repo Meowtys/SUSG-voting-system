@@ -1,9 +1,11 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../config/session.php';
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('HTTP/1.1 403 Forbidden');
     exit('Access denied');
 }
+
+validate_session_activity('comelec', '../../comelec/login.php', true);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);

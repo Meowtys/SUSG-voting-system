@@ -7,6 +7,8 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+validate_session_activity('voter', 'login.php');
+
 // Retrieve user details from the session
 $user = $_SESSION['user'];
 

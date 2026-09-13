@@ -6,6 +6,8 @@ if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_i
     exit();
 }
 
+validate_session_activity('comelec', 'login.php');
+
 if (isset($_SESSION['success'])) {
     $success_message = $_SESSION['success'];
     unset($_SESSION['success']);

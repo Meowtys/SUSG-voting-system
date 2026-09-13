@@ -9,6 +9,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+validate_session_activity('voter', '../../voter/login.php', true);
+
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);

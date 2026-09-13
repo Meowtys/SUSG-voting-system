@@ -1,9 +1,11 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('Location: login.php');
     exit();
 }
+
+validate_session_activity('comelec', 'login.php');
 
 require_once __DIR__ . '/../config/database.php';
 

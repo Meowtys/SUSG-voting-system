@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+const SESSION_IDLE_TIMEOUTS = [
+    'voter' => 30,
+    'comelec' => 30,
+];
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -41,6 +46,76 @@ function validate_csrf_token(bool $jsonResponse = false): void
 
         exit('Invalid CSRF token');
     }
+}
+
+function validate_session_activity(
+    string $role,
+    string $loginRedirect,
+    bool $jsonResponse = false
+): void {
+    $roleConfig = [
+        'voter' => [
+            'activity_key' => 'voter_last_activity',
+            'authenticated' => isset($_SESSION['user']),
+            'session_keys' => [
+                'user',
+                'selectedVotes',
+                'voter_last_activity',
+            ],
+        ],
+        'comelec' => [
+            'activity_key' => 'comelec_last_activity',
+            'authenticated' => !empty($_SESSION['is_comelec_logged_in']),
+            'session_keys' => [
+                'is_comelec_logged_in',
+                'comelec_name',
+                'comelec_last_activity',
+            ],
+        ],
+    ];
+
+    if (!isset($roleConfig[$role])) {
+        throw new InvalidArgumentException('Unsupported session role');
+    }
+
+    $config = $roleConfig[$role];
+
+    if (!$config['authenticated']) {
+        return;
+    }
+
+    $now = time();
+    $lastActivity = $_SESSION[$config['activity_key']] ?? null;
+    $timeout = SESSION_IDLE_TIMEOUTS[$role];
+
+    if (!is_int($lastActivity) && !ctype_digit((string)$lastActivity)) {
+        $_SESSION[$config['activity_key']] = $now;
+        return;
+    }
+
+    if (($now - (int)$lastActivity) > $timeout) {
+        foreach ($config['session_keys'] as $sessionKey) {
+            unset($_SESSION[$sessionKey]);
+        }
+
+        $message = "You've been logged out due to inactivity.";
+
+        if ($jsonResponse) {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $message,
+            ]);
+            exit;
+        }
+
+        $_SESSION['error_message'] = $message;
+        header('Location: ' . $loginRedirect);
+        exit;
+    }
+
+    $_SESSION[$config['activity_key']] = $now;
 }
 
 function validate_voter_election(PDO $pdo, string $loginRedirect, bool $jsonResponse = false): void

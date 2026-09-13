@@ -7,6 +7,8 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+validate_session_activity('voter', 'login.php');
+
 $user = $_SESSION['user'];
 
 require_once __DIR__ . '/../config/database.php';

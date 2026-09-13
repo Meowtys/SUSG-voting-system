@@ -13,6 +13,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
+validate_session_activity('voter', '../../voter/login.php', true);
+
 validate_csrf_token(true);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
