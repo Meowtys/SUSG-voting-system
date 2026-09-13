@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+
 if (!isset($_SESSION['is_comelec_logged_in']) || !$_SESSION['is_comelec_logged_in']) {
     header('Location: login.php');
     exit();
@@ -297,6 +298,7 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
 
             <!-- Form Section with added top padding for header -->
             <form class="space-y-6 pt-20" id="studentForm" method="POST" action="../technical/comelec/create_student.php">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                 <input type="hidden" id="studentFormId" name="studentFormId">
                 
                 <div class="grid grid-cols-2 gap-8">
@@ -376,6 +378,7 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
 
             <!-- Form Section -->
             <form class="space-y-6 pt-20" id="bulkUploadForm" method="POST" action="../technical/comelec/process_bulk_upload.php" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
@@ -462,7 +465,8 @@ $votingPercentage = $totalStudents > 0 ? round(($votedStudents / $totalStudents)
                     fetch('../technical/comelec/delete_student.php', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': '<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>'
                         },
                         body: JSON.stringify({ studentId })
                     })
