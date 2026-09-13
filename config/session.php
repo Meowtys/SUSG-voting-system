@@ -15,7 +15,7 @@ function csrf_token(): string
     return $_SESSION['csrf_token'];
 }
 
-function validate_csrf_token(): void
+function validate_csrf_token(bool $jsonResponse = false): void
 {
     $submittedToken = $_SERVER['HTTP_X_CSRF_TOKEN']
         ?? $_POST['csrf_token']
@@ -29,6 +29,16 @@ function validate_csrf_token(): void
         || !hash_equals($_SESSION['csrf_token'], $submittedToken)
     ) {
         http_response_code(403);
+
+        if ($jsonResponse) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid CSRF token'
+            ]);
+            exit;
+        }
+
         exit('Invalid CSRF token');
     }
 }
