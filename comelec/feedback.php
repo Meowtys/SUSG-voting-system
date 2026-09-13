@@ -325,15 +325,19 @@ $sentimentScore = $overallSentiment ? $overallSentiment['score'] : 0;
                 $('#commentModal').removeClass('hidden');
             });
 
-            // Close modal handlers
-            $('.close-modal, #commentModal').on('click', function(e) {
+            // Close the modal with the X button or by clicking the backdrop.
+            $('.close-modal').on('click', function() {
+                $('#commentModal').addClass('hidden');
+            });
+
+            $('#commentModal').on('click', function(e) {
                 if (e.target === this) {
                     $('#commentModal').addClass('hidden');
                 }
             });
 
             // Prevent modal close when clicking inside modal content
-            $('.modal-content').on('click', function(e) {
+            $('.comment-content').on('click', function(e) {
                 e.stopPropagation();
             });
         });
