@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 require_once __DIR__ . '/../../config/database.php';
 
+validate_voter_election($pdo, '../../voter/login.php', true);
+
 try {
     $data = json_decode(file_get_contents('php://input'), true);
     if (!is_array($data) || !$data) {

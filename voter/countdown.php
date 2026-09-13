@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -9,6 +9,8 @@ if (!isset($_SESSION['user'])) {
 
 // Database connection
 require_once __DIR__ . '/../config/database.php';
+
+validate_voter_election($pdo, 'login.php');
 
 // Get fresh user data from database to ensure current voting status
 $stmt = $pdo->prepare("SELECT * FROM students WHERE student_id = ?");

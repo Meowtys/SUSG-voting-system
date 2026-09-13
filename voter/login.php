@@ -1,10 +1,26 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/database.php';
 
-// Only check for voter login status
+$errorMessage = $_SESSION['error_message'] ?? null;
+unset($_SESSION['error_message']);
+
 if (isset($_SESSION['user'])) {
-    header('Location: homepage.php');
-    exit();
+    $stmt = $pdo->query(
+        "SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1"
+    );
+    $currentElectionId = $stmt->fetchColumn();
+
+    if (
+        (string)($_SESSION['user']['election_id'] ?? null)
+        !== (string)$currentElectionId
+    ) {
+        unset($_SESSION['user'], $_SESSION['selectedVotes']);
+        $errorMessage = 'The election has changed, please log in again.';
+    } else {
+        header('Location: homepage.php');
+        exit();
+    }
 }
 
 if (isset($_SESSION['errors'])) {
@@ -164,6 +180,12 @@ if (isset($_SESSION['errors'])) {
             <div class="login-page-box">
                 <img src="../asset/sulogo.png" alt="University Logo" class="login-page-logo">
                 <h2 class="login-page-title">Login as Voter</h2>
+
+                <?php if ($errorMessage): ?>
+                    <p class="login-page-error-message">
+                        <?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?>
+                    </p>
+                <?php endif; ?>
                 
                 <form id="loginForm" method="POST" action="../technical/auth/user-session.php">
                     <div class="login-page-input-group">

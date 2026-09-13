@@ -42,3 +42,36 @@ function validate_csrf_token(bool $jsonResponse = false): void
         exit('Invalid CSRF token');
     }
 }
+
+function validate_voter_election(PDO $pdo, string $loginRedirect, bool $jsonResponse = false): void
+{
+    if (!isset($_SESSION['user'])) {
+        return;
+    }
+
+    $stmt = $pdo->query(
+        "SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1"
+    );
+    $currentElectionId = $stmt->fetchColumn();
+    $sessionElectionId = $_SESSION['user']['election_id'] ?? null;
+
+    if ((string)$sessionElectionId === (string)$currentElectionId) {
+        return;
+    }
+
+    unset($_SESSION['user'], $_SESSION['selectedVotes']);
+
+    if ($jsonResponse) {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'message' => 'The election has changed, please log in again.'
+        ]);
+        exit;
+    }
+
+    $_SESSION['error_message'] = 'The election has changed, please log in again.';
+    header('Location: ' . $loginRedirect);
+    exit;
+}

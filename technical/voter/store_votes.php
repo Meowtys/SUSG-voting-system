@@ -17,6 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+require_once __DIR__ . '/../../config/database.php';
+
+validate_voter_election($pdo, '../../voter/login.php', true);
+
 // Get JSON data
 $data = json_decode(file_get_contents('php://input'), true);
 

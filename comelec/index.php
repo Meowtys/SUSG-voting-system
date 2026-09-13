@@ -84,15 +84,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_POST['set_current_election'])) {
             $electionId = $_POST['election_id'];
 
-            // Reset the current election
-            $resetStmt = $pdo->prepare("UPDATE elections SET is_current = 0 WHERE is_current = 1");
-            $resetResult = $resetStmt->execute();
+            try {
+                $pdo->beginTransaction();
 
-            // Set the selected election as current
-            $setStmt = $pdo->prepare("UPDATE elections SET is_current = 1 WHERE election_id = ?");
-            $setResult = $setStmt->execute([$electionId]);
+                $resetStmt = $pdo->prepare(
+                    "UPDATE elections SET is_current = 0 WHERE is_current = 1"
+                );
+                $resetResult = $resetStmt->execute();
 
-            if ($resetResult && $setResult) {
+                $setStmt = $pdo->prepare(
+                    "UPDATE elections SET is_current = 1 WHERE election_id = ?"
+                );
+                $setResult = $setStmt->execute([$electionId]);
+
+                if (!$resetResult || !$setResult) {
+                    $pdo->rollBack();
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Failed to set current election.'
+                    ]);
+                    exit();
+                }
+
+                $pdo->commit();
+
                 // Fetch the updated current election
                 $stmt = $pdo->prepare("SELECT * FROM elections WHERE election_id = ?");
                 $stmt->execute([$electionId]);
@@ -108,9 +123,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'election_name' => htmlspecialchars($currentElection['election_name']),
                     'status' => htmlspecialchars($currentElection['status'])
                 ]);
-            } else {
-                // Handle error
-                echo json_encode(['success' => false, 'message' => 'Failed to set current election.']);
+            } catch (PDOException $exception) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Failed to set current election.'
+                ]);
             }
             exit();
         }
@@ -329,16 +351,7 @@ $currentElection = $electionStmt->fetch(PDO::FETCH_ASSOC);
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                // Send request to logout all voters
-                                fetch('../technical/auth/logout.php?type=comelec')
-                                    .then(() => {
-                                        // Reload the page after logout request
-                                        location.reload();
-                                    })
-                                    .catch(error => {
-                                        console.error('Error:', error);
-                                        location.reload(); // Reload anyway if there's an error
-                                    });
+                                location.reload();
                             } else {
                                 alert(data.message || 'Failed to update current election.');
                             }

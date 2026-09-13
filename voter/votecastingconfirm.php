@@ -20,6 +20,8 @@ $selectedVotes = isset($_SESSION['selectedVotes']) ? $_SESSION['selectedVotes'] 
 
 require_once __DIR__ . '/../config/database.php';
 
+validate_voter_election($pdo, 'login.php');
+
 // Fetch positions from the database
 $positions_stmt = $pdo->query("SELECT * FROM positions");
 $positions = $positions_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -374,16 +376,33 @@ $collegeAbbreviations = [
                     },
                     body: JSON.stringify(votes)
                 })
-                .then(response => response.text())
-                .then(text => {
+                .then(response => response.text().then(text => ({
+                    status: response.status,
+                    text
+                })))
+                .then(({ status, text }) => {
+                    let data;
+
                     try {
-                        return JSON.parse(text);
+                        data = JSON.parse(text);
                     } catch (e) {
                         console.error('Server response:', text);
                         throw new Error('Invalid JSON response from server');
                     }
+
+                    if (status === 401) {
+                        alert(data.message);
+                        window.location.href = "login.php";
+                        return null;
+                    }
+
+                    return data;
                 })
                 .then(data => {
+                    if (!data) {
+                        return;
+                    }
+
                     if (data.success) {
                         showSuccessAndRedirect();
                     } else {

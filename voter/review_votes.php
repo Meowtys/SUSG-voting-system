@@ -1,7 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../config/session.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['user'])) {
@@ -10,6 +8,8 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../config/database.php';
+
+validate_voter_election($pdo, 'login.php');
 
 // Check if user has voted by querying the database
 $student_id = $_SESSION['user']['student_id'];

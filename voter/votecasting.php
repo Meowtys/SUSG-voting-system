@@ -11,6 +11,8 @@ $user = $_SESSION['user'];
 
 require_once __DIR__ . '/../config/database.php';
 
+validate_voter_election($pdo, 'login.php');
+
 // Get current election
 $stmt = $pdo->query("SELECT * FROM elections WHERE is_current = 1 LIMIT 1");
 $election = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -169,7 +171,19 @@ foreach ($candidates as $candidate) {
 
         function fetchCandidates(position_id) {
             return fetch(`../technical/voter/fetch_candidates.php?position_id=${position_id}`)
-                .then(response => response.json())
+                .then(response => response.json().then(data => ({
+                    status: response.status,
+                    data
+                })))
+                .then(({ status, data }) => {
+                    if (status === 401) {
+                        alert(data.message);
+                        window.location.href = "login.php";
+                        return [];
+                    }
+
+                    return data;
+                })
                 .then(candidates => {
                     console.log(candidates); // Log fetched candidates
                     return candidates;
@@ -460,8 +474,17 @@ foreach ($candidates as $candidate) {
                         isConfirmation: true
                     })
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(response => response.json().then(data => ({
+                    status: response.status,
+                    data
+                })))
+                .then(({ status, data }) => {
+                    if (status === 401) {
+                        alert(data.message);
+                        window.location.href = "login.php";
+                        return;
+                    }
+
                     if (data.success) {
                         window.location.href = "votecastingconfirm.php";
                     } else {
@@ -589,8 +612,17 @@ foreach ($candidates as $candidate) {
                     },
                     body: JSON.stringify(selectedVotes)
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(response => response.json().then(data => ({
+                    status: response.status,
+                    data
+                })))
+                .then(({ status, data }) => {
+                    if (status === 401) {
+                        alert(data.message);
+                        window.location.href = "login.php";
+                        return;
+                    }
+
                     if (data.success) {
                         alert("Votes submitted successfully!");
                         window.location.href = "homepage.php";

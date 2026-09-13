@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../config/session.php';
 
 if (!isset($_SESSION['user'])) {
     header('Location: login.php');
@@ -7,6 +7,8 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../config/database.php';
+
+validate_voter_election($pdo, 'login.php');
 
 // Get current election
 $stmt = $pdo->query("

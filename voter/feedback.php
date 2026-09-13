@@ -13,6 +13,8 @@ $user = $_SESSION['user'];
 // Include database connection
 require_once __DIR__ . '/../config/database.php';
 
+validate_voter_election($pdo, 'login.php');
+
 // Get current election
 $stmt = $pdo->query("SELECT election_id FROM elections WHERE is_current = 1 LIMIT 1");
 $currentElection = $stmt->fetch(PDO::FETCH_ASSOC);
