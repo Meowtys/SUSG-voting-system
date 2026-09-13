@@ -1,7 +1,5 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/../../config/session.php';
 
 header('Content-Type: application/json');
 
@@ -10,6 +8,8 @@ if (!isset($_SESSION['user'])) {
     echo json_encode(['success' => false, 'message' => 'Access denied']);
     exit;
 }
+
+validate_csrf_token(true);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
