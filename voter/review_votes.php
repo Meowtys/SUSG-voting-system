@@ -184,9 +184,15 @@ foreach ($votes as $vote) {
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="flex items-center bg-white rounded-lg p-4 border border-gray-200">
-                                                        <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
-                                                             src="<?php echo htmlspecialchars($representative['candidate_image']); ?>"
-                                                             alt="<?php echo htmlspecialchars($representative['candidate_name']); ?>">
+                                                        <?php if (!empty($representative['candidate_image'])): ?>
+                                                            <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
+                                                                 src="../<?php echo htmlspecialchars($representative['candidate_image'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                                 alt="<?php echo htmlspecialchars($representative['candidate_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                        <?php else: ?>
+                                                            <div class="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-100 text-gray-400" aria-label="<?php echo htmlspecialchars($representative['candidate_name'], ENT_QUOTES, 'UTF-8'); ?> has no photo">
+                                                                <i class="fas fa-user text-2xl"></i>
+                                                            </div>
+                                                        <?php endif; ?>
                                                         <div class="ml-4">
                                                             <!-- Rest of the existing representative display code -->
                                                             <h4 class="text-lg font-medium text-gray-800">
@@ -274,9 +280,16 @@ foreach ($votes as $vote) {
                                                     <i class="fas fa-ban"></i>
                                                 </div>
                                             <?php else: ?>
-                                                <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
-                                                     src="<?php echo htmlspecialchars($candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']] ?? '../asset/default-candidate.png'); ?>"
-                                                     alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                                <?php $candidateImage = $candidate_images_map[$selectedVotes[$position['position_name']]['candidate_name']] ?? null; ?>
+                                                <?php if (!empty($candidateImage)): ?>
+                                                    <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
+                                                         src="../<?php echo htmlspecialchars($candidateImage, ENT_QUOTES, 'UTF-8'); ?>"
+                                                         alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                <?php else: ?>
+                                                    <div class="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-100 text-gray-400" aria-label="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name'], ENT_QUOTES, 'UTF-8'); ?> has no photo">
+                                                        <i class="fas fa-user text-2xl"></i>
+                                                    </div>
+                                                <?php endif; ?>
                                             <?php endif; ?>
                                             <div class="ml-4">
                                                 <h4 class="text-lg font-medium <?php echo $selectedVotes[$position['position_name']]['candidate_name'] === 'Abstain' ? 'text-yellow-800' : 'text-gray-800'; ?>">

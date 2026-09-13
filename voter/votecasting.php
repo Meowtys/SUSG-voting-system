@@ -269,7 +269,11 @@ foreach ($candidates as $candidate) {
 
                     candidateCard.innerHTML = `
                         <div class="relative aspect-w-4 aspect-h-3">
-                            <img class="w-full h-64 object-cover object-center" src="${candidate.candidate_image}" alt="${candidate.candidate_name}">
+                            ${candidate.candidate_image
+                                ? `<img class="w-full h-64 object-cover object-center" src="../${candidate.candidate_image}" alt="${candidate.candidate_name}">`
+                                : `<div class="w-full h-64 flex items-center justify-center bg-gray-100 text-gray-400" aria-label="${candidate.candidate_name} has no photo">
+                                    <i class="fas fa-user text-6xl"></i>
+                                </div>`}
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div class="absolute top-0 right-0 m-2">
                                 <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded-full shadow-md">

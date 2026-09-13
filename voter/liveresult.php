@@ -550,9 +550,15 @@ foreach ($candidates as $candidate) {
                                         <div class="candidate-card">
                                             <div class="candidate-info">
                                                 <div class="candidate-image-wrapper">
-                                                    <img src="<?= htmlspecialchars($candidate['candidate_image']) ?>" 
-                                                         alt="<?= htmlspecialchars($candidate['candidate_name']) ?>" 
-                                                         class="candidate-image">
+                                                    <?php if (!empty($candidate['candidate_image'])): ?>
+                                                        <img src="../<?= htmlspecialchars($candidate['candidate_image'], ENT_QUOTES, 'UTF-8') ?>"
+                                                             alt="<?= htmlspecialchars($candidate['candidate_name'], ENT_QUOTES, 'UTF-8') ?>"
+                                                             class="candidate-image">
+                                                    <?php else: ?>
+                                                        <div class="candidate-image flex items-center justify-center bg-gray-100 text-gray-400" aria-label="<?= htmlspecialchars($candidate['candidate_name'], ENT_QUOTES, 'UTF-8') ?> has no photo">
+                                                            <i class="fas fa-user text-2xl"></i>
+                                                        </div>
+                                                    <?php endif; ?>
                                                     <?php if ($index === 0 && $candidate['vote_count'] > 0): ?>
                                                         <div class="crown-badge">
                                                             <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">

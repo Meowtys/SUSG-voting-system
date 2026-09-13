@@ -130,9 +130,15 @@ $collegeAbbreviations = [
                                         <div class="grid gap-4">
                                             <?php foreach ($selectedVotes[$position['position_name']] as $representative): ?>
                                                 <div class="flex items-center bg-white rounded-lg p-4 border border-gray-200">
-                                                    <img class="w-16 h-16 rounded-lg object-cover shadow-sm" 
-                                                         src="<?php echo htmlspecialchars($representative['candidate_image']); ?>" 
-                                                         alt="<?php echo htmlspecialchars($representative['candidate_name']); ?>">
+                                                    <?php if (!empty($representative['candidate_image'])): ?>
+                                                        <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
+                                                             src="../<?php echo htmlspecialchars($representative['candidate_image'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                             alt="<?php echo htmlspecialchars($representative['candidate_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                    <?php else: ?>
+                                                        <div class="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-100 text-gray-400" aria-label="<?php echo htmlspecialchars($representative['candidate_name'], ENT_QUOTES, 'UTF-8'); ?> has no photo">
+                                                            <i class="fas fa-user text-2xl"></i>
+                                                        </div>
+                                                    <?php endif; ?>
                                                     <div class="ml-4">
                                                         <h4 class="text-lg font-medium text-gray-800">
                                                             <?php echo htmlspecialchars($representative['candidate_name']); ?>
@@ -212,9 +218,15 @@ $collegeAbbreviations = [
                                     <?php else: ?>
                                         <!-- Candidate Card -->
                                         <div class="flex items-center bg-white rounded-lg p-4 border border-gray-200">
-                                            <img class="w-16 h-16 rounded-lg object-cover shadow-sm" 
-                                                 src="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_image']); ?>" 
-                                                 alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>">
+                                            <?php if (!empty($selectedVotes[$position['position_name']]['candidate_image'])): ?>
+                                                <img class="w-16 h-16 rounded-lg object-cover shadow-sm"
+                                                     src="../<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_image'], ENT_QUOTES, 'UTF-8'); ?>"
+                                                     alt="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            <?php else: ?>
+                                                <div class="w-16 h-16 flex items-center justify-center rounded-lg bg-gray-100 text-gray-400" aria-label="<?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name'], ENT_QUOTES, 'UTF-8'); ?> has no photo">
+                                                    <i class="fas fa-user text-2xl"></i>
+                                                </div>
+                                            <?php endif; ?>
                                             <div class="ml-4">
                                                 <h4 class="text-lg font-medium text-gray-800">
                                                     <?php echo htmlspecialchars($selectedVotes[$position['position_name']]['candidate_name']); ?>
